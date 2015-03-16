@@ -2,6 +2,7 @@ import httplib2
 import os
 import datetime
 
+from apiclient.errors import HttpError
 from apiclient.discovery import build
 from oauth2client import client
 
@@ -88,6 +89,11 @@ def get_id(service):
         # Handle errors in constructing a query.
         print ('There was an error in constructing your query : %s' % error)
 
+    except HttpError, error:
+        # Handle API errors.
+        print ('Arg, there was an API error : %s : %s' %
+               (error.resp.status, error._get_reason()))
+
     except client.AccessTokenRefreshError:
         # Handle Auth errors.
         print ('The credentials have been revoked or expired, please re-run '
@@ -146,6 +152,11 @@ def get_clicked_issue_urls(service, id):
     except TypeError, error:
         # Handle errors in constructing a query.
         print ('There was an error in constructing your query : %s' % error)
+
+    except HttpError, error:
+        # Handle API service errors.
+        print ('There was an API error : %s : %s' %
+               (error.resp.status, error._get_reason()))
 
 
 if __name__ == '__main__':
