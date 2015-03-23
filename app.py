@@ -1,6 +1,7 @@
 import httplib2
 import os
 import datetime
+import json
 
 from apiclient.errors import HttpError
 from apiclient.discovery import build
@@ -32,8 +33,9 @@ def index():
 
     id = get_id(service)
     results = get_clicked_issue_urls(service, id)
+    clicked_issues = cleanup_clicked_issues(results)
 
-    return jsonify(results)
+    return json.dumps(clicked_issues, indent=4)
 
 
 @app.route('/login')
@@ -157,6 +159,20 @@ def get_clicked_issue_urls(service, id):
         # Handle API service errors.
         print ('There was an API error : %s : %s' %
                (error.resp.status, error._get_reason()))
+
+
+def cleanup_clicked_issues(results):
+    ''' Turn Google Analytics results into nice labeled json '''
+
+    clicked_issues = []
+    for row in results["rows"]:
+        clicked_issue = {
+            "issue" : row[0],
+            "clicks" : row[1]
+        }
+        clicked_issues.append(clicked_issue)
+
+    return clicked_issues
 
 
 if __name__ == '__main__':
