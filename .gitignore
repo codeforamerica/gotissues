@@ -58,3 +58,4 @@ target/
 
 # Virtual Environment
 venv-*
+.venv

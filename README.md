@@ -12,6 +12,7 @@ This project is just starting out. We're still figuring out the best way to get 
 ### Installation
 #### Requirements
 * `pip` and `virtualenv` - https://github.com/codeforamerica/howto/blob/master/Python-Virtualenv.md
+* Google Analytics credentials for your `.env` file. Ping @ondrae to get the credentials, then fill in your `env.sample` file. Then `mv env.sample .env`
 
 ```
 git clone https://github.com/codeforamerica/gotissues
