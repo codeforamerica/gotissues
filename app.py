@@ -42,7 +42,7 @@ def login():
     flow = client.OAuth2WebServerFlow(client_id=CLIENT_ID,
                                       client_secret=CLIENT_SECRET,
                                       scope='https://www.googleapis.com/auth/analytics.readonly',
-                                      redirect_uri='http://localhost:5000/oauth2callback',
+                                      redirect_uri=request.url_root + '/oauth2callback',
                                       access_type="offline")
 
     auth_uri = flow.step1_get_authorize_url()
