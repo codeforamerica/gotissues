@@ -9,11 +9,10 @@ from oauth2client import client
 
 from flask import Flask, session, request, redirect, url_for, jsonify
 
-# LOGGING
-# logging.basicConfig(filename='debug.log',level=logging.DEBUG)
 
 # CONFIG
 app = Flask(__name__)
+app.secret_key = os.environ['SECRET_KEY']
 
 CLIENT_ID = os.environ['CLIENT_ID']
 CLIENT_SECRET = os.environ['CLIENT_SECRET']
