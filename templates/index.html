@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Got Issues</title>
+    <!-- Check the CfA Style Guide at https://style.codeforamerica.org/ -->
+    <link rel="stylesheet" href="https://style.codeforamerica.org/style/css/main.css">
+    <link rel="stylesheet" href="https://style.codeforamerica.org/style/css/layout.css" media="all and (min-width: 40em)">
+
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <link rel="shortcut icon" type="image/x-icon" href="https://style.codeforamerica.org/1/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" href="https://style.codeforamerica.org/1/style/favicons/60x60/flag-red.png"/>
+
+  </head>
+
+  <body>
+
+    <section>
+      <div class="layout-breve">
+
+        <h1>Got Issues?</h1>
+        <h3>Does the <a href="http://www.codeforamerica.org/geeks/civicissues">civic issue finder</a> actually work? Lets explore the data to find out.</h3>
+
+        <div class="layout-crotchet">
+          <h1>Total Clicks</h1>
+          <h1 class="number">{{ total_clicks }}</h1>
+        </div>
+
+        <div class="layout-crotchet">
+          <h1>Top Ten Clicked Issues</h1>
+          {% for issue in top_ten_clicked_issues %}
+            <p>Issue: <a href="{{ issue[0] }}">{{ issue[0] }}</a></p>
+            <p>Clicks: {{ issue[1] }}</p>
+          {% endfor %}
+        </div>
+
+        <div class="layout-crotchet">
+          <h1>Most Recently Clicked Issue</h1>
+          <a href=" {{ most_recent_clicked_issue }} ">{{ most_recent_clicked_issue }}</a>
+        </div>
+
+      </div>
+    </section>
+
+  </body>
+
+</html>
