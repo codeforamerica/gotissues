@@ -23,6 +23,12 @@ pip install -r requirements.txt
 ```
 
 ### To Run
+Either use
 ```
-env `cat .env` python app.py
+source .env
+python run.py
+```
+or to mimic Heroku use
+```
+foreman start
 ```
