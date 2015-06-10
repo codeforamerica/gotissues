@@ -7,7 +7,7 @@ from httplib2 import Http
 from oauth2client.client import SignedJwtAssertionCredentials
 from apiclient.discovery import build
 
-from flask import Flask
+from flask import Flask, render_template
 
 # Logging Setup
 logging.basicConfig(level=logging.INFO)
@@ -39,43 +39,66 @@ service = login_to_google_analytics()
 #
 # Functions used in Routes
 #
-def get_clicked_issue_urls(service, id):
-    ''' Get the each issue and the total times its been clicked in desc order '''
+
+def get_total_clicks():
+    ''' Get the total amount of clicks ever '''
     results = service.data().ga().get(
-        ids="ga:" + id,
+        ids="ga:" + GOOGLE_ANALYTICS_PROFILE_ID,
+        start_date='2014-08-24',
+        end_date=datetime.date.today().strftime("%Y-%m-%d"),
+        metrics='ga:totalEvents').execute()
+
+    total_clicks = results["rows"][0][0]
+    return total_clicks
+
+
+def get_top_ten_clicked_issues():
+    ''' Get the top ten clicked issues '''
+    results = service.data().ga().get(
+        ids="ga:" + GOOGLE_ANALYTICS_PROFILE_ID,
         start_date='2014-08-24',
         end_date=datetime.date.today().strftime("%Y-%m-%d"),
         metrics='ga:totalEvents',
         dimensions='ga:eventLabel',
         sort='-ga:totalEvents',
-        # Some older entries have different labels. Filter them out
+        # Only include github events
         filters='ga:eventLabel=@github.com',
+        max_results=10,
         fields='rows').execute()
 
-    return results
+    top_ten_clicked_issues = results["rows"]
+    return top_ten_clicked_issues
 
 
-def cleanup_clicked_issues(results):
-    ''' Turn Google Analytics results into nice labeled json '''
+def get_most_recent_clicked_issue():
+    ''' Get the most recently clicked link '''
+    results = service.data().ga().get(
+        ids="ga:" + GOOGLE_ANALYTICS_PROFILE_ID,
+        start_date='7daysAgo',
+        end_date=datetime.date.today().strftime("%Y-%m-%d"),
+        metrics='ga:totalEvents',
+        dimensions='ga:eventLabel, ga:date',
+        # Only include github events
+        filters='ga:eventLabel=@github.com',
+        max_results=1,
+        fields='rows').execute()
 
-    clicked_issues = []
-    for row in results["rows"]:
-        clicked_issue = {
-            "issue" : row[0],
-            "clicks" : row[1]
-        }
-        clicked_issues.append(clicked_issue)
+    most_recent_clicked_issue = results["rows"][0][0]
+    return most_recent_clicked_issue
 
-    return clicked_issues
 
 #
 # Routes
 #
 @app.route("/")
 def index():
-    results = get_clicked_issue_urls(service, GOOGLE_ANALYTICS_PROFILE_ID)
-    clicked_issues = cleanup_clicked_issues(results)
-    return json.dumps(clicked_issues, indent=4)
+    total_clicks = get_total_clicks()
+    top_ten_clicked_issues = get_top_ten_clicked_issues()
+    most_recent_clicked_issue = get_most_recent_clicked_issue()
+
+    return render_template("index.html",total_clicks=total_clicks, 
+        top_ten_clicked_issues=top_ten_clicked_issues, 
+        most_recent_clicked_issue=most_recent_clicked_issue)
 
 
 if __name__ == '__main__':
