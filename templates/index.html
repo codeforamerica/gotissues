@@ -23,6 +23,12 @@
         <h1>Got Issues?</h1>
         <h3>Does the <a href="http://www.codeforamerica.org/geeks/civicissues">civic issue finder</a> actually work? Lets explore the data to find out.</h3>
 
+        <div id="embed-api-auth-container"></div>
+        <div id="map"></div>
+        <div id="cities"></div>
+        <div id="pages"></div>
+        <div id="view-selector-container" hidden></div>
+
         <div class="layout-crotchet">
           <h1>Total Clicks</h1>
           <h1 class="number">{{ total_clicks }}</h1>
@@ -45,5 +51,114 @@
     </section>
 
   </body>
+
+  <script>
+(function(w,d,s,g,js,fs){
+  g=w.gapi||(w.gapi={});g.analytics={q:[],ready:function(f){this.q.push(f);}};
+  js=d.createElement(s);fs=d.getElementsByTagName(s)[0];
+  js.src='https://apis.google.com/js/platform.js';
+  fs.parentNode.insertBefore(js,fs);js.onload=function(){g.load('analytics');};
+}(window,document,'script'));
+</script>
+
+<script>
+
+gapi.analytics.ready(function() {
+
+  /**
+   * Authorize the user immediately if the user has already granted access.
+   * If no access has been created, render an authorize button inside the
+   * element with the ID "embed-api-auth-container".
+   */
+  gapi.analytics.auth.authorize({
+    serverAuth: {
+      access_token: "{{ access_token }}"
+    }
+  });
+
+
+  /**
+   * Create a new ViewSelector instance to be rendered inside of an
+   * element with the id "view-selector-container".
+   */
+  var viewSelector = new gapi.analytics.ViewSelector({
+    container: 'view-selector-container'
+  });
+
+  // Render the view selector to the page.
+  viewSelector.execute();
+
+  /**
+   * Create a new DataChart instance with the given query parameters
+   * and Google chart options. It will be rendered inside an element
+   * with the id "chart-container".
+   */
+  var country = new gapi.analytics.googleCharts.DataChart({
+    query: {
+      metrics: 'ga:totalEvents',
+      dimensions: 'ga:country',
+      'start-date': '2014-08-24',
+      'end-date': 'yesterday'
+    },
+    chart: {
+      container: 'map',
+      type: 'GEO',
+      options: {
+        width: '100%'
+      }
+    }
+  });
+
+  var cities = new gapi.analytics.googleCharts.DataChart({
+    query: {
+      metrics: 'ga:totalEvents',
+      dimensions: 'ga:city',
+      'start-date': '2014-08-24',
+      'end-date': 'yesterday',
+      sort : '-ga:totalEvents',
+      'max-results' : 10
+    },
+    chart: {
+      container: 'cities',
+      type: 'GEO',
+      options: {
+        width: '100%',
+        region: 'US',
+        displayMode: 'markers'
+      }
+    }
+  });
+
+  var pages = new gapi.analytics.googleCharts.DataChart({
+    query: {
+      metrics: 'ga:totalEvents',
+      dimensions: 'ga:pagePath',
+      filters : 'ga:eventLabel=@github.com',
+      'start-date': '2014-08-24',
+      'end-date': 'yesterday',
+      sort : '-ga:totalEvents',
+      'max-results' : 10
+    },
+    chart: {
+      container: 'pages',
+      type: 'TABLE',
+      options: {
+        width: '100%'
+      }
+    }
+  });
+
+
+  /**
+   * Render the dataChart on the page whenever a new view is selected.
+   */
+  viewSelector.on('change', function(ids) {
+    country.set({query: {ids: ids}}).execute();
+    cities.set({query: {ids: ids}}).execute();
+    pages.set({query: {ids: ids}}).execute();
+  });
+
+});
+</script>
 
 </html>

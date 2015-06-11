@@ -31,9 +31,11 @@ def login_to_google_analytics():
     http = Http()
     credentials.authorize(http)
     service = build("analytics", "v3", http=http)
-    return service
+    return service, credentials.access_token
 
-service = login_to_google_analytics()
+service, access_token = login_to_google_analytics()
+
+
 
 
 #
@@ -42,13 +44,20 @@ service = login_to_google_analytics()
 
 def get_total_clicks():
     ''' Get the total amount of clicks ever '''
+
     results = service.data().ga().get(
         ids="ga:" + GOOGLE_ANALYTICS_PROFILE_ID,
         start_date='2014-08-24',
         end_date=datetime.date.today().strftime("%Y-%m-%d"),
-        metrics='ga:totalEvents').execute()
+        metrics='ga:totalEvents',
+        dimensions='ga:eventCategory').execute()
 
-    total_clicks = results["rows"][0][0]
+    # Can't seem to filter on ga:eventCategory in the query
+    # so we do it by code.
+    for row in results["rows"]:
+        if row[0] == "Civic Issues":
+            total_clicks = row[1]
+
     return total_clicks
 
 
@@ -95,10 +104,10 @@ def index():
     total_clicks = get_total_clicks()
     top_ten_clicked_issues = get_top_ten_clicked_issues()
     most_recent_clicked_issue = get_most_recent_clicked_issue()
-
     return render_template("index.html",total_clicks=total_clicks, 
         top_ten_clicked_issues=top_ten_clicked_issues, 
-        most_recent_clicked_issue=most_recent_clicked_issue)
+        most_recent_clicked_issue=most_recent_clicked_issue,
+        access_token=access_token)
 
 
 if __name__ == '__main__':
