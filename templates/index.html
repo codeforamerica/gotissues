@@ -124,18 +124,21 @@ gapi.analytics.ready(function() {
    * and Google chart options. It will be rendered inside an element
    * with the id "chart-container".
    */
+
   var country = new gapi.analytics.googleCharts.DataChart({
     query: {
       metrics: 'ga:totalEvents',
       dimensions: 'ga:country',
+      filters : 'ga:eventCategory=@Civic Issues',
       'start-date': '2014-08-24',
-      'end-date': 'yesterday'
+      'end-date': 'today'
     },
     chart: {
       container: 'map',
       type: 'GEO',
       options: {
-        width: '100%'
+        width: '100%',
+        legend: 'none'
       }
     }
   });
