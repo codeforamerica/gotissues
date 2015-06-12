@@ -7,7 +7,7 @@ Does the [civic issue finder](http://www.codeforamerica.org/geeks/civicissues) a
 3. Perhaps visualize number of clicks, number of closed issues, number of commented on issues, relationships between people.
 
 ### Status
-This project is just starting out. We're still figuring out the best way to get analytics on the issues being clicked on.
+This project is just starting out.
 
 ### Installation
 #### Requirements

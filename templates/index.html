@@ -17,36 +17,67 @@
 
   <body>
 
+    <header class="slab-blue">
+      <div class="layout-breve">
+        <h1>Got Issues?</h1>
+        <p>Does the <a href="http://www.codeforamerica.org/geeks/civicissues">civic issue finder</a> actually work? Lets explore the data to find out.</p>
+    </header>
+
     <section>
       <div class="layout-breve">
 
-        <h1>Got Issues?</h1>
-        <h3>Does the <a href="http://www.codeforamerica.org/geeks/civicissues">civic issue finder</a> actually work? Lets explore the data to find out.</h3>
-
-        <div id="embed-api-auth-container"></div>
-        <div id="map"></div>
-        <div id="cities"></div>
-        <div id="pages"></div>
-        <div id="view-selector-container" hidden></div>
+        <h2>Goal One: Increase Reach</h2>
+        <p>Increase page views and clicks.</p>
 
         <div class="layout-crotchet">
-          <h1>Total Clicks</h1>
+          <h2>Total Clicks</h2>
           <h1 class="number">{{ total_clicks }}</h1>
         </div>
 
         <div class="layout-crotchet">
-          <h1>Top Ten Clicked Issues</h1>
-          {% for issue in top_ten_clicked_issues %}
-            <p>Issue: <a href="{{ issue[0] }}">{{ issue[0] }}</a></p>
-            <p>Clicks: {{ issue[1] }}</p>
-          {% endfor %}
+          <h2>Total Page Views</h2>
+          <h1 class="number">{{ total_page_views }}</h1>
         </div>
 
         <div class="layout-crotchet">
-          <h1>Most Recently Clicked Issue</h1>
+          <h2>Clicks Per View</h2>
+          <h1 class="number">{{ clicks_per_view }} %</h1>
+        </div>
+
+      </div>
+      <div class="layout-breve">
+
+        <div class="layout-minim">
+          <h2>Top Three Clicked Issues</h2>
+          <p>Not a good thing. Why havent they been closed yet?</p>
+          {% for issue in top_clicked_issues %}
+            <p><a href="{{ issue[0] }}">{{ issue[0] }}</a> Clicks: {{ issue[1] }}</p>
+          {% endfor %}
+        </div>
+
+        <div class="layout-minim">
+          <h2>Most Recently Clicked Issue</h2>
           <a href=" {{ most_recent_clicked_issue }} ">{{ most_recent_clicked_issue }}</a>
         </div>
 
+      </div>
+      <div class="layout-breve">
+
+        <h2>Where</h2>
+        <p>I mostly included this to try out the Google Analytics Embed API.</p>
+        <div id="embed-api-auth-container"></div>
+        <div id="map" class="layout-major-invert"></div>
+        <!-- <div id="cities"></div>
+        <div id="pages"></div> -->
+        <div id="view-selector-container" hidden></div>
+
+      </div>
+    </section>
+
+    <section>
+      <div class="layout-breve">
+        <h2>Goal Two: Increase Effectiveness</h2>
+        <p>How effective is a click? Lets explore the GitHub API for the clicked issues to find out.</p>
       </div>
     </section>
 
@@ -109,44 +140,44 @@ gapi.analytics.ready(function() {
     }
   });
 
-  var cities = new gapi.analytics.googleCharts.DataChart({
-    query: {
-      metrics: 'ga:totalEvents',
-      dimensions: 'ga:city',
-      'start-date': '2014-08-24',
-      'end-date': 'yesterday',
-      sort : '-ga:totalEvents',
-      'max-results' : 10
-    },
-    chart: {
-      container: 'cities',
-      type: 'GEO',
-      options: {
-        width: '100%',
-        region: 'US',
-        displayMode: 'markers'
-      }
-    }
-  });
+  // var cities = new gapi.analytics.googleCharts.DataChart({
+  //   query: {
+  //     metrics: 'ga:totalEvents',
+  //     dimensions: 'ga:city',
+  //     'start-date': '2014-08-24',
+  //     'end-date': 'yesterday',
+  //     sort : '-ga:totalEvents',
+  //     'max-results' : 10
+  //   },
+  //   chart: {
+  //     container: 'cities',
+  //     type: 'GEO',
+  //     options: {
+  //       width: '100%',
+  //       region: 'US',
+  //       displayMode: 'markers'
+  //     }
+  //   }
+  // });
 
-  var pages = new gapi.analytics.googleCharts.DataChart({
-    query: {
-      metrics: 'ga:totalEvents',
-      dimensions: 'ga:pagePath',
-      filters : 'ga:eventLabel=@github.com',
-      'start-date': '2014-08-24',
-      'end-date': 'yesterday',
-      sort : '-ga:totalEvents',
-      'max-results' : 10
-    },
-    chart: {
-      container: 'pages',
-      type: 'TABLE',
-      options: {
-        width: '100%'
-      }
-    }
-  });
+  // var pages = new gapi.analytics.googleCharts.DataChart({
+  //   query: {
+  //     metrics: 'ga:totalEvents',
+  //     dimensions: 'ga:pagePath',
+  //     filters : 'ga:eventLabel=@github.com',
+  //     'start-date': '2014-08-24',
+  //     'end-date': 'yesterday',
+  //     sort : '-ga:totalEvents',
+  //     'max-results' : 10
+  //   },
+  //   chart: {
+  //     container: 'pages',
+  //     type: 'TABLE',
+  //     options: {
+  //       width: '100%'
+  //     }
+  //   }
+  // });
 
 
   /**
@@ -154,8 +185,8 @@ gapi.analytics.ready(function() {
    */
   viewSelector.on('change', function(ids) {
     country.set({query: {ids: ids}}).execute();
-    cities.set({query: {ids: ids}}).execute();
-    pages.set({query: {ids: ids}}).execute();
+    // cities.set({query: {ids: ids}}).execute();
+    // pages.set({query: {ids: ids}}).execute();
   });
 
 });

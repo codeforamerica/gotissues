@@ -36,33 +36,46 @@ def login_to_google_analytics():
 service, access_token = login_to_google_analytics()
 
 
-
-
 #
 # Functions used in Routes
 #
 
 def get_total_clicks():
     ''' Get the total amount of clicks ever '''
-
     results = service.data().ga().get(
         ids="ga:" + GOOGLE_ANALYTICS_PROFILE_ID,
         start_date='2014-08-24',
         end_date=datetime.date.today().strftime("%Y-%m-%d"),
         metrics='ga:totalEvents',
-        dimensions='ga:eventCategory').execute()
+        filters='ga:eventCategory=@Civic Issues').execute()
 
-    # Can't seem to filter on ga:eventCategory in the query
-    # so we do it by code.
-    for row in results["rows"]:
-        if row[0] == "Civic Issues":
-            total_clicks = row[1]
+    total_clicks = results["rows"][0][0]
 
     return total_clicks
 
 
-def get_top_ten_clicked_issues():
-    ''' Get the top ten clicked issues '''
+def get_total_page_views():
+    ''' Get the total page views for the civic issue finder. '''
+    results = service.data().ga().get(
+        ids="ga:" + GOOGLE_ANALYTICS_PROFILE_ID,
+        start_date='2014-08-24',
+        end_date=datetime.date.today().strftime("%Y-%m-%d"),
+        metrics='ga:pageviews',
+        filters='ga:pagePath=@civicissues',
+        max_results=10).execute()
+
+    total_page_views = results["rows"][0][0]
+    return total_page_views
+
+
+def get_percentage_of_views_with_clicks(total_clicks, total_page_views):
+    ''' What percentage of views have a click? '''
+    clicks_per_view = ( float(total_clicks) / float(total_page_views) ) * 100
+    return int(clicks_per_view)
+
+
+def get_top_clicked_issues():
+    ''' Get the top clicked issues '''
     results = service.data().ga().get(
         ids="ga:" + GOOGLE_ANALYTICS_PROFILE_ID,
         start_date='2014-08-24',
@@ -70,27 +83,25 @@ def get_top_ten_clicked_issues():
         metrics='ga:totalEvents',
         dimensions='ga:eventLabel',
         sort='-ga:totalEvents',
-        # Only include github events
-        filters='ga:eventLabel=@github.com',
-        max_results=10,
+        filters='ga:eventCategory=@Civic Issues',
+        max_results=3,
         fields='rows').execute()
 
-    top_ten_clicked_issues = results["rows"]
-    return top_ten_clicked_issues
+    top_clicked_issues = results["rows"]
+    return top_clicked_issues
 
 
 def get_most_recent_clicked_issue():
     ''' Get the most recently clicked link '''
     results = service.data().ga().get(
         ids="ga:" + GOOGLE_ANALYTICS_PROFILE_ID,
-        start_date='7daysAgo',
+        start_date='1daysAgo',
         end_date=datetime.date.today().strftime("%Y-%m-%d"),
         metrics='ga:totalEvents',
         dimensions='ga:eventLabel, ga:date',
-        # Only include github events
-        filters='ga:eventLabel=@github.com',
-        max_results=1,
-        fields='rows').execute()
+        filters='ga:eventCategory=@Civic Issues',
+        sort='-ga:date',
+        max_results=1).execute()
 
     most_recent_clicked_issue = results["rows"][0][0]
     return most_recent_clicked_issue
@@ -102,11 +113,15 @@ def get_most_recent_clicked_issue():
 @app.route("/")
 def index():
     total_clicks = get_total_clicks()
-    top_ten_clicked_issues = get_top_ten_clicked_issues()
+    top_clicked_issues = get_top_clicked_issues()
     most_recent_clicked_issue = get_most_recent_clicked_issue()
-    return render_template("index.html",total_clicks=total_clicks, 
-        top_ten_clicked_issues=top_ten_clicked_issues, 
+    total_page_views = get_total_page_views()
+    clicks_per_view = get_percentage_of_views_with_clicks(total_clicks, total_page_views)
+    return render_template("index.html",total_clicks=total_clicks,
+        total_page_views=total_page_views,
+        top_clicked_issues=top_clicked_issues, 
         most_recent_clicked_issue=most_recent_clicked_issue,
+        clicks_per_view=clicks_per_view,
         access_token=access_token)
 
 
