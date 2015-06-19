@@ -84,25 +84,40 @@ def get_top_clicked_issues():
         dimensions='ga:eventLabel',
         sort='-ga:totalEvents',
         filters='ga:eventCategory=@Civic Issues',
-        max_results=3,
+        max_results=5,
         fields='rows').execute()
 
     top_clicked_issues = results["rows"]
     return top_clicked_issues
 
+def get_least_clicked_issues():
+    ''' Get the least clicked issues '''
+    results = service.data().ga().get(
+        ids="ga:" + GOOGLE_ANALYTICS_PROFILE_ID,
+        start_date='2014-08-24',
+        end_date=datetime.date.today().strftime("%Y-%m-%d"),
+        metrics='ga:totalEvents',
+        dimensions='ga:eventLabel',
+        sort='ga:totalEvents',
+        filters='ga:eventCategory=@Civic Issues',
+        max_results=3,
+        fields='rows').execute()
+
+    least_clicked_issues = results["rows"]
+    return least_clicked_issues
 
 def get_most_recent_clicked_issue():
-    ''' Get the most recently clicked link '''
+    ''' Get the 5 most recently clicked links'''
     results = service.data().ga().get(
         ids="ga:" + GOOGLE_ANALYTICS_PROFILE_ID,
         start_date='1daysAgo',
         end_date=datetime.date.today().strftime("%Y-%m-%d"),
         metrics='ga:totalEvents',
         dimensions='ga:eventLabel, ga:date',
-        filters='ga:eventCategory=@Civic Issues',
+        filters='ga:eventCategory==Civic Issues',
         sort='-ga:date',
         max_results=1).execute()
-
+    # we should try to get the github statuses of each recently clicked issue
     most_recent_clicked_issue = results["rows"][0][0]
     return most_recent_clicked_issue
 
@@ -113,13 +128,15 @@ def get_most_recent_clicked_issue():
 @app.route("/")
 def index():
     total_clicks = get_total_clicks()
-    top_clicked_issues = get_top_clicked_issues()
-    most_recent_clicked_issue = get_most_recent_clicked_issue()
     total_page_views = get_total_page_views()
+    top_clicked_issues = get_top_clicked_issues()
+    least_clicked_issues = get_least_clicked_issues()
+    most_recent_clicked_issue = get_most_recent_clicked_issue()
     clicks_per_view = get_percentage_of_views_with_clicks(total_clicks, total_page_views)
     return render_template("index.html",total_clicks=total_clicks,
         total_page_views=total_page_views,
-        top_clicked_issues=top_clicked_issues, 
+        top_clicked_issues=top_clicked_issues,
+        least_clicked_issues=least_clicked_issues, 
         most_recent_clicked_issue=most_recent_clicked_issue,
         clicks_per_view=clicks_per_view,
         access_token=access_token)

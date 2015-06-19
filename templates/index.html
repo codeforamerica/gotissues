@@ -56,8 +56,16 @@
         </div>
 
         <div class="layout-minim">
+          <h2>Bottom Ten Clicked Issues</h2>
+          <p>Not a good thing. Why haven't they been seen?</p>
+          {% for issue in least_clicked_issues %}
+            <p><a href="{{ issue[0] }}">{{ issue[0] }}</a> Clicks: {{ issue[1] }}</p>
+          {% endfor %}
+        </div>
+
+        <div class="layout-minim">
           <h2>Most Recently Clicked Issue</h2>
-          <a href=" {{ most_recent_clicked_issue }} ">{{ most_recent_clicked_issue }}</a>
+            <a href=" {{ most_recent_clicked_issue }} ">{{ most_recent_clicked_issue }}</a>
         </div>
 
       </div>
