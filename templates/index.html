@@ -48,7 +48,7 @@
       <div class="layout-breve">
 
         <div class="layout-minim">
-          <h2>Top Three Clicked Issues</h2>
+          <h2>Top Five Clicked Issues</h2>
           <p>Not a good thing. Why havent they been closed yet?</p>
           {% for issue in top_clicked_issues %}
             <p><a href="{{ issue[0] }}">{{ issue[0] }}</a> Clicks: {{ issue[1] }}</p>
@@ -56,7 +56,7 @@
         </div>
 
         <div class="layout-minim">
-          <h2>Bottom Ten Clicked Issues</h2>
+          <h2>Bottom Five Clicked Issues</h2>
           <p>Not a good thing. Why haven't they been seen?</p>
           {% for issue in least_clicked_issues %}
             <p><a href="{{ issue[0] }}">{{ issue[0] }}</a> Clicks: {{ issue[1] }}</p>

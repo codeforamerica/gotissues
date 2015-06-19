@@ -102,7 +102,10 @@ def get_top_clicked_issues():
         fields='rows').execute()
 
     top_clicked_issues = results["rows"]
+
     return top_clicked_issues
+
+# Define a route that measures most recent click of the last top issues
 
 def get_least_clicked_issues():
     ''' Get the least clicked issues '''
@@ -114,7 +117,7 @@ def get_least_clicked_issues():
         dimensions='ga:eventLabel',
         sort='ga:totalEvents',
         filters='ga:eventCategory=@Civic Issues',
-        max_results=3,
+        max_results=5,
         fields='rows').execute()
 
     least_clicked_issues = results["rows"]
