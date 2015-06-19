@@ -59,20 +59,23 @@
   <div class="layout-breve">
   <div class="layout-minor">
     <h2>Recently clicked issues</h2>
-    <select style="max-width:95%;">
+    <form action="/test" method="post">
+    <select name="issue" style="max-width:95%;">
       {% for issue in dates_of_issues %}
-        <option><p>{{issue[1]}} was clicked on {{issue[0]}}</p></option>
+        <p><option>{{issue[1]}}</option></p> Was last clicked on  {{issue[0]}}
       {% endfor %}
     once selected print below.
     </select>
+    <input class="check1" action="/test" method="post" type="submit" value="Check Github!">
+  </form>
   </div>
 
   <div class="layout-major">
     <h2>How are those recently clicked issues doing on Github?</h2>
       <h3>Open/Closed + Last Updated</h3>
-      {% for issue in recently_clicked_github %}
-        Project <em><p>{{issue['title']}}</em> has a current state of <strong>{{issue['state']}}</strong> and was last updated <em>{{issue['updated_at']}}</em><p>
-      {% endfor %}
+        {% for issue in recently_clicked_github %}
+          Project <em><p>{{issue['title']}}</em> has a current state of <strong>{{issue['state']}}</strong> and was last updated <em>{{issue['updated_at']}}</em><p>
+        {% endfor %}
   </div>
 </div>
 

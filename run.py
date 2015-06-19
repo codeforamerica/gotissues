@@ -8,7 +8,7 @@ from httplib2 import Http
 from oauth2client.client import SignedJwtAssertionCredentials
 from apiclient.discovery import build
 
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 
 # Logging Setup
 logging.basicConfig(level=logging.INFO)
@@ -212,8 +212,15 @@ def get_all_github_data(all_issues):
     for link in all_issues:
         ga_github.append(get_github_auth(url + link[1][19:]).json())
         total += 1
-        print "Completed " + str(total*100/20) +  " percent!" 
+        print "Completed " + str(total*100/len(all_issues)) +  " percent!"
     return ga_github
+
+def get_github_data(issue):
+    # Let's see if I can get some issue comment data from the top_clicked_issues'''
+    url = "https://api.github.com/repos/"
+    # define a stripping link method that takes away "https://github.com/"
+    git_data = get_github_auth(url + issue[19:]).json()
+    return git_data
 
 def get_date_of_issues():
     results = service.data().ga().get(
@@ -223,7 +230,7 @@ def get_date_of_issues():
         metrics='ga:totalEvents',
         dimensions='ga:date, ga:eventLabel',
         sort='-ga:date',
-        max_results=20,
+        max_results=5,
         #fields='rows, columnHeaders'
         filters='ga:eventCategory==Civic Issues;ga:eventLabel=@github.com').execute()
 
@@ -267,14 +274,19 @@ def index():
         github_data = github_data,
         access_token=access_token)
 
-@app.route("/test")
+@app.route("/test", methods=["GET", "POST"])
 def test():
     top_cities = get_top_city_clicks()
     issue_list = get_all_the_issues()
     total_issues = len(issue_list)
     no_cities = len(top_cities)
     dates_of_issues = get_date_of_issues()
-    recently_clicked_github = get_all_github_data(dates_of_issues)
+    if request.method == "POST":
+        data_list = []
+        data_list.append(get_github_data(request.form["issue"]))
+        recently_clicked_github = data_list
+    else:
+        recently_clicked_github = get_all_github_data(dates_of_issues)
     #all_github_data = get_all_github_data(issue_list) Takes like 4-5 minutes
     return render_template("test.html", recently_clicked_github = recently_clicked_github, dates_of_issues=dates_of_issues, no_cities=no_cities, total_issues=total_issues, top_cities=top_cities, issue_list=issue_list)
 
