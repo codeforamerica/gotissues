@@ -147,8 +147,9 @@ def get_most_recent_clicked_issue():
 def get_stripped_url(url):
     #handle other urls later
     if url.startswith('https://github.com/'):
-        url = url[19:]
-    return url
+        return url[19:]
+    else:
+        return url
 
 def get_top_github_data():
     ''' Let's see if I can get some issue comment data from the top_clicked_issues'''
@@ -201,6 +202,20 @@ def get_all_the_issues():
     total_issues=results["rows"]
     return total_issues
 
+
+def get_all_github_data(all_issues):
+    # Let's see if I can get some issue comment data from the top_clicked_issues'''
+    ga_github = []
+    url = "https://api.github.com/repos/"
+    total = 0
+    # define a stripping link method that takes away "https://github.com/"
+    for link in all_issues:
+        ga_github.append(get_github_auth(url + link[0][19:]).json())
+        total += 1
+        print "Completed " + str(total*100/972) +  " percent!" 
+    return ga_github
+
+
 #
 # Routes
 #
@@ -229,7 +244,7 @@ def test():
     issue_list = get_all_the_issues()
     total_issues = len(issue_list)
     no_cities = len(top_cities)
-    #total_github_data = get_total_github_data()
+    #all_github_data = get_all_github_data(issue_list) Takes like 4-5 minutes
     return render_template("test.html", no_cities=no_cities, total_issues=total_issues, top_cities=top_cities, issue_list=issue_list)
 
 
