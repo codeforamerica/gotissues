@@ -177,7 +177,7 @@ def get_top_city_clicks():
         end_date=datetime.date.today().strftime("%Y-%m-%d"),
         metrics='ga:totalEvents',
         dimensions='ga:city',
-        max_results=10,
+        max_results=5,
         sort='-ga:totalEvents',
         filters='ga:eventCategory=@Civic Issues').execute()
 
@@ -228,8 +228,9 @@ def test():
     top_cities = get_top_city_clicks()
     issue_list = get_all_the_issues()
     total_issues = len(issue_list)
+    no_cities = len(top_cities)
     #total_github_data = get_total_github_data()
-    return render_template("test.html", total_issues=total_issues, top_cities=top_cities, issue_list=issue_list)
+    return render_template("test.html", no_cities=no_cities, total_issues=total_issues, top_cities=top_cities, issue_list=issue_list)
 
 
 if __name__ == '__main__':

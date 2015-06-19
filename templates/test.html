@@ -24,7 +24,7 @@
     </header>
 
   <div class="layout-breve">
-        <h2>Where are the top clicks coming from</h2>
+        <h2>Top {{no_cities}} cities by click source</h2>
           {% for data in top_cities%}
             <p>City: {{data[0]}}. Clicks from that City: {{data[1]}}</p>
           {% endfor %}
@@ -34,9 +34,9 @@
         <h2>Listing all Issues</h2>
         <h3>We have a lot of them: <strong>{{total_issues}}</strong> Issues total!</h3>
         <h3>List of issues: {{total_github_data}}</h3>
-        <select>
+        <select onchange="location = this.options[this.selectedIndex].value;">
         {% for issue in issue_list %}
-          <a href="{{issue[0]}}"><option><p>{{issue[0]}}</p></option></a>
+          <option value="{{issue[0]}}"><p>{{issue[0]}}</p></option>
         {% endfor %}
         </select>
   </div>
