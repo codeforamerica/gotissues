@@ -210,10 +210,39 @@ def get_all_github_data(all_issues):
     total = 0
     # define a stripping link method that takes away "https://github.com/"
     for link in all_issues:
-        ga_github.append(get_github_auth(url + link[0][19:]).json())
+        ga_github.append(get_github_auth(url + link[1][19:]).json())
         total += 1
-        print "Completed " + str(total*100/972) +  " percent!" 
+        print "Completed " + str(total*100/20) +  " percent!" 
     return ga_github
+
+def get_date_of_issues():
+    results = service.data().ga().get(
+        ids="ga:" + GOOGLE_ANALYTICS_PROFILE_ID,
+        start_date='2014-08-24',
+        end_date=datetime.date.today().strftime("%Y-%m-%d"),
+        metrics='ga:totalEvents',
+        dimensions='ga:date, ga:eventLabel',
+        sort='-ga:date',
+        max_results=20,
+        #fields='rows, columnHeaders'
+        filters='ga:eventCategory==Civic Issues;ga:eventLabel=@github.com').execute()
+
+    # sorted by click frequency (same as all freq)
+    dates = results["rows"]
+    for date in dates:
+        date[0] = analytics_formatted_date(date[0])
+
+    return dates
+
+def analytics_formatted_date(date):
+    #monthDict={'01':'Jan', '02':'Feb', '03':'Mar', '04':'Apr', '05':'May', '06':'Jun', '07':'Jul', '08':'Aug', '09':'Sep', '10':'Oct', '11':'Nov', '12':'Dec'}
+    year = date[:4]
+    month = date[4:6]
+    #if month in monthDict:
+        #for key in monthDict:
+            #month=monthDict.get(key)
+    day = date[6:]
+    return month + " " + day + ", " + year
 
 
 #
@@ -244,8 +273,10 @@ def test():
     issue_list = get_all_the_issues()
     total_issues = len(issue_list)
     no_cities = len(top_cities)
+    dates_of_issues = get_date_of_issues()
+    recently_clicked_github = get_all_github_data(dates_of_issues)
     #all_github_data = get_all_github_data(issue_list) Takes like 4-5 minutes
-    return render_template("test.html", no_cities=no_cities, total_issues=total_issues, top_cities=top_cities, issue_list=issue_list)
+    return render_template("test.html", recently_clicked_github = recently_clicked_github, dates_of_issues=dates_of_issues, no_cities=no_cities, total_issues=total_issues, top_cities=top_cities, issue_list=issue_list)
 
 
 if __name__ == '__main__':

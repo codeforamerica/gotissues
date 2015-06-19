@@ -18,28 +18,67 @@
 <body>
 
     <header class="slab-blue">
-      <div class="layout-breve">
+      <div class="layout-semibreve">
         <h1>Got Issues?</h1>
         <p>Does the <a href="http://www.codeforamerica.org/geeks/civicissues">civic issue finder</a> actually work? Lets explore the data to find out.</p>
+      </div>
     </header>
 
-  <div class="layout-breve">
+      <section>
+        <div class="layout-breve">
+    <div class="layout-minim">
         <h2>Top {{no_cities}} cities by click source</h2>
           {% for data in top_cities%}
             <p>City: {{data[0]}}. Clicks from that City: {{data[1]}}</p>
           {% endfor %}
-  </div>
+    </div>
 
-  <div class="layout-breve">
+  <div class="layout-minim">
         <h2>Listing all Issues</h2>
-        <h3>We have a lot of them: <strong>{{total_issues}}</strong> Issues total!</h3>
-        <h3>List of issues: {{total_github_data}}</h3>
-        <select onchange="location = this.options[this.selectedIndex].value;">
+        <label for="select">Complete list of {{total_issues}} issues <abbr title="Required">*</abbr></label>
+
+        <select style="max-width:80%;" onchange="location = this.options[this.selectedIndex].value;">
         {% for issue in issue_list %}
-          <option value="{{issue[0]}}"><p>{{issue[0]}}</p></option>
+          <option value="{{issue[0]}}"><p>{{issue[0]}} and has <strong>{{issue[1]}} clicks</strong>!</p></option>
         {% endfor %}
         </select>
   </div>
+</section>
+
+<section>
+  <div class="layout-breve">
+  <div class="layout-semibreve">
+    <header class="layout-semibreve">
+    <h2>Check out this Github data</h2>
+      <p> Because we need to send a request for each Github issue out of {{total_issues}} issues, we need to find a better way to do this.</p>
+      <p> Will look at certain intersection of issues, like frequently clicked issues or recently clicked issues (see next section)</p>
+    </header>
+  </div>
+</section>
+<section>
+  <div class="layout-breve">
+  <div class="layout-minor">
+    <h2>Recently clicked issues</h2>
+    <select style="max-width:95%;">
+      {% for issue in dates_of_issues %}
+        <option><p>{{issue[1]}} was clicked on {{issue[0]}}</p></option>
+      {% endfor %}
+    once selected print below.
+    </select>
+  </div>
+
+  <div class="layout-major">
+    <h2>How are those recently clicked issues doing on Github?</h2>
+      <h3>Open/Closed + Last Updated</h3>
+      {% for issue in recently_clicked_github %}
+        Project <em><p>{{issue['title']}}</em> has a current state of <strong>{{issue['state']}}</strong> and was last updated <em>{{issue['updated_at']}}</em><p>
+      {% endfor %}
+  </div>
+</div>
+
+<section>
+
+</div>
 </body>
 
   <script>
