@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en-us">
   <head>
     <meta charset="utf-8">
@@ -15,7 +14,8 @@
 
   </head>
 
-  <body>
+
+<body>
 
     <header class="slab-blue">
       <div class="layout-breve">
@@ -23,86 +23,24 @@
         <p>Does the <a href="http://www.codeforamerica.org/geeks/civicissues">civic issue finder</a> actually work? Lets explore the data to find out.</p>
     </header>
 
-    <section>
-      <div class="layout-breve">
-
-        <h2>Goal One: Increase Reach</h2>
-        <p>Increase page views and clicks.</p>
-
-        <div class="layout-crotchet">
-          <h2>Total Clicks</h2>
-          <h1 class="number">{{ total_clicks }}</h1>
-        </div>
-
-        <div class="layout-crotchet">
-          <h2>Total Page Views</h2>
-          <h1 class="number">{{ total_page_views }}</h1>
-        </div>
-
-        <div class="layout-crotchet">
-          <h2>Clicks Per View</h2>
-          <h1 class="number">{{ clicks_per_view }} %</h1>
-        </div>
-
-      </div>
-      <div class="layout-breve">
-
-        <div class="layout-minim">
-          <h2>Top Five Clicked Issues</h2>
-          <p>Not a good thing. Why havent they been closed yet?</p>
-          {% for issue in top_clicked_issues %}
-            <p><a href="{{ issue[0] }}">{{ issue[0] }}</a> Clicks: {{ issue[1] }}</p>
+  <div class="layout-breve">
+        <h2>Where are the top clicks coming from</h2>
+          {% for data in top_cities%}
+            <p>City: {{data[0]}}. Clicks from that City: {{data[1]}}</p>
           {% endfor %}
-        </div>
+  </div>
 
-        <div class="layout-minim">
-          <h2>Bottom Five Clicked Issues</h2>
-          <p>Not a good thing. Why haven't they been seen?</p>
-          {% for issue in least_clicked_issues %}
-            <p><a href="{{ issue[0] }}">{{ issue[0] }}</a> Clicks: {{ issue[1] }}</p>
-          {% endfor %}
-        </div>
-
-        <div class="layout-minim">
-          <h2>Most Recently Clicked Issue</h2>
-            <a href=" {{ most_recent_clicked_issue }} ">{{ most_recent_clicked_issue }}</a>
-        </div>
-
-      </div>
-      <div class="layout-breve">
-
-        <h2>Where</h2>
-        <p>I mostly included this to try out the Google Analytics Embed API.</p>
-        <div id="embed-api-auth-container"></div>
-        <div id="map" class="layout-major-invert"></div>
-        <!-- <div id="cities"></div>
-        <div id="pages"></div> -->
-        <div id="view-selector-container" hidden></div>
-
-      </div>
-
-    </section>
-
-    <section>
-      <div class="layout-breve">
-        <h2>Goal Two: Increase Effectiveness</h2>
-        <p>How effective is a click or comment? Lets explore the GitHub API for the clicked issues to find out.</p>
-        <p>If the project was last updated more than 3 months ago, it isn't getting help and we need to ping them</p>
-          {% for issue in github_data %}
-            Issue Name: <a href="{{issue[1][0]}}"><h2>{{issue[0]['title']}}</h2></a>
-            <h3>State: <strong>{{issue[0]['state']}}</strong>, last updated <strong>{{issue[0]['updated_at']}}</strong></h3>
-            <p>Number of comments on <a href="{{issue[1][0]}}">{{issue[0]['title']}}</a>: <b>{{ issue[0]['comments'] }}</b>. This had <b>{{issue[1][1]}}</b> clicks</p>
-            <br>
-          {% endfor %}
-      </div>
-    </section>
-
-    <section>
-      <div class="layout-breve">
-        <h2>Goal Three: <a href="/test">Test a whole lot of different data stuff</a></h2>
-      </div>
-    </section>
-  </body>
+  <div class="layout-breve">
+        <h2>Listing all Issues</h2>
+        <h3>We have a lot of them: <strong>{{total_issues}}</strong> Issues total!</h3>
+        <h3>List of issues: {{total_github_data}}</h3>
+        <select>
+        {% for issue in issue_list %}
+          <a href="{{issue[0]}}"><option><p>{{issue[0]}}</p></option></a>
+        {% endfor %}
+        </select>
+  </div>
+</body>
 
   <script>
 (function(w,d,s,g,js,fs){

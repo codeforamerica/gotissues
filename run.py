@@ -168,6 +168,40 @@ def get_top_github_data():
 
 
 #
+# Tests
+#
+def get_top_city_clicks():
+    results = service.data().ga().get(
+        ids="ga:" + GOOGLE_ANALYTICS_PROFILE_ID,
+        start_date='2014-08-24',
+        end_date=datetime.date.today().strftime("%Y-%m-%d"),
+        metrics='ga:totalEvents',
+        dimensions='ga:city',
+        max_results=10,
+        sort='-ga:totalEvents',
+        filters='ga:eventCategory=@Civic Issues').execute()
+
+    top_clicked_cities = results["rows"]
+
+    # You can do today's date minus the most recent, and once you figure out most recent,  compare the time delta and if the time delta is smaller then you add it to the dictionry
+    return top_clicked_cities
+
+def get_all_the_issues():
+    ''' We will look at the percentage of issues are doing X or Y soon'''
+    results = service.data().ga().get(
+        ids="ga:" + GOOGLE_ANALYTICS_PROFILE_ID,
+        start_date='2014-08-24',
+        end_date=datetime.date.today().strftime("%Y-%m-%d"),
+        metrics='ga:totalEvents',
+        dimensions='ga:eventLabel',
+        sort='-ga:totalEvents',
+        #fields='rows, columnHeaders'
+        filters='ga:eventCategory==Civic Issues;ga:eventLabel=@github.com').execute()
+
+    total_issues=results["rows"]
+    return total_issues
+
+#
 # Routes
 #
 
@@ -179,13 +213,23 @@ def index():
     least_clicked_issues = get_least_clicked_issues()
     most_recent_clicked_issue = get_most_recent_clicked_issue()
     clicks_per_view = get_percentage_of_views_with_clicks(total_clicks, total_page_views)
+    github_data = get_top_github_data()
     return render_template("index.html",total_clicks=total_clicks,
         total_page_views=total_page_views,
         top_clicked_issues=top_clicked_issues,
         least_clicked_issues=least_clicked_issues, 
         most_recent_clicked_issue=most_recent_clicked_issue,
         clicks_per_view=clicks_per_view,
+        github_data = github_data,
         access_token=access_token)
+
+@app.route("/test")
+def test():
+    top_cities = get_top_city_clicks()
+    issue_list = get_all_the_issues()
+    total_issues = len(issue_list)
+    #total_github_data = get_total_github_data()
+    return render_template("test.html", total_issues=total_issues, top_cities=top_cities, issue_list=issue_list)
 
 
 if __name__ == '__main__':
