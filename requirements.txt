@@ -2,3 +2,4 @@ flask
 google-api-python-client
 pyOpenSSL
 gunicorn
+requests

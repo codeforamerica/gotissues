@@ -2,6 +2,7 @@ import json
 import os
 import datetime
 import logging
+import requests
 from httplib2 import Http
 
 from oauth2client.client import SignedJwtAssertionCredentials
@@ -21,6 +22,19 @@ app = Flask(__name__)
 GOOGLE_ANALYTICS_PROFILE_ID = "41226190"
 GOOGLE_SERVICE_ACCOUNT_EMAIL = os.environ["GOOGLE_SERVICE_ACCOUNT_EMAIL"]
 GOOGLE_SERVICE_ACCOUNT_SECRET_KEY = os.environ["GOOGLE_SERVICE_ACCOUNT_SECRET_KEY"]
+GITHUB_TOKEN = os.environ["GITHUB_TOKEN"]
+
+if 'GITHUB_TOKEN' in os.environ:
+    github_auth = (os.environ['GITHUB_TOKEN'], '')
+else:
+    github_auth = None
+
+#
+# Get authorized by github
+#
+def get_github_auth(url, headers=None):
+    got = requests.get(url, auth=github_auth, headers=headers)
+    return got
 
 #
 # Runs when server starts
@@ -122,9 +136,38 @@ def get_most_recent_clicked_issue():
     return most_recent_clicked_issue
 
 
+
+#
+# Github
+#
+
+def get_stripped_url(url):
+    #handle other urls later
+    if url.startswith('https://github.com/'):
+        url = url[19:]
+    return url
+
+def get_top_github_data():
+    ''' Let's see if I can get some issue comment data from the top_clicked_issues'''
+    top_issues = get_top_clicked_issues()
+    ga_github =[]
+    url = "https://api.github.com/repos/"
+    # define a stripping link method that takes away "https://github.com/"
+    for link in top_issues:
+        stripped_link = get_stripped_url(link[0])
+        request_link = url + stripped_link
+        response = get_github_auth(request_link).json()
+        response_list =[]
+        response_list.append(response)
+        response_list.append(link)
+        ga_github.append(response_list)
+    return ga_github
+
+
 #
 # Routes
 #
+
 @app.route("/")
 def index():
     total_clicks = get_total_clicks()
