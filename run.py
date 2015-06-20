@@ -285,10 +285,12 @@ def test():
         data_list = []
         data_list.append(get_github_data(request.form["issue"]))
         recently_clicked_github = data_list
+        all_clicked_github = data_list
     else:
         recently_clicked_github = get_all_github_data(dates_of_issues)
+        all_clicked_github = []
     #all_github_data = get_all_github_data(issue_list) Takes like 4-5 minutes
-    return render_template("test.html", recently_clicked_github = recently_clicked_github, dates_of_issues=dates_of_issues, no_cities=no_cities, total_issues=total_issues, top_cities=top_cities, issue_list=issue_list)
+    return render_template("test.html", all_clicked_github= all_clicked_github, recently_clicked_github = recently_clicked_github, dates_of_issues=dates_of_issues, no_cities=no_cities, total_issues=total_issues, top_cities=top_cities, issue_list=issue_list)
 
 
 if __name__ == '__main__':

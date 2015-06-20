@@ -23,6 +23,14 @@
         <p>Does the <a href="http://www.codeforamerica.org/geeks/civicissues">civic issue finder</a> actually work? Lets explore the data to find out.</p>
       </div>
     </header>
+  <div class="layout-breve">
+  <div class="layout-semibreve">
+    <header class="layout-semibreve">
+    <h2>Check out this Github data</h2>
+      <p> Because we need to send a request for each Github issue out of {{total_issues}} issues, we need to find a better way to do this.</p>
+      <p> Will look at certain intersection of issues, like frequently clicked issues or recently clicked issues (see next section)</p>
+    </header>
+  </div>
 
       <section>
         <div class="layout-breve">
@@ -36,28 +44,27 @@
   <div class="layout-minim">
         <h2>Listing all Issues</h2>
         <label for="select">Complete list of {{total_issues}} issues <abbr title="Required">*</abbr></label>
-
-        <select style="max-width:80%;" onchange="location = this.options[this.selectedIndex].value;">
+        <form action="/test" method="post">
+        <select name="issue" style="max-width:80%;">
         {% for issue in issue_list %}
-          <option value="{{issue[0]}}"><p>{{issue[0]}} and has <strong>{{issue[1]}} clicks</strong>!</p></option>
+          <option><p>{{issue[0]}}</p></option>
         {% endfor %}
         </select>
+        <input class="check1" action="/test" method="post" type="submit" value="Check Github!">
+      </form>
+      <p>
+      {% if all_clicked_github %}
+        {% for issue in all_clicked_github %}
+        <em><a href="{{issue['url']}}"><p>{{issue['title']}}</a></em> has a current state of <strong>{{issue['state']}}</strong> and was last updated <em>{{issue['updated_at']}}</em><p>
+        {% endfor %}
+      {% endif %}
+      <p>
   </div>
 </section>
 
 <section>
   <div class="layout-breve">
-  <div class="layout-semibreve">
-    <header class="layout-semibreve">
-    <h2>Check out this Github data</h2>
-      <p> Because we need to send a request for each Github issue out of {{total_issues}} issues, we need to find a better way to do this.</p>
-      <p> Will look at certain intersection of issues, like frequently clicked issues or recently clicked issues (see next section)</p>
-    </header>
-  </div>
-</section>
-<section>
-  <div class="layout-breve">
-  <div class="layout-minor">
+  <div class="layout-minim">
     <h2>Recently clicked issues</h2>
     <form action="/test" method="post">
     <select name="issue" style="max-width:95%;">
