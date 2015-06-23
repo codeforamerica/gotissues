@@ -290,6 +290,7 @@ def read_github_response():
     with open("github.json") as f:
         for info in json_parse(f):
             data.append(info)
+    # returns data array with one json response (each link) per array index
     return data
 
 def fetch_closed_issues(data):

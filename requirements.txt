@@ -3,4 +3,3 @@ google-api-python-client
 pyOpenSSL
 gunicorn
 requests
-APScheduler==3.0.0
