@@ -342,11 +342,15 @@ def test():
         all_clicked_github = []
 
     #all_github_data = get_all_github_data(issue_list) Takes like 4-5 minutes
-    return render_template("test.html", closed_issue_total=closed_issue_total, closed_issue_percentage=closed_issue_percentage, all_clicked_github= all_clicked_github, recently_clicked_github = recently_clicked_github, dates_of_issues=dates_of_issues, no_cities=no_cities, total_issues=total_issues, top_cities=top_cities, issue_list=issue_list)
-
-@app.route("/script")
-def script_test():
-    return render_template("index.html")
+    return render_template("test.html", closed_issue_total=closed_issue_total,
+        closed_issue_percentage=closed_issue_percentage,
+        all_clicked_github= all_clicked_github,
+        recently_clicked_github = recently_clicked_github,
+        dates_of_issues=dates_of_issues,
+        no_cities=no_cities,
+        total_issues=total_issues,
+        top_cities=top_cities,
+        issue_list=issue_list)
 
 
 if __name__ == '__main__':
