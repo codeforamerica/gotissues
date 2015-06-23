@@ -215,11 +215,14 @@ def get_all_github_data(all_issues):
         print "Completed " + str(total*100/len(all_issues)) +  " percent!"
     return ga_github
 
-def get_github_data(issue):
+def get_github_data(issue, scripting=True):
     # Let's see if I can get some issue comment data from the top_clicked_issues'''
     url = "https://api.github.com/repos/"
     # define a stripping link method that takes away "https://github.com/"
-    git_data = get_github_auth(url + issue[19:]).json()
+    if scripting== False:
+        git_data = get_github_auth(url + issue[19:]).json()
+    else:
+        print "Running Script"
     return git_data
 
 def get_date_of_issues():
@@ -283,7 +286,7 @@ def test():
     dates_of_issues = get_date_of_issues()
     if request.method == "POST":
         data_list = []
-        data_list.append(get_github_data(request.form["issue"]))
+        data_list.append(get_github_data(request.form["issue"], False))
         recently_clicked_github = data_list
         all_clicked_github = data_list
     else:
