@@ -116,7 +116,7 @@ def get_least_clicked_issues():
         metrics='ga:totalEvents',
         dimensions='ga:eventLabel',
         sort='ga:totalEvents',
-        filters='ga:eventCategory=@Civic Issues',
+        filters='ga:eventCategory=@Civic Issues;ga:eventLabel=@github.com',
         max_results=5,
         fields='rows').execute()
 
