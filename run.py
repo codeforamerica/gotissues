@@ -294,12 +294,30 @@ def read_github_response():
     return data
 
 def fetch_closed_issues(data):
+    # Gets the number of closed issues plus info from all the closed issues
     total_closed = 0
+    dict_array = []
     for data_obj in data:
         for k,v in data_obj.iteritems():
+            new_dict = {}
+            #Get the number of closed issues
+            # Build dictionary of things we want
+            useful_info = ["html_url", "title", "label", "state", "comments", "created at", "closed_at", "closed_by"]
+            #closed_by.login...figure out better way to do this
             if v == "closed":
                 total_closed+=1
-    return total_closed
+            for keys in useful_info:
+                if k == keys:
+                    new_dict[k] = v
+            dict_array.append(new_dict)
+    # return array of new dict info here
+
+    return total_closed, dict_array
+
+''' def fetch_comments(data):
+    comment_dict = {}
+    # get
+    return total_comments '''
 
 #
 # Routes
@@ -330,7 +348,7 @@ def test():
     total_issues = len(issue_list)
     no_cities = len(top_cities)
     dates_of_issues = get_date_of_issues()
-    closed_issue_total = (fetch_closed_issues(read_github_response()))
+    closed_issue_total, closed_issue_data = (fetch_closed_issues(read_github_response()))
     closed_issue_percentage = int((closed_issue_total/float(total_issues))*100)
     if request.method == "POST":
         data_list = []
@@ -342,7 +360,8 @@ def test():
         all_clicked_github = []
 
     #all_github_data = get_all_github_data(issue_list) Takes like 4-5 minutes
-    return render_template("test.html", closed_issue_total=closed_issue_total,
+    return render_template("test.html", closed_issue_data=closed_issue_data, 
+        closed_issue_total=closed_issue_total,
         closed_issue_percentage=closed_issue_percentage,
         all_clicked_github= all_clicked_github,
         recently_clicked_github = recently_clicked_github,
