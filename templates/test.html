@@ -23,29 +23,37 @@
         <p>Does the <a href="http://www.codeforamerica.org/geeks/civicissues">civic issue finder</a> actually work? Lets explore the data to find out.</p>
       </div>
     </header>
+
   <div class="layout-breve">
-  <div class="layout-semibreve">
     <header class="layout-semibreve">
-    <h2>Check out this Github data</h2>
-      <p> Because we need to send a request for each Github issue out of {{total_issues}} issues, we need to find a better way to do this.</p>
+    <h2>Check out this Activity data</h2>
       <p> Will look at certain intersection of issues, like frequently clicked issues or recently clicked issues (see next section)</p>
     </header>
   </div>
 
-      <section>
-        <div class="layout-breve">
-    <div class="layout-minim">
-        <h2>Top {{no_cities}} cities by click source</h2>
-          {% for data in top_cities%}
-            <p>City: {{data[0]}}. Clicks from that City: {{data[1]}}</p>
-          {% endfor %}
-    </div>
+  <section>
+    <header class="slab-gray">
+      <div class="layout-semibreve">
+        <h2>How many issues are closed?</h2>
+        <h3>Out of <strong>{{total_issues}}</strong> total issues, there are <strong>{{closed_issue_total}}</strong> closed issues. That is <strong>{{closed_issue_percentage}}%</strong>!</h3>
+    </header>
+  </section>
+</div>
 
-  <div class="layout-minim">
-        <h2>Listing all Issues</h2>
-        <label for="select">Complete list of {{total_issues}} issues <abbr title="Required">*</abbr></label>
+</section>
+      <section class="slab-gray">
+        <header class="slab-red">
+        <div class="layout-semibreve">
+        <center>
+        <h2>Check a specific issue's status</h2>
+        <label for="select">Check the status from a complete list of {{total_issues}} issues <abbr title="Required">*</abbr></label>
         <form action="/test" method="post">
         <select name="issue" style="max-width:80%;">
+        {% if all_clicked_github %}
+          <option value="" disabled selected>Click the dropdown to search again!</option>
+        {% else %}
+          <option value="" disabled selected>Select an issue!</option>
+        {% endif %}
         {% for issue in issue_list %}
           <option><p>{{issue[0]}}</p></option>
         {% endfor %}
@@ -55,15 +63,25 @@
       <p>
       {% if all_clicked_github %}
         {% for issue in all_clicked_github %}
-        <em><a href="{{issue['url']}}"><p>{{issue['title']}}</a></em> has a current state of <strong>{{issue['state']}}</strong> and was last updated <em>{{issue['updated_at']}}</em><p>
+        <em><a href="{{issue['html_url']}}"><p>{{issue['title']}}</a></em> has a current state of <strong>{{issue['state']}}</strong> and was last updated <em>{{issue['updated_at']}}</em><p>
         {% endfor %}
       {% endif %}
       <p>
   </div>
+</center>
+</header>
 </section>
 
 <section>
+
   <div class="layout-breve">
+
+    <div class="layout-minim">
+        <h2>Top {{no_cities}} cities by click source</h2>
+          {% for data in top_cities%}
+            <p>City: {{data[0]}}. Clicks from that City: {{data[1]}}</p>
+          {% endfor %}
+    </div>
   <div class="layout-minim">
     <h2>Recently clicked issues</h2>
     <form action="/test" method="post">
@@ -77,18 +95,15 @@
   </form>
   </div>
 
-  <div class="layout-major">
+  <div class="layout-minim">
     <h2>How are those recently clicked issues doing on Github?</h2>
       <h3>Open/Closed + Last Updated</h3>
         {% for issue in recently_clicked_github %}
-          Project <em><p>{{issue['title']}}</em> has a current state of <strong>{{issue['state']}}</strong> and was last updated <em>{{issue['updated_at']}}</em><p>
+          <em><p>{{issue['title']}}</em> has a current state of <strong>{{issue['state']}}</strong> and was last updated <em>{{issue['updated_at']}}</em><p>
         {% endfor %}
   </div>
-</div>
+</section>
 
-<section>
-
-</div>
 </body>
 
   <script>
