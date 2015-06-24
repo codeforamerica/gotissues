@@ -41,7 +41,6 @@ class GotIssuesTestCase(unittest.TestCase):
     def test_trim_github_issues(self):
         ''' Test that only the github attributes we want are left '''
         trimmed_issues = trim_github_issues([full_issue])
-        # cmp == 0 when they are equal
         result = json.dumps(trimmed_issues[0], sort_keys=True, indent=4)
         control = json.dumps(trimmed_issue, sort_keys=True, indent=4)
 

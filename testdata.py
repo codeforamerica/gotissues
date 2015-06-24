@@ -1,4 +1,4 @@
-DATABASE_URL = 'postgres:///peopledbtest'
+DATABASE_URL = 'postgres:///gotissuestest'
 
 full_issue = {
   "url": "https://api.github.com/repos/codeforamerica/gotissues/issues/8",
