@@ -5,6 +5,7 @@ import logging
 import requests
 from functools import partial
 from httplib2 import Http
+from psycopg2 import connect, extras
 
 from oauth2client.client import SignedJwtAssertionCredentials
 from apiclient.discovery import build
@@ -49,6 +50,14 @@ def login_to_google_analytics():
 
 service, access_token = login_to_google_analytics()
 
+#
+# Database setup
+#
+def db_connect(app):
+    return connect(app.config['DATABASE_URL'])
+
+def db_cursor(conn, cursor_factory=extras.RealDictCursor):
+    return conn.cursor(cursor_factory=cursor_factory)
 
 #
 # Functions used in Routes
