@@ -5,6 +5,7 @@ import logging
 import requests
 from functools import partial
 from httplib2 import Http
+from psycopg2 import connect, extras
 
 from oauth2client.client import SignedJwtAssertionCredentials
 from apiclient.discovery import build
@@ -32,7 +33,7 @@ else:
 #
 # Get authorized by github
 #
-def get_github_auth(url, headers=None):
+def get_github_with_auth(url, headers=None):
     got = requests.get(url, auth=github_auth, headers=headers)
     return got
 
@@ -49,6 +50,14 @@ def login_to_google_analytics():
 
 service, access_token = login_to_google_analytics()
 
+#
+# Database setup
+#
+def db_connect(app):
+    return connect(app.config['DATABASE_URL'])
+
+def db_cursor(conn, cursor_factory=extras.RealDictCursor):
+    return conn.cursor(cursor_factory=cursor_factory)
 
 #
 # Functions used in Routes
@@ -160,7 +169,7 @@ def get_top_github_data():
     for link in top_issues:
         stripped_link = get_stripped_url(link[0])
         request_link = url + stripped_link
-        response = get_github_auth(request_link).json()
+        response = get_github_with_auth(request_link).json()
         response_list =[]
         response_list.append(response)
         response_list.append(link)
@@ -187,8 +196,8 @@ def get_top_city_clicks():
     # You can do today's date minus the most recent, and once you figure out most recent,  compare the time delta and if the time delta is smaller then you add it to the dictionry
     return top_clicked_cities
 
-def get_all_the_issues():
-    ''' We will look at the percentage of issues are doing X or Y soon'''
+def get_clicked_issues():
+    ''' Get all the clicked issues as json'''
     results = service.data().ga().get(
         ids="ga:" + GOOGLE_ANALYTICS_PROFILE_ID,
         start_date='2014-08-24',
@@ -196,11 +205,16 @@ def get_all_the_issues():
         metrics='ga:totalEvents',
         dimensions='ga:eventLabel',
         sort='-ga:totalEvents',
-        #fields='rows, columnHeaders'
         filters='ga:eventCategory==Civic Issues;ga:eventLabel=@github.com').execute()
 
-    total_issues=results["rows"]
-    return total_issues
+    issues = []
+    for row in results["rows"]:
+        issue = {
+            "url" : row[0],
+            "clicks" : row[1]
+        }
+        issues.append(issue)
+    return issues
 
 
 def get_all_github_data(all_issues):
@@ -210,7 +224,7 @@ def get_all_github_data(all_issues):
     total = 0
     # define a stripping link method that takes away "https://github.com/"
     for link in all_issues:
-        ga_github.append(get_github_auth(url + link[1][19:]).json())
+        ga_github.append(get_github_with_auth(url + link[1][19:]).json())
         total += 1
         print "Completed " + str(total*100/len(all_issues)) +  " percent!"
     return ga_github
@@ -219,7 +233,7 @@ def get_github_data(issue):
     # Let's see if I can get some issue comment data from the top_clicked_issues'''
     url = "https://api.github.com/repos/"
     # define a stripping link method that takes away "https://github.com/"
-    git_data = get_github_auth(url + issue[19:]).json()
+    git_data = get_github_with_auth(url + issue[19:]).json()
     return git_data
 
 def get_date_of_issues():
@@ -344,7 +358,7 @@ def index():
 @app.route("/test", methods=["GET", "POST"])
 def test():
     top_cities = get_top_city_clicks()
-    issue_list = get_all_the_issues()
+    issue_list = get_clicked_issues()
     total_issues = len(issue_list)
     no_cities = len(top_cities)
     dates_of_issues = get_date_of_issues()
