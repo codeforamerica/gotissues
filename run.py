@@ -196,8 +196,8 @@ def get_top_city_clicks():
     # You can do today's date minus the most recent, and once you figure out most recent,  compare the time delta and if the time delta is smaller then you add it to the dictionry
     return top_clicked_cities
 
-def get_all_the_issues():
-    ''' We will look at the percentage of issues are doing X or Y soon'''
+def get_clicked_issues():
+    ''' Get all the clicked issues as json'''
     results = service.data().ga().get(
         ids="ga:" + GOOGLE_ANALYTICS_PROFILE_ID,
         start_date='2014-08-24',
@@ -205,11 +205,16 @@ def get_all_the_issues():
         metrics='ga:totalEvents',
         dimensions='ga:eventLabel',
         sort='-ga:totalEvents',
-        #fields='rows, columnHeaders'
         filters='ga:eventCategory==Civic Issues;ga:eventLabel=@github.com').execute()
 
-    total_issues=results["rows"]
-    return total_issues
+    issues = []
+    for row in results["rows"]:
+        issue = {
+            "url" : row[0],
+            "clicks" : row[1]
+        }
+        issues.append(issue)
+    return issues
 
 
 def get_all_github_data(all_issues):
@@ -353,7 +358,7 @@ def index():
 @app.route("/test", methods=["GET", "POST"])
 def test():
     top_cities = get_top_city_clicks()
-    issue_list = get_all_the_issues()
+    issue_list = get_clicked_issues()
     total_issues = len(issue_list)
     no_cities = len(top_cities)
     dates_of_issues = get_date_of_issues()
