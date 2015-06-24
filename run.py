@@ -33,7 +33,7 @@ else:
 #
 # Get authorized by github
 #
-def get_github_auth(url, headers=None):
+def get_github_with_auth(url, headers=None):
     got = requests.get(url, auth=github_auth, headers=headers)
     return got
 
@@ -169,7 +169,7 @@ def get_top_github_data():
     for link in top_issues:
         stripped_link = get_stripped_url(link[0])
         request_link = url + stripped_link
-        response = get_github_auth(request_link).json()
+        response = get_github_with_auth(request_link).json()
         response_list =[]
         response_list.append(response)
         response_list.append(link)
@@ -224,7 +224,7 @@ def get_all_github_data(all_issues):
     total = 0
     # define a stripping link method that takes away "https://github.com/"
     for link in all_issues:
-        ga_github.append(get_github_auth(url + link[1][19:]).json())
+        ga_github.append(get_github_with_auth(url + link[1][19:]).json())
         total += 1
         print "Completed " + str(total*100/len(all_issues)) +  " percent!"
     return ga_github
@@ -233,7 +233,7 @@ def get_github_data(issue):
     # Let's see if I can get some issue comment data from the top_clicked_issues'''
     url = "https://api.github.com/repos/"
     # define a stripping link method that takes away "https://github.com/"
-    git_data = get_github_auth(url + issue[19:]).json()
+    git_data = get_github_with_auth(url + issue[19:]).json()
     return git_data
 
 def get_date_of_issues():
