@@ -32,6 +32,12 @@ class GotIssuesTestCase(unittest.TestCase):
     #     self.assertEqual(response.status_code, 200)
 
 
+    # def test_test_view(self):
+    #     ''' Test the test gotissues view '''
+    #     response = self.app.get("/test")
+    #     self.assertEqual(response.status_code, 200)
+
+
     def test_trim_github_issues(self):
         ''' Test that only the github attributes we want are left '''
         trimmed_issues = trim_github_issues([full_issue])
