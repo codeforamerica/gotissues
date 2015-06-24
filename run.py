@@ -3,6 +3,7 @@ import os
 import datetime
 import logging
 import requests
+from functools import partial
 from httplib2 import Http
 
 from oauth2client.client import SignedJwtAssertionCredentials
@@ -16,7 +17,6 @@ logging.basicConfig(level=logging.INFO)
 
 # Config
 app = Flask(__name__)
-
 
 # Variables
 GOOGLE_ANALYTICS_PROFILE_ID = "41226190"
@@ -116,7 +116,7 @@ def get_least_clicked_issues():
         metrics='ga:totalEvents',
         dimensions='ga:eventLabel',
         sort='ga:totalEvents',
-        filters='ga:eventCategory=@Civic Issues',
+        filters='ga:eventCategory=@Civic Issues;ga:eventLabel=@github.com',
         max_results=5,
         fields='rows').execute()
 
@@ -253,6 +253,73 @@ def analytics_formatted_date(date):
 
 
 #
+# Script
+#
+def write_github_response():
+    # Fetch Issues from Clicked Issues
+      print "Starting"
+      total_issues = get_all_the_issues()
+      total = 0
+      #Request All Github stufff (Will take time)
+      for issue in total_issues:
+        response = get_github_data(issue[0])
+        #Dump to github.json (This is where I can test if it is writing to file)
+        with open("github.json", "a") as myfile:
+          json.dump(response, myfile)
+          total +=1
+          percent = (total/float(len(total_issues))) * 100
+          print "Completed " + str(total) + " out of " + str(len(total_issues))
+          print "Completed " + str(int(percent)) + "%"
+
+def json_parse(fileobj, decoder=json.JSONDecoder(), buffersize=2048):
+    buffer = ''
+    for chunk in iter(partial(fileobj.read, buffersize), ''):
+         buffer += chunk
+         while buffer:
+             try:
+                 result, index = decoder.raw_decode(buffer)
+                 yield result
+                 buffer = buffer[index:]
+             except ValueError:
+                 # Not enough data to decode, read more
+                 break
+
+def read_github_response():
+    # Tried as dict, wasn't being efficient
+    data = []
+    with open("github.json") as f:
+        for info in json_parse(f):
+            data.append(info)
+    # returns data array with one json response (each link) per array index
+    return data
+
+def fetch_closed_issues(data):
+    # Gets the number of closed issues plus info from all the closed issues
+    total_closed = 0
+    dict_array = []
+    for data_obj in data:
+        for k,v in data_obj.iteritems():
+            new_dict = {}
+            #Get the number of closed issues
+            # Build dictionary of things we want
+            useful_info = ["html_url", "title", "label", "state", "comments", "created at", "closed_at", "closed_by"]
+            #closed_by.login...figure out better way to do this
+            if v == "closed":
+                total_closed+=1
+            for keys in useful_info:
+                if k == keys:
+                    new_dict[k] = v
+            dict_array.append(new_dict)
+    # return array of new dict info here
+
+    return total_closed, dict_array
+
+''' def fetch_comments(data):
+    comment_dict = {}
+    # get
+    return total_comments '''
+
+#
 # Routes
 #
 
@@ -281,6 +348,8 @@ def test():
     total_issues = len(issue_list)
     no_cities = len(top_cities)
     dates_of_issues = get_date_of_issues()
+    closed_issue_total, closed_issue_data = (fetch_closed_issues(read_github_response()))
+    closed_issue_percentage = int((closed_issue_total/float(total_issues))*100)
     if request.method == "POST":
         data_list = []
         data_list.append(get_github_data(request.form["issue"]))
@@ -289,8 +358,18 @@ def test():
     else:
         recently_clicked_github = get_all_github_data(dates_of_issues)
         all_clicked_github = []
+
     #all_github_data = get_all_github_data(issue_list) Takes like 4-5 minutes
-    return render_template("test.html", all_clicked_github= all_clicked_github, recently_clicked_github = recently_clicked_github, dates_of_issues=dates_of_issues, no_cities=no_cities, total_issues=total_issues, top_cities=top_cities, issue_list=issue_list)
+    return render_template("test.html", closed_issue_data=closed_issue_data, 
+        closed_issue_total=closed_issue_total,
+        closed_issue_percentage=closed_issue_percentage,
+        all_clicked_github= all_clicked_github,
+        recently_clicked_github = recently_clicked_github,
+        dates_of_issues=dates_of_issues,
+        no_cities=no_cities,
+        total_issues=total_issues,
+        top_cities=top_cities,
+        issue_list=issue_list)
 
 
 if __name__ == '__main__':
