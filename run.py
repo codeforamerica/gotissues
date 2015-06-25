@@ -114,6 +114,12 @@ def get_top_clicked_issues():
 
     return top_clicked_issues
 
+def find(lst, key, value):
+    for i, dic in enumerate(lst):
+        if dic[key] == value:
+            return i
+    return False
+
 # Define a route that measures most recent click of the last top issues
 
 def get_least_clicked_issues():
@@ -207,14 +213,46 @@ def get_clicked_issues():
         sort='-ga:totalEvents',
         filters='ga:eventCategory==Civic Issues;ga:eventLabel=@github.com').execute()
 
-    issues = []
+    clicked_issues = []
     for row in results["rows"]:
         issue = {
             "url" : row[0],
             "clicks" : row[1]
         }
-        issues.append(issue)
-    return issues
+        clicked_issues.append(issue)
+    return clicked_issues
+
+
+def get_viewed_issues():
+    ''' Get all the viewed issues as json
+        Group the issues by github url
+        source will be a list of sources where the issue was viewed '''
+
+    results = service.data().ga().get(
+        ids="ga:" + GOOGLE_ANALYTICS_PROFILE_ID,
+        start_date='2014-08-24',
+        end_date=datetime.date.today().strftime("%Y-%m-%d"),
+        metrics='ga:totalEvents',
+        dimensions='ga:eventLabel',
+        sort='-ga:totalEvents',
+        filters='ga:eventCategory==Civic Issue View').execute()
+
+    # From results, build up a list of issues with lists of sources
+    viewed_issues = []
+    for row in results["rows"]:
+        viewed_issue = {
+            "url" : row[0].split(',')[0],
+            "views" : row[1],
+            "view_sources" : [row[0].split(',')[1]]
+        }
+
+        # If the github url already exists in our list, add the new source to it
+        found = find(viewed_issues, "url", viewed_issue["view_sources"][0])
+        if found:
+            viewed_issues[found]["view_sources"].append(viewed_issue["view_sources"][0])
+        else:
+            viewed_issues.append(viewed_issue)
+    return viewed_issues
 
 
 def get_all_github_data(all_issues):

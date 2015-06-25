@@ -52,13 +52,14 @@ class GotIssuesTestCase(unittest.TestCase):
         ''' Test that writing to the db works '''
         with connect(DATABASE_URL) as conn:
             with db_cursor(conn) as db:
-                write_issue_to_db(trimmed_issue, db)
+                write_issue_to_db(db_issue, db)
 
                 q = ''' SELECT * FROM issues '''
                 db.execute(q)
                 issue = db.fetchone()
                 self.assertEqual(issue["id"],87136867)
                 self.assertEqual(issue["clicks"],10000000)
+                self.assertEqual(issue["views"],777)
 
 
 if __name__ == '__main__':
