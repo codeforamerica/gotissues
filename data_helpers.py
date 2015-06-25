@@ -71,12 +71,6 @@ choice_dict = {
 }
 
 def edit_request_query(choice_dict_query):
-  print choice_dict[choice_dict_query]
-  print choice_dict[choice_dict_query]['metrics']
-  print choice_dict[choice_dict_query]['dimensions']
-  print choice_dict[choice_dict_query]['sort']
-  print choice_dict[choice_dict_query]['max_results']
-  print choice_dict[choice_dict_query]['filters']
   results = service.data().ga().get(
           ids="ga:" + GOOGLE_ANALYTICS_PROFILE_ID,
           start_date='2014-08-24',
