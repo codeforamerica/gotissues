@@ -72,3 +72,27 @@ trimmed_issue = {
   },
   "clicks" : 10000000
 }
+
+db_issue = {
+  "html_url": "https://github.com/codeforamerica/gotissues/issues/8",
+  "id": 87136867,
+  "title": "Pull in data from GitHub about the clicked issues",
+  "labels": [
+    { "url": "https://api.github.com/repos/codeforamerica/gotissues/labels/enhancement",
+      "name": "enhancement",
+      "color": "84b6eb"
+    }
+  ],
+  "state": "closed",
+  "comments": 1,
+  "created_at": "2015-06-10T23:03:05Z",
+  "closed_at": "2015-06-23T00:43:26Z",
+  "body": "TEST BODY",
+  "closed_by": {
+    "login": "ondrae",
+    "id": 595778
+  },
+  "clicks" : 10000000,
+  "views" : 777,
+  "view_sources" : ["www.codeforamerica.org"]
+}
