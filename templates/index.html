@@ -4,14 +4,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Got Issues</title>
-    <!-- Check the CfA Style Guide at https://style.codeforamerica.org/ -->
-    <link rel="stylesheet" href="https://style.codeforamerica.org/style/css/main.css">
-    <link rel="stylesheet" href="https://style.codeforamerica.org/style/css/layout.css" media="all and (min-width: 40em)">
+    <!-- Check the CfA Style Guide at https:style.codeforamerica.org/ -->
+    <link rel="stylesheet" href="https:style.codeforamerica.org/style/css/main.css">
+    <link rel="stylesheet" href="https:style.codeforamerica.org/style/css/layout.css" media="all and (min-width: 40em)">
 
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
 
-    <link rel="shortcut icon" type="image/x-icon" href="https://style.codeforamerica.org/1/favicon.ico">
-    <link rel="apple-touch-icon-precomposed" href="https://style.codeforamerica.org/1/style/favicons/60x60/flag-red.png"/>
+    <link rel="shortcut icon" type="image/x-icon" href="https:style.codeforamerica.org/1/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" href="https:style.codeforamerica.org/1/style/favicons/60x60/flag-red.png"/>
 
   </head>
 
@@ -20,7 +20,7 @@
     <header class="slab-blue">
       <div class="layout-breve">
         <h1>Got Issues?</h1>
-        <p>Does the <a href="http://www.codeforamerica.org/geeks/civicissues">civic issue finder</a> actually work? Lets explore the data to find out.</p>
+        <p>Does the <a href="http:www.codeforamerica.org/geeks/civicissues">civic issue finder</a> actually work? Lets explore the data to find out.</p>
     </header>
 
     <section>
@@ -48,7 +48,7 @@
 
         <div class="layout-minim">
           <h2>Top Five Clicked Issues</h2>
-          <p>Not a good thing. Why havent they been closed yet?</p>
+          <p>Why do people want to click on these? Why aren't they closed yet?</p>
           {% for issue in choice_dict.most_clicked %}
             <p><a href="{{ issue[0] }}">{{ issue[0] }}</a> Clicks: {{ issue[1] }}</p>
           {% endfor %}
@@ -56,22 +56,27 @@
 
         <div class="layout-minim">
           <h2>Bottom Five Clicked Issues</h2>
-          <p>Not a good thing. Why haven't they been seen?</p>
+          <p>What makes these unclickable?</p>
           {% for issue in choice_dict.least_clicked %}
             <p><a href="{{ issue[0] }}">{{ issue[0] }}</a> Clicks: {{ issue[1] }}</p>
           {% endfor %}
         </div>
-
-        <div class="layout-minim">
+        <center>
+        <div class="layout-breve">
           <h2>Most Recently Clicked Issue</h2>
             <a href=" {{ choice_dict.recently_clicked }} ">{{ choice_dict.recently_clicked }}</a>
         </div>
+      </center>
 
       </div>
+    </section>
+<section>
       <div class="layout-breve">
 
+        <div class="layout-minim">
+
         <h2>Where</h2>
-        <p>I mostly included this to try out the Google Analytics Embed API.</p>
+        <p>Hover to see amount of clicks from that area</p>
         <div id="embed-api-auth-container"></div>
         <div id="map" class="layout-major-invert"></div>
         <!-- <div id="cities"></div>
@@ -80,6 +85,13 @@
 
       </div>
 
+      <div class="layout-minim">
+        <h2>Top {{choice_dict.no_cities}} cities by click source</h2>
+          {% for data in choice_dict.top_cities%}
+            <p>City: {{data[0]}}. Clicks from that City: {{data[1]}}</p>
+          {% endfor %}
+    </div>
+  </div>
     </section>
 
     <section>
@@ -87,12 +99,13 @@
         <h2>Goal Two: Increase Effectiveness</h2>
         <p>How effective is a click or comment? Lets explore the GitHub API for the clicked issues to find out.</p>
         <p>If the project was last updated more than 3 months ago, it isn't getting help and we need to ping them</p>
-          {% for issue in github_data %}
+        <p> We will look into activity data below</p>
+          <!--{% for issue in github_data %}
             Issue Name: <a href="{{issue[1][0]}}"><h2>{{issue[0]['title']}}</h2></a>
             <h3>State: <strong>{{issue[0]['state']}}</strong>, last updated <strong>{{issue[0]['updated_at']}}</strong></h3>
             <p>Number of comments on <a href="{{issue[1][0]}}">{{issue[0]['title']}}</a>: <b>{{ issue[0]['comments'] }}</b>. This had <b>{{issue[1][1]}}</b> clicks</p>
             <br>
-          {% endfor %}
+          {% endfor %}-->
       </div>
     </section>
 
@@ -144,15 +157,6 @@
 
 <section>
 
-  <div class="layout-breve">
-
-    <div class="layout-minim">
-        <h2>Top {{choice_dict.no_cities}} cities by click source</h2>
-          {% for data in choice_dict.top_cities%}
-            <p>City: {{data[0]}}. Clicks from that City: {{data[1]}}</p>
-          {% endfor %}
-    </div>
-
     <div class="layout-breve">
         <h2>Which pages are views coming from?</h2>
           <table style="font-size:12px">
@@ -173,27 +177,6 @@
           {% endfor %}
           </table>
     </div>
-
-  <!--<div class="layout-minim">
-    <h2>Recently clicked issues</h2>
-    <form action="/test" method="post">
-    <select name="issue" style="max-width:95%;">
-      {% for issue in dates_of_issues %}
-        <p><option>{{issue[1]}}</option></p>
-      {% endfor %}
-    </select>
-    <input class="check1" action="/test" method="post" type="submit" value="Check Github!">
-  </form>
-  </div>-->
-
-  <!-- Need to define new way of getting recently clicked issues
-  <div class="layout-minim">
-    <h2>How are those recently clicked issues doing on Github?</h2>
-      <h3>Open/Closed + Last Updated</h3>
-        {% for issue in recently_clicked_github %}
-          <em><p>{{issue['title']}}</em> has a current state of <strong>{{issue['state']}}</strong> and was last updated <em>{{issue['updated_at']}}</em><p>
-        {% endfor %}
-  </div> -->
 </section>
 
 <!--{{closed_issue_data}}-->
@@ -203,7 +186,7 @@
 (function(w,d,s,g,js,fs){
   g=w.gapi||(w.gapi={});g.analytics={q:[],ready:function(f){this.q.push(f);}};
   js=d.createElement(s);fs=d.getElementsByTagName(s)[0];
-  js.src='https://apis.google.com/js/platform.js';
+  js.src='https:apis.google.com/js/platform.js';
   fs.parentNode.insertBefore(js,fs);js.onload=function(){g.load('analytics');};
 }(window,document,'script'));
 </script>
@@ -219,7 +202,7 @@ gapi.analytics.ready(function() {
    */
   gapi.analytics.auth.authorize({
     serverAuth: {
-      access_token: "{{ access_token }}"
+      access_token: "{{ choice_dict['access_token'] }}"
     }
   });
 
@@ -232,7 +215,7 @@ gapi.analytics.ready(function() {
     container: 'view-selector-container'
   });
 
-  // Render the view selector to the page.
+   //Render the view selector to the page.
   viewSelector.execute();
 
   /**
@@ -259,53 +242,54 @@ gapi.analytics.ready(function() {
     }
   });
 
-  // var cities = new gapi.analytics.googleCharts.DataChart({
-  //   query: {
-  //     metrics: 'ga:totalEvents',
-  //     dimensions: 'ga:city',
-  //     'start-date': '2014-08-24',
-  //     'end-date': 'yesterday',
-  //     sort : '-ga:totalEvents',
-  //     'max-results' : 10
-  //   },
-  //   chart: {
-  //     container: 'cities',
-  //     type: 'GEO',
-  //     options: {
-  //       width: '100%',
-  //       region: 'US',
-  //       displayMode: 'markers'
-  //     }
-  //   }
-  // });
+/*
+  var cities = new gapi.analytics.googleCharts.DataChart({
+  query: {
+       metrics: 'ga:totalEvents',
+       dimensions: 'ga:city',
+       'start-date': '2014-08-24',
+       'end-date': 'yesterday',
+       sort : '-ga:totalEvents',
+       'max-results' : 10
+     },
+     chart: {
+       container: 'cities',
+       type: 'GEO',
+       options: {
+         width: '100%',
+         region: 'US',
+         displayMode: 'markers'
+       }
+     }
+   });
 
-  // var pages = new gapi.analytics.googleCharts.DataChart({
-  //   query: {
-  //     metrics: 'ga:totalEvents',
-  //     dimensions: 'ga:pagePath',
-  //     filters : 'ga:eventLabel=@github.com',
-  //     'start-date': '2014-08-24',
-  //     'end-date': 'yesterday',
-  //     sort : '-ga:totalEvents',
-  //     'max-results' : 10
-  //   },
-  //   chart: {
-  //     container: 'pages',
-  //     type: 'TABLE',
-  //     options: {
-  //       width: '100%'
-  //     }
-  //   }
-  // });
-
+   var pages = new gapi.analytics.googleCharts.DataChart({
+     query: {
+       metrics: 'ga:totalEvents',
+       dimensions: 'ga:pagePath',
+       filters : 'ga:eventLabel=@github.com',
+       'start-date': '2014-08-24',
+       'end-date': 'yesterday',
+       sort : '-ga:totalEvents',
+       'max-results' : 10
+     },
+     chart: {
+       container: 'pages',
+       type: 'TABLE',
+       options: {
+         width: '100%'
+       }
+     }
+   });
+*/
 
   /**
    * Render the dataChart on the page whenever a new view is selected.
    */
   viewSelector.on('change', function(ids) {
     country.set({query: {ids: ids}}).execute();
-    // cities.set({query: {ids: ids}}).execute();
-    // pages.set({query: {ids: ids}}).execute();
+     //cities.set({query: {ids: ids}}).execute();
+     //pages.set({query: {ids: ids}}).execute();
   });
 
 });
