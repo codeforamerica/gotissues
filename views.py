@@ -1,12 +1,11 @@
 ''' views.py: This file contains all of the routes '''
-from gotissues import app
 from data_helpers import *
+from gotissues import app
 from flask import Flask, render_template, request
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    choice_list = ["total_page_views", "most_clicked"]
-    choice_dict_test = {
+    choice_dict = {
         "clicked_issues":"",
         "top_cities":"",
         "least_clicked":"",
@@ -15,15 +14,21 @@ def index():
         "total_page_views":"",
         "total_clicks":""
     }
-    final_response = []
-    for choice in choice_list:
-        final_response.append(get_analytics_query(choice))
 
+    for k in choice_dict.iterkeys():
+        choice_dict[k] = get_analytics_query(k)
+
+    choice_dict["no_cities"] = len(choice_dict["top_cities"])
+    choice_dict["clicks_per_view"] = int(100 * int(choice_dict["total_clicks"])/float(int(choice_dict["total_page_views"])))
+    
+    # view helpers
     if request.method == "POST":
-        check_clicked_github = get_github_data(request.form["issue"])
+        choice_dict["check_clicked_github"] = get_github_data(request.form["issue"])
+        print "UO\n\n"
+        print choice_dict["check_clicked_github"]['html_url']
     else:
-        check_clicked_github = []
+        choice_dict["check_clicked_github"] = []
 
-    #get total number of closed issues differently
+    # to do: get total number of closed issues differently
 
-    return render_template("index.html", final_response=final_response)
+    return render_template("index.html", choice_dict=choice_dict)

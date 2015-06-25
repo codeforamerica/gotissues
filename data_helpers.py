@@ -5,7 +5,6 @@ from gotissues import *
 #
 # Methods that return data from Google Analytics
 #
-
 choice_dict = {
     "clicked_issues": {
       'metrics':'ga:totalEvents',
@@ -46,9 +45,10 @@ choice_dict = {
     "recently_clicked": {
       'metrics':'ga:totalEvents',
       'dimensions':'ga:eventLabel, ga:date',
-      'sort':'-ga:dates',
-      'filters':'ga:eventCategory==Civic Issues;ga:eventLabel=@github.com',
-      'max_results':None
+      'sort':'-ga:date',
+      'filters':'ga:eventCategory==Civic Issues',
+      'max_results':1,
+      'fields':None
     },
 
     "total_page_views": {
@@ -64,7 +64,7 @@ choice_dict = {
       'metrics':'ga:totalEvents',
       'dimensions':None,
       'sort':None,
-      'filters':'ga:pagePath=@Civic Issues',
+      'filters':'ga:eventCategory=@Civic Issues',
       'max_results':None,
       'fields':None
     }
@@ -81,17 +81,12 @@ def edit_request_query(choice_dict_query):
           max_results=choice_dict[choice_dict_query]['max_results'],
           filters=choice_dict[choice_dict_query]['filters'],
           fields=choice_dict[choice_dict_query]['fields']).execute()
-  
-  print "THE RESULTS"
-  print results
+
   return results
 
-def get_analytics_query(choice):
-  #choice_list = ["clicked_issues", "top_cities"]
-  
+def get_analytics_query(choice):  
   if choice == "clicked_issues":
-    #print choice_dict[choice]
-    results = edit_request_query(choice_dict[choice])
+    results = edit_request_query(choice)
     issues = []
     for row in results["rows"]:
         issue = {
@@ -124,14 +119,10 @@ def get_analytics_query(choice):
 
   elif choice == "total_page_views":
     results = edit_request_query(choice)
-    print "RESULTS ARE FINALLY WORKING"
-    print results.keys()
     total_page_views = results["rows"][0][0]
     return total_page_views
 
   elif choice == "total_clicks":
-    print "Dictionary Test\n"
-    print choice_dict[choice]['metrics']
     results = edit_request_query(choice)
     total_clicks = results["rows"][0][0]
     return total_clicks

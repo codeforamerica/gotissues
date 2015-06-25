@@ -8,9 +8,6 @@ import json
 
 from httplib2 import Http
 from psycopg2 import connect, extras
-from data_helpers import *
-
-
 from oauth2client.client import SignedJwtAssertionCredentials
 from apiclient.discovery import build
 

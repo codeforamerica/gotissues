@@ -25,29 +25,22 @@
 
     <section>
       <div class="layout-breve">
-
-        <h2>Testing</h2>
-          {% for response in final_response %}
-            <p>{{response}}<p>
-          {% endfor %}
-
-
         <h2>Goal One: Increase Reach</h2>
         <p>Increase page views and clicks.</p>
 
         <div class="layout-crotchet">
           <h2>Total Clicks</h2>
-          <h1 class="number">{{ total_clicks }}</h1>
+          <h1 class="number">{{ choice_dict.total_clicks }}</h1>
         </div>
 
         <div class="layout-crotchet">
           <h2>Total Page Views</h2>
-          <h1 class="number">{{ total_page_views }}</h1>
+          <h1 class="number">{{ choice_dict.total_page_views }}</h1>
         </div>
 
         <div class="layout-crotchet">
           <h2>Clicks Per View</h2>
-          <h1 class="number">{{ clicks_per_view }} %</h1>
+          <h1 class="number">{{ choice_dict.clicks_per_view }} %</h1>
         </div>
 
       </div>
@@ -56,7 +49,7 @@
         <div class="layout-minim">
           <h2>Top Five Clicked Issues</h2>
           <p>Not a good thing. Why havent they been closed yet?</p>
-          {% for issue in top_clicked_issues %}
+          {% for issue in choice_dict.most_clicked %}
             <p><a href="{{ issue[0] }}">{{ issue[0] }}</a> Clicks: {{ issue[1] }}</p>
           {% endfor %}
         </div>
@@ -64,14 +57,14 @@
         <div class="layout-minim">
           <h2>Bottom Five Clicked Issues</h2>
           <p>Not a good thing. Why haven't they been seen?</p>
-          {% for issue in least_clicked_issues %}
+          {% for issue in choice_dict.least_clicked %}
             <p><a href="{{ issue[0] }}">{{ issue[0] }}</a> Clicks: {{ issue[1] }}</p>
           {% endfor %}
         </div>
 
         <div class="layout-minim">
           <h2>Most Recently Clicked Issue</h2>
-            <a href=" {{ most_recent_clicked_issue }} ">{{ most_recent_clicked_issue }}</a>
+            <a href=" {{ choice_dict.recently_clicked }} ">{{ choice_dict.recently_clicked }}</a>
         </div>
 
       </div>
@@ -114,7 +107,7 @@
     <header class="slab-gray">
       <div class="layout-semibreve">
         <h2>How many issues are closed?</h2>
-        <h3>Out of <strong>{{total_issues}}</strong> total issues, there are <strong>{{closed_issue_total}}</strong> closed issues. That is <strong>{{closed_issue_percentage}}%</strong>!</h3>
+        <h3>Out of <strong>{{choice_dict.total_issues}}</strong> total issues, there are <strong>{{closed_issue_total}}</strong> closed issues. That is <strong>{{closed_issue_percentage}}%</strong>!</h3>
     </header>
   </section>
 </div>
@@ -128,20 +121,20 @@
         <label for="select">Check the status from a complete list of {{total_issues}} issues <abbr title="Required">*</abbr></label>
         <form action="/" method="post">
         <select name="issue" style="max-width:80%;">
-        {% if all_clicked_github %}
+        {% if choice_dict.clicked_issues %}
           <option value="" disabled selected>Click the dropdown to search again!</option>
         {% else %}
           <option value="" disabled selected>Select an issue!</option>
         {% endif %}
-        {% for issue in issue_list %}
+        {% for issue in choice_dict.clicked_issues %}
           <option><p>{{issue["url"]}}</p></option>
         {% endfor %}
         </select>
         <input class="check1" action="/" method="post" type="submit" value="Check Github!">
       </form>
       <p>
-      {% if check_clicked_github %}
-        <em><a href="{{check_clicked_github['html_url']}}"><p>{{check_clicked_github['title']}}</a></em> has a current state of <strong>{{check_clicked_github['state']}}</strong> and was last updated <em>{{check_clicked_github['updated_at']}}</em><p>
+      {% if choice_dict.check_clicked_github %}
+        <em><a href="{{choice_dict['check_clicked_github']['html_url']}}"><p>{{choice_dict['check_clicked_github']['title']}}</a></em> has a current state of <strong>{{choice_dict['check_clicked_github']['state']}}</strong> and was last updated <em>{{choice_dict['check_clicked_github']['updated_at']}}</em><p>
       {% endif %}
       <p>
   </div>
@@ -154,8 +147,8 @@
   <div class="layout-breve">
 
     <div class="layout-minim">
-        <h2>Top {{no_cities}} cities by click source</h2>
-          {% for data in top_cities%}
+        <h2>Top {{choice_dict.no_cities}} cities by click source</h2>
+          {% for data in choice_dict.top_cities%}
             <p>City: {{data[0]}}. Clicks from that City: {{data[1]}}</p>
           {% endfor %}
     </div>
