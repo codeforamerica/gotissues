@@ -4,7 +4,7 @@ import os
 import logging
 import datetime
 import requests
-from views import *
+import json
 
 from httplib2 import Http
 from psycopg2 import connect, extras

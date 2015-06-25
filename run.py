@@ -57,60 +57,9 @@ def db_connect(app):
 def db_cursor(conn, cursor_factory=extras.RealDictCursor):
     return conn.cursor(cursor_factory=cursor_factory)
 
-#
-# Functions used in Routes
-#
-
-def get_total_clicks():
-    ''' Get the total amount of clicks ever '''
-    results = service.data().ga().get(
-        ids="ga:" + GOOGLE_ANALYTICS_PROFILE_ID,
-        start_date='2014-08-24',
-        end_date=datetime.date.today().strftime("%Y-%m-%d"),
-        metrics='ga:totalEvents',
-        filters='ga:eventCategory=@Civic Issues').execute()
-
-    total_clicks = results["rows"][0][0]
-
-    return total_clicks
 
 
-def get_total_page_views():
-    ''' Get the total page views for the civic issue finder. '''
-    results = service.data().ga().get(
-        ids="ga:" + GOOGLE_ANALYTICS_PROFILE_ID,
-        start_date='2014-08-24',
-        end_date=datetime.date.today().strftime("%Y-%m-%d"),
-        metrics='ga:pageviews',
-        filters='ga:pagePath=@civicissues',
-        max_results=10).execute()
 
-    total_page_views = results["rows"][0][0]
-    return total_page_views
-
-
-def get_percentage_of_views_with_clicks(total_clicks, total_page_views):
-    ''' What percentage of views have a click? '''
-    clicks_per_view = ( float(total_clicks) / float(total_page_views) ) * 100
-    return int(clicks_per_view)
-
-
-def get_top_clicked_issues():
-    ''' Get the top clicked issues '''
-    results = service.data().ga().get(
-        ids="ga:" + GOOGLE_ANALYTICS_PROFILE_ID,
-        start_date='2014-08-24',
-        end_date=datetime.date.today().strftime("%Y-%m-%d"),
-        metrics='ga:totalEvents',
-        dimensions='ga:eventLabel',
-        sort='-ga:totalEvents',
-        filters='ga:eventCategory=@Civic Issues',
-        max_results=5,
-        fields='rows').execute()
-
-    top_clicked_issues = results["rows"]
-
-    return top_clicked_issues
 
 #
 # Routes
@@ -118,16 +67,10 @@ def get_top_clicked_issues():
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    total_clicks = get_total_clicks()
-    total_page_views = get_total_page_views()
-    top_clicked_issues = get_top_clicked_issues()
-    least_clicked_issues = get_least_clicked_issues()
-    most_recent_clicked_issue = get_most_recent_clicked_issue()
-    clicks_per_view = get_percentage_of_views_with_clicks(total_clicks, total_page_views)
-    issue_list = get_clicked_issues()
-    total_issues = len(issue_list)
-    top_cities = get_top_city_clicks()
-    no_cities = len(top_cities)
+    choice_list = ["total_page_views", "most_clicked"]
+    final_response = []
+    for choice in choice_list:
+        final_response.append(get_analytics_query(choice))
 
     if request.method == "POST":
         check_clicked_github = get_github_data(request.form["issue"])
@@ -136,18 +79,7 @@ def index():
 
     #get total number of closed issues differently
 
-    return render_template("index.html",total_clicks=total_clicks,
-        total_page_views=total_page_views,
-        top_clicked_issues=top_clicked_issues,
-        least_clicked_issues=least_clicked_issues, 
-        most_recent_clicked_issue=most_recent_clicked_issue,
-        clicks_per_view=clicks_per_view,
-        access_token=access_token,
-        total_issues=total_issues,
-        issue_list=issue_list,
-        top_cities = top_cities,
-        no_cities=no_cities,
-        check_clicked_github = check_clicked_github)
+    return render_template("index.html", final_response=final_response)
 
 
 if __name__ == '__main__':
