@@ -153,6 +153,27 @@
           {% endfor %}
     </div>
 
+    <div class="layout-breve">
+        <h2>Which pages are views coming from?</h2>
+          <table style="font-size:12px">
+          <tr>
+            <th>Issue</th>
+            <th>Issue Source</th>
+            <th>Views</th>
+          </tr>
+          
+          {% for data in choice_dict['viewed_issues'] %}
+            <tr>
+            <td>{{data['url']}}</td>
+              {% for source in data['view_sources'] %}
+                <td>{{source}}</td>
+              {% endfor %}
+            <td>{{data['views']}}</td>
+          </tr>
+          {% endfor %}
+          </table>
+    </div>
+
   <!--<div class="layout-minim">
     <h2>Recently clicked issues</h2>
     <form action="/test" method="post">

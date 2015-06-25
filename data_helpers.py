@@ -67,6 +67,15 @@ choice_dict = {
       'filters':'ga:eventCategory=@Civic Issues',
       'max_results':None,
       'fields':None
+    },
+
+    "viewed_issues": {
+      'metrics':'ga:totalEvents',
+      'dimensions':'ga:eventLabel',
+      'sort':'-ga:totalEvents',
+      'filters':'ga:eventCategory==Civic Issue View',
+      'max_results':20,
+      'fields':None
     }
 }
 
@@ -87,14 +96,14 @@ def edit_request_query(choice_dict_query):
 def get_analytics_query(choice):  
   if choice == "clicked_issues":
     results = edit_request_query(choice)
-    issues = []
+    clicked_issues = []
     for row in results["rows"]:
         issue = {
             "url" : row[0],
             "clicks" : row[1]
         }
-        issues.append(issue)
-    return issues
+        clicked_issues.append(issue)
+    return clicked_issues
 
 
   elif choice == "top_cities":
@@ -127,10 +136,29 @@ def get_analytics_query(choice):
     total_clicks = results["rows"][0][0]
     return total_clicks
 
-def get_percentage_of_views_with_clicks(total_clicks, total_page_views):
-    ''' What percentage of views have a click? '''
-    clicks_per_view = ( float(total_clicks) / float(total_page_views) ) * 100
-    return int(clicks_per_view)
+  elif choice == "viewed_issues":
+    results = edit_request_query(choice)
+    viewed_issues = []
+    for row in results["rows"]:
+        viewed_issue = {
+            "url" : row[0].split(',')[0],
+            "views" : row[1],
+            "view_sources" : [row[0].split(',')[1]]
+        }
+
+        # If the github url already exists in our list, add the new source to it
+        found = find(viewed_issues, "url", viewed_issue["view_sources"][0])
+        if found:
+            viewed_issues[found]["view_sources"].append(viewed_issue["view_sources"][0])
+        else:
+            viewed_issues.append(viewed_issue)
+    return viewed_issues
+
+def find(lst, key, value):
+    for i, dic in enumerate(lst):
+        if dic[key] == value:
+            return i
+    return False
 
 
 #

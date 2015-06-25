@@ -12,7 +12,8 @@ def index():
         "most_clicked":"",
         "recently_clicked":"",
         "total_page_views":"",
-        "total_clicks":""
+        "total_clicks":"",
+        "viewed_issues":""
     }
 
     for k in choice_dict.iterkeys():
@@ -24,8 +25,6 @@ def index():
     # view helpers
     if request.method == "POST":
         choice_dict["check_clicked_github"] = get_github_data(request.form["issue"])
-        print "UO\n\n"
-        print choice_dict["check_clicked_github"]['html_url']
     else:
         choice_dict["check_clicked_github"] = []
 
