@@ -1,9 +1,10 @@
 import os, unittest
 from psycopg2 import connect, extras
 
-from run import *
+from gotissues import *
 from clock import *
 from testdata import *
+from data_helpers import *
 
 
 class GotIssuesTestCase(unittest.TestCase):
@@ -46,6 +47,22 @@ class GotIssuesTestCase(unittest.TestCase):
 
         self.assertEqual(result,control)
 
+    def test_writing_bad_GA_request(self):
+        ''' Test that fetching from GA is working '''
+        error = {
+        "Error":"Bad query request, not added to our dictionary"
+        }
+
+        for k in bad_sample_dict.iterkeys():
+            bad_sample_dict[k] = get_analytics_query(k)
+            self.assertEqual(bad_sample_dict[k], error)
+
+    '''def test_writing_good_GA_request(self):
+        Test that fetching from GA is working
+
+        for k in bad_sample_dict.iterkeys():
+            bad_sample_dict[k] = get_analytics_query(k)
+            self.assertEqual(bad_sample_dict[k], error)'''
 
     def test_write_issue_to_db(self):
         ''' Test that writing to the db works '''

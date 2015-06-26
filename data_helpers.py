@@ -154,6 +154,12 @@ def get_analytics_query(choice):
             viewed_issues.append(viewed_issue)
     return viewed_issues
 
+  else:
+    response = {
+      "Error" : "Bad query request, not added to our dictionary"
+    }
+    return response
+
 def find(lst, key, value):
     for i, dic in enumerate(lst):
         if dic[key] == value:
@@ -179,21 +185,3 @@ def get_github_data(issue_url):
         "Error" : "Link invalid"
       }
     return git_data
-
-def get_date_of_issues():
-    results = service.data().ga().get(
-        ids="ga:" + GOOGLE_ANALYTICS_PROFILE_ID,
-        start_date='2014-08-24',
-        end_date=datetime.date.today().strftime("%Y-%m-%d"),
-        metrics='ga:totalEvents',
-        dimensions='ga:date, ga:eventLabel',
-        sort='-ga:date',
-        max_results=5,
-        filters='ga:eventCategory==Civic Issues;ga:eventLabel=@github.com').execute()
-
-    # sorted by click frequency (same as all freq)
-    dates = results["rows"]
-    for date in dates:
-        date[0] = analytics_formatted_date(date[0])
-
-    return dates
