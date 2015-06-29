@@ -1,5 +1,5 @@
 import json
-from run import *
+from gotissues import *
 
 def github_html_url_to_api(url):
     """ Convert https://github.com links to https://api.gitub.com """

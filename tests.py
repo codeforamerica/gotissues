@@ -48,7 +48,7 @@ class GotIssuesTestCase(unittest.TestCase):
         self.assertEqual(result,control)
 
     def test_writing_bad_GA_request(self):
-        ''' Test that fetching from GA is working '''
+        ''' Test for writing a bad key to GA'''
         error = {
         "Error":"Bad query request, not added to our dictionary"
         }
@@ -60,9 +60,9 @@ class GotIssuesTestCase(unittest.TestCase):
     '''def test_writing_good_GA_request(self):
         Test that fetching from GA is working
 
-        for k in bad_sample_dict.iterkeys():
-            bad_sample_dict[k] = get_analytics_query(k)
-            self.assertEqual(bad_sample_dict[k], error)'''
+        for k in good_sample_dict.iterkeys():
+            good_sample_dict[k] = get_analytics_query(k)
+            self.assertEqual(good_sample_dict[k], error)'''
 
     def test_write_issue_to_db(self):
         ''' Test that writing to the db works '''

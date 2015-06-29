@@ -1,6 +1,20 @@
 ''' one function that can talk to google! '''
 from gotissues import *
+# Variables
+GOOGLE_ANALYTICS_PROFILE_ID = "41226190"
+GOOGLE_SERVICE_ACCOUNT_EMAIL = os.environ["GOOGLE_SERVICE_ACCOUNT_EMAIL"]
+GOOGLE_SERVICE_ACCOUNT_SECRET_KEY = os.environ["GOOGLE_SERVICE_ACCOUNT_SECRET_KEY"]
+GITHUB_TOKEN = os.environ["GITHUB_TOKEN"]
 
+def login_to_google_analytics():
+    credentials = SignedJwtAssertionCredentials(GOOGLE_SERVICE_ACCOUNT_EMAIL, GOOGLE_SERVICE_ACCOUNT_SECRET_KEY,
+    'https://www.googleapis.com/auth/analytics.readonly')
+    http = Http()
+    credentials.authorize(http)
+    service = build("analytics", "v3", http=http)
+    return service, credentials.access_token
+
+service, access_token = login_to_google_analytics()
 
 #
 # Methods that return data from Google Analytics
