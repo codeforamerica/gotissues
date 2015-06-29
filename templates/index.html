@@ -64,7 +64,7 @@
         <center>
         <div class="layout-breve">
           <h2>Most Recently Clicked Issue</h2>
-            <a href=" {{ choice_dict.recently_clicked }} ">{{ choice_dict.recently_clicked }}</a>
+            <a href=" {{ choice_dict.recently_clicked[0]["url"] }} ">{{ choice_dict.recently_clicked[0]["url"]}} </a> at {{choice_dict.recently_clicked[0]["readable_date"] }}
         </div>
       </center>
 

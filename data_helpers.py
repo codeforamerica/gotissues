@@ -58,10 +58,10 @@ choice_dict = {
 
     "recently_clicked": {
       'metrics':'ga:totalEvents',
-      'dimensions':'ga:eventLabel, ga:date',
-      'sort':'-ga:date',
+      'dimensions':'ga:eventLabel, ga:dateHour, ga:minute',
+      'sort':'-ga:dateHour',
       'filters':'ga:eventCategory==Civic Issues',
-      'max_results':1,
+      'max_results':None,
       'fields':None
     },
 
@@ -137,8 +137,17 @@ def get_analytics_query(choice):
 
   elif choice == "recently_clicked":
     results = edit_request_query(choice)
-    most_recent_clicked_issue = results["rows"][0][0]
-    return most_recent_clicked_issue
+    clicked_timestamps = []
+    for row in results["rows"]:
+      new_time = ga_time_to_timestamp(row[1], row[2])
+      # print str(new_time) + "\n"
+      clicked_timestamp = {
+          "url": row[0],
+          "timestamp": new_time[0],
+          "readable_date" : new_time[1]
+      }
+      clicked_timestamps.append(clicked_timestamp)
+    return clicked_timestamps
 
   elif choice == "total_page_views":
     results = edit_request_query(choice)
@@ -180,7 +189,19 @@ def find(lst, key, value):
             return i
     return False
 
+def ga_time_to_timestamp(date, minute):
+  # Format should be 2015-06-29T16:35:39Z
+  # or Year-Mo-DaTHr:Mi:00Z
+  year = int(date[:4])
+  month = int(date[4:6])
+  day = int(date[6:8])
+  hour = int(date[8:10])
+  minute = int(minute)
 
+  new_time = datetime.datetime(year, month, day, hour, minute)
+  iso_time = new_time.isoformat()
+  new_time = new_time.strftime('%A, %B %d %Y %I:%M%p')
+  return iso_time, new_time
 #
 # Methods that return data from Github
 #
