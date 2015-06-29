@@ -41,7 +41,7 @@ choice_dict = {
     "least_clicked": {
       'metrics':'ga:totalEvents',
       'dimensions':'ga:eventLabel',
-      'sort':'-ga:totalEvents',
+      'sort':'ga:totalEvents',
       'filters':'ga:eventCategory==Civic Issues;ga:eventLabel=@github.com',
       'max_results':5,
       'fields':'rows'
@@ -50,7 +50,7 @@ choice_dict = {
     "most_clicked": {
       'metrics':'ga:totalEvents',
       'dimensions':'ga:eventLabel',
-      'sort':'ga:totalEvents',
+      'sort':'-ga:totalEvents',
       'filters':'ga:eventCategory==Civic Issues;ga:eventLabel=@github.com',
       'max_results':5,
       'fields':'rows'
@@ -170,7 +170,7 @@ def get_analytics_query(choice):
 
   else:
     response = {
-      "Error" : "Bad query request, not added to our dictionary"
+        "Error" : "Bad query request, not added to our dictionary"
     }
     return response
 
@@ -196,6 +196,6 @@ def get_github_data(issue_url):
         git_data = get_github_with_auth(url + issue_url[19:]).json()
     else:
       git_data = {
-        "Error" : "Link invalid"
+          "Error" : "Link invalid"
       }
     return git_data

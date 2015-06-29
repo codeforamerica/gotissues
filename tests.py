@@ -77,6 +77,8 @@ class GotIssuesTestCase(unittest.TestCase):
                 self.assertEqual(issue["clicks"],10000000)
                 self.assertEqual(issue["views"],777)
 
+    # Test for valid timestamps
+
 
 if __name__ == '__main__':
     unittest.main()
