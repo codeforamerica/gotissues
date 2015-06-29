@@ -1,5 +1,6 @@
 import json
 from gotissues import *
+from data_helpers import *
 
 def github_html_url_to_api(url):
     """ Convert https://github.com links to https://api.gitub.com """
@@ -81,9 +82,9 @@ def write_issue_to_db(issue, db):
 
 if __name__ == '__main__':
     # Get all the clicked issues from Google Analytics
-    clicked_issues = get_clicked_issues()
+    clicked_issues = get_analytics_query("clicked_issues")
     # Get the viewed issues from GA
-    viewed_issues = get_viewed_issues()
+    viewed_issues = get_analytics_query("viewed_issues")
 
     # Get the Github data for those clicked issues
     # Set the limit to 1 for testing
