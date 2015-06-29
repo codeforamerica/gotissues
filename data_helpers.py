@@ -60,8 +60,8 @@ choice_dict = {
       'metrics':'ga:totalEvents',
       'dimensions':'ga:eventLabel, ga:dateHour, ga:minute',
       'sort':'-ga:dateHour',
-      'filters':'ga:eventCategory==Civic Issues',
-      'max_results':None,
+      'filters':'ga:eventCategory==Civic Issues;ga:eventLabel=@github.com',
+      'max_results':10000,
       'fields':None
     },
 
