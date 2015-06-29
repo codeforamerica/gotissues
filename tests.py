@@ -1,9 +1,10 @@
 import os, unittest
 from psycopg2 import connect, extras
 
-from run import *
+from gotissues import *
 from clock import *
 from testdata import *
+from data_helpers import *
 
 
 class GotIssuesTestCase(unittest.TestCase):
@@ -41,12 +42,27 @@ class GotIssuesTestCase(unittest.TestCase):
     def test_trim_github_issues(self):
         ''' Test that only the github attributes we want are left '''
         trimmed_issues = trim_github_issues([full_issue])
-        # cmp == 0 when they are equal
         result = json.dumps(trimmed_issues[0], sort_keys=True, indent=4)
         control = json.dumps(trimmed_issue, sort_keys=True, indent=4)
 
         self.assertEqual(result,control)
 
+    def test_writing_bad_GA_request(self):
+        ''' Test for writing a bad key to GA'''
+        error = {
+        "Error":"Bad query request, not added to our dictionary"
+        }
+
+        for k in bad_sample_dict.iterkeys():
+            bad_sample_dict[k] = get_analytics_query(k)
+            self.assertEqual(bad_sample_dict[k], error)
+
+    '''def test_writing_good_GA_request(self):
+        Test that fetching from GA is working
+
+        for k in good_sample_dict.iterkeys():
+            good_sample_dict[k] = get_analytics_query(k)
+            self.assertEqual(good_sample_dict[k], error)'''
 
     def test_write_issue_to_db(self):
         ''' Test that writing to the db works '''

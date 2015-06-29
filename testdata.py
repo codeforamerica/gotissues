@@ -1,4 +1,4 @@
-DATABASE_URL = 'postgres:///peopledbtest'
+DATABASE_URL = 'postgres:///gotissuestest'
 
 full_issue = {
   "url": "https://api.github.com/repos/codeforamerica/gotissues/issues/8",
@@ -95,4 +95,13 @@ db_issue = {
   "clicks" : 10000000,
   "views" : 777,
   "view_sources" : ["www.codeforamerica.org"]
+}
+
+bad_sample_dict = {
+  "test":"",
+  "holla":""
+}
+
+good_sample_dict = {
+  "total_clicks":""
 }
