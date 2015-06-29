@@ -139,14 +139,7 @@ def get_analytics_query(choice):
     results = edit_request_query(choice)
     clicked_timestamps = []
     for row in results["rows"]:
-      new_time = ga_time_to_timestamp(row[1], row[2])
-      # print str(new_time) + "\n"
-      clicked_timestamp = {
-          "url": row[0],
-          "timestamp": new_time[0],
-          "readable_date" : new_time[1]
-      }
-      clicked_timestamps.append(clicked_timestamp)
+      clicked_timestamps.append(return_timestamp_dict(row))
     return clicked_timestamps
 
   elif choice == "total_page_views":
@@ -202,6 +195,16 @@ def ga_time_to_timestamp(date, minute):
   iso_time = new_time.isoformat()
   new_time = new_time.strftime('%A, %B %d %Y %I:%M%p')
   return iso_time, new_time
+
+def return_timestamp_dict(row):
+  new_time = ga_time_to_timestamp(row[1], row[2])
+  # print str(new_time) + "\n"
+  clicked_timestamp = {
+      "url": row[0],
+      "timestamp": new_time[0],
+      "readable_date" : new_time[1]
+  }
+  return clicked_timestamp
 #
 # Methods that return data from Github
 #

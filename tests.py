@@ -56,6 +56,14 @@ class GotIssuesTestCase(unittest.TestCase):
         for k in bad_sample_dict.iterkeys():
             bad_sample_dict[k] = get_analytics_query(k)
             self.assertEqual(bad_sample_dict[k], error)
+    def test_write_timestamp(self):
+        ''' Test for taking a sample GA response for issues + date info
+            and writing the timestamp to '''
+        timestamp_response = return_timestamp_dict(ga_timestamp_row)
+        control = json.dumps(timestamp_entry, sort_keys=True, indent=4)
+        results = json.dumps(timestamp_response, sort_keys=True, indent=4)
+
+        self.assertEqual(control, results)
 
     '''def test_writing_good_GA_request(self):
         Test that fetching from GA is working
@@ -78,6 +86,8 @@ class GotIssuesTestCase(unittest.TestCase):
                 self.assertEqual(issue["views"],777)
 
     # Test for valid timestamps
+    # Capture datetime.datetime.now() and the month year day 
+    # version of now() and assertEqual?
 
 
 if __name__ == '__main__':

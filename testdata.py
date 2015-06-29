@@ -105,3 +105,10 @@ bad_sample_dict = {
 good_sample_dict = {
   "total_clicks":""
 }
+
+ga_timestamp_row = ['https://github.com/codeforamerica/gotissues/issues/8', '2015122707', '30']
+timestamp_entry = {
+    "url":"https://github.com/codeforamerica/gotissues/issues/8",
+    "timestamp":"2015-12-27T07:30:00",
+    "readable_date":"Sunday, December 27 2015 07:30AM"
+} 
