@@ -113,6 +113,11 @@
     <header class="layout-semibreve">
     <h2>Check out this Activity data</h2>
       <p> Will look at certain intersection of issues, like frequently clicked issues or recently clicked issues (see next section)</p>
+      <select style="max-width:90%;">
+      {% for recent_click in choice_dict.recently_clicked %}
+      <option> {{recent_click["url"]}} was clicked at {{recent_click["readable_date"] }} </option>
+      {% endfor %}
+      </select>
     </header>
   </div>
 

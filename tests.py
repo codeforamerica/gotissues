@@ -2,7 +2,7 @@ import os, unittest
 from psycopg2 import connect, extras
 
 from gotissues import *
-from clock import *
+from daily_update import *
 from testdata import *
 from data_helpers import *
 
@@ -56,6 +56,7 @@ class GotIssuesTestCase(unittest.TestCase):
         for k in bad_sample_dict.iterkeys():
             bad_sample_dict[k] = get_analytics_query(k)
             self.assertEqual(bad_sample_dict[k], error)
+    
     def test_write_timestamp(self):
         ''' Test for taking a sample GA response for issues + date info
             and writing the timestamp to '''
