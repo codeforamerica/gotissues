@@ -241,3 +241,12 @@ def get_github_data(issue_url):
           "Error" : "Link invalid"
       }
     return git_data
+
+
+def get_closed_count(db):
+  ''' Pull out data from the database '''
+  q = ''' SELECT COUNT(*) FROM issues WHERE state = 'closed' '''
+
+  db.execute(q)
+  closed_count = db.fetchone()["count"]
+  return closed_count

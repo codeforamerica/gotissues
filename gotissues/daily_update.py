@@ -43,10 +43,14 @@ def add_views_to_issues(trimmed_issues, viewed_issues):
     ''' Add the number of views and sources to each issue '''
     issues = []
     for issue in trimmed_issues:
+        issue["views"] = None
+        issue["view_sources"] = None
+
         found = find(viewed_issues,"url",issue["html_url"])
         if found:
             issue["views"] = viewed_issues[found]["views"]
             issue["view_sources"] = viewed_issues[found]["view_sources"]
+
 
     return trimmed_issues
 
@@ -114,24 +118,25 @@ def write_issue_to_db(issue, db):
 
     if db.fetchone():
         # UPDATE
-        q = ''' UPDATE issues SET (id, html_url, title, body, labels, state,
+        q = ''' UPDATE issues SET (html_url, title, body, labels, state,
                       comments, created_at, closed_at, closed_by, clicks,
                       views, view_sources)
-                = ( %s, %s, %s, %s, %s::json, %s, %s, %s, %s, %s::json, %s, %s, %s)
+                = ( %(html_url)s, %(title)s, %(body)s, %(labels)s::json, %(state)s, %(comments)s, %(created_at)s, %(closed_at)s, %(closed_by)s::json, %(clicks)s, %(views)s, %(view_sources)s)
+                WHERE id = %(id)s
             '''
     else:
         # INSERT
         q = ''' INSERT INTO issues (id, html_url, title, body, labels, state,
                       comments, created_at, closed_at, closed_by, clicks,
                       views, view_sources)
-                VALUES ( %s, %s, %s, %s, %s::json, %s, %s, %s, %s, %s::json, %s, %s, %s)
+                VALUES ( %(id)s, %(html_url)s, %(title)s, %(body)s, %(labels)s::json, %(state)s, %(comments)s, %(created_at)s, %(closed_at)s, %(closed_by)s::json, %(clicks)s, %(views)s, %(view_sources)s)
             '''
 
-    db.execute(q, (issue["id"], issue["html_url"], issue["title"], issue["body"],
-                       json.dumps(issue["labels"]), issue["state"],
-                       issue["comments"], issue["created_at"],issue["closed_at"],
-                       json.dumps(issue["closed_by"]), issue["clicks"],
-                       issue["views"], issue["view_sources"]))
+    db.execute(q, {"id":issue["id"], "html_url":issue["html_url"], "title":issue["title"],
+                    "body":issue["body"], "labels":json.dumps(issue["labels"]), "state":issue["state"],
+                    "comments":issue["comments"], "created_at": issue["created_at"], "closed_at": issue["closed_at"],
+                    "closed_by":json.dumps(issue["closed_by"]), "clicks":issue["clicks"], "views":issue["views"],
+                    "view_sources":issue["view_sources"]})
 
 
 if __name__ == '__main__':
