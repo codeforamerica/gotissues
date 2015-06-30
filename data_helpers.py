@@ -18,13 +18,6 @@ def db_cursor(conn, cursor_factory=extras.RealDictCursor):
     return conn.cursor(cursor_factory=cursor_factory)
 
 
-# Github Auth set up
-if 'GITHUB_TOKEN' in os.environ:
-    github_auth = (os.environ['GITHUB_TOKEN'], '')
-else:
-    github_auth = None
-
-
 def login_to_google_analytics():
     credentials = SignedJwtAssertionCredentials(GOOGLE_SERVICE_ACCOUNT_EMAIL, GOOGLE_SERVICE_ACCOUNT_SECRET_KEY,
     'https://www.googleapis.com/auth/analytics.readonly')
@@ -34,6 +27,12 @@ def login_to_google_analytics():
     return service, credentials.access_token
 
 service, access_token = login_to_google_analytics()
+
+# Github Auth set up
+if 'GITHUB_TOKEN' in os.environ:
+    github_auth = (os.environ['GITHUB_TOKEN'], '')
+else:
+    github_auth = None
 
 #
 # Methods that return data from Google Analytics

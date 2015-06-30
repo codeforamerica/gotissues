@@ -100,7 +100,7 @@ def get_timestamp_issue_github_data(clicked_issues, limit=None):
         # github_issues.append(timestamp_dict)
 
 
-recent_issues = get_analytics_query("recently_clicked")
+
 
 # Get the Github data for those clicked issues
 # Set the limit to 1 for testing
@@ -145,6 +145,7 @@ if __name__ == '__main__':
     github_issues = get_clicked_issue_github_data(clicked_issues, limit=None)
     trimmed_issues = trim_github_issues(github_issues)
     issues = add_views_to_issues(github_issues, viewed_issues)
+    # recent_issues = get_analytics_query("recently_clicked")
 
     # print json.dumps(issues, indent=4, sort_keys=True)
 

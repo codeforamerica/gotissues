@@ -1,2 +1,2 @@
 DROP TABLE IF EXISTS issues;
-DROP TABLE IF EXISTS issues_activity;
+DROP TABLE IF EXISTS activity;

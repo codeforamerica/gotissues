@@ -21,7 +21,7 @@ def index():
 
     choice_dict["no_cities"] = len(choice_dict["top_cities"])
     choice_dict["clicks_per_view"] = int(100 * int(choice_dict["total_clicks"])/float(int(choice_dict["total_page_views"])))
-    choice_dict["access_token"]=login_to_google_analytics()[1]
+    choice_dict["access_token"] = access_token
     choice_dict["total_recently_clicked"] = len(choice_dict["recently_clicked"])
     
     # view helpers
@@ -31,5 +31,4 @@ def index():
         choice_dict["check_clicked_github"] = []
 
     # to do: get total number of closed issues differently
-
     return render_template("index.html", choice_dict=choice_dict)

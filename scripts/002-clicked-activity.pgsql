@@ -2,7 +2,7 @@
 -- Table of clicked Github Issue data
 --
 
-CREATE TABLE issues_activity
+CREATE TABLE activity
 (
 
     clicked_at        TIMESTAMP,
