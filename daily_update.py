@@ -1,5 +1,4 @@
 import json
-from gotissues import app
 from data_helpers import *
 
 def github_html_url_to_api(url):
