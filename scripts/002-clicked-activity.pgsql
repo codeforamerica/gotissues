@@ -2,11 +2,11 @@
 -- Table of clicked Github Issue data
 --
 
-CREATE TABLE issues
+CREATE TABLE issues_activity
 (
-    
+
     clicked_at        TIMESTAMP,
-    
+
     -- Issue id is the issue that the click is related to
     issue_id          INT PRIMARY KEY,
     nearby_events     TEXT[],
