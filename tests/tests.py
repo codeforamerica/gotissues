@@ -18,8 +18,8 @@ class GotIssuesTestCase(unittest.TestCase):
         with connect(DATABASE_URL) as conn:
             with conn.cursor() as db:
                 # Runs all the scripts to create tables
-                for filename in os.listdir("../scripts"):
-                    with open("../scripts/"+filename) as file:
+                for filename in os.listdir("scripts"):
+                    with open("scripts/"+filename) as file:
                         db.execute(file.read())
 
         self.app = app.test_client()
