@@ -1,4 +1,7 @@
-import os, unittest
+import os, unittest, sys, inspect
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parentdir = os.path.dirname(currentdir)
+sys.path.insert(0,parentdir) 
 from psycopg2 import connect, extras
 
 from gotissues import app
@@ -15,8 +18,8 @@ class GotIssuesTestCase(unittest.TestCase):
         with connect(DATABASE_URL) as conn:
             with conn.cursor() as db:
                 # Runs all the scripts to create tables
-                for filename in os.listdir("scripts"):
-                    with open("scripts/"+filename) as file:
+                for filename in os.listdir("../scripts"):
+                    with open("../scripts/"+filename) as file:
                         db.execute(file.read())
 
         self.app = app.test_client()
