@@ -371,6 +371,19 @@ def fetch_closed_issues(data):
     # get
     return total_comments '''
 
+def get_issues_from_db():
+    ''' An example of how to get data from the db '''
+    with connect(os.environ['DATABASE_URL']) as conn:
+        with db_cursor(conn) as db:
+
+            q = ''' SELECT html_url, clicks, views, sources
+                    FROM issues
+                    ORDER BY views DESC LIMIT 10 '''
+            db.execute(q)
+            rows = db.fetchall()
+
+            return rows
+
 #
 # Routes
 #
