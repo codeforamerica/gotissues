@@ -1,7 +1,7 @@
 import os, unittest
 from psycopg2 import connect, extras
 
-from gotissues import *
+from gotissues import app
 from daily_update import *
 from testdata import *
 from data_helpers import *

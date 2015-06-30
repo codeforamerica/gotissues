@@ -1,5 +1,4 @@
 import json
-from gotissues import *
 from data_helpers import *
 
 def github_html_url_to_api(url):
@@ -105,7 +104,7 @@ recent_issues = get_analytics_query("recently_clicked")
 
 # Get the Github data for those clicked issues
 # Set the limit to 1 for testing
-github_issues = get_timestamp_issue_github_data(recent_issues, limit=100)
+# github_issues = get_timestamp_issue_github_data(recent_issues, limit=100)
 
 def write_issue_to_db(issue, db):
     """ Write the issue to the database """

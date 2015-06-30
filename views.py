@@ -1,7 +1,7 @@
 ''' views.py: This file contains all of the routes '''
 from data_helpers import *
 from gotissues import app
-from flask import Flask, render_template, request
+from flask import render_template, request
 
 @app.route("/", methods=["GET", "POST"])
 def index():

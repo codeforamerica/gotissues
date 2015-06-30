@@ -1,10 +1,29 @@
-''' one function that can talk to google! '''
-from gotissues import *
-# Variables
-GOOGLE_ANALYTICS_PROFILE_ID = "41226190"
-GOOGLE_SERVICE_ACCOUNT_EMAIL = os.environ["GOOGLE_SERVICE_ACCOUNT_EMAIL"]
-GOOGLE_SERVICE_ACCOUNT_SECRET_KEY = os.environ["GOOGLE_SERVICE_ACCOUNT_SECRET_KEY"]
-GITHUB_TOKEN = os.environ["GITHUB_TOKEN"]
+import datetime
+import requests
+from psycopg2 import connect, extras
+
+from httplib2 import Http
+from oauth2client.client import SignedJwtAssertionCredentials
+from apiclient.discovery import build
+
+from config import *
+
+#
+# Database setup
+#
+def db_connect(app):
+    return connect(app.config['DATABASE_URL'])
+
+def db_cursor(conn, cursor_factory=extras.RealDictCursor):
+    return conn.cursor(cursor_factory=cursor_factory)
+
+
+# Github Auth set up
+if 'GITHUB_TOKEN' in os.environ:
+    github_auth = (os.environ['GITHUB_TOKEN'], '')
+else:
+    github_auth = None
+
 
 def login_to_google_analytics():
     credentials = SignedJwtAssertionCredentials(GOOGLE_SERVICE_ACCOUNT_EMAIL, GOOGLE_SERVICE_ACCOUNT_SECRET_KEY,
