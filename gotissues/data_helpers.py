@@ -1,5 +1,6 @@
 import datetime
 import requests
+import json
 from psycopg2 import connect, extras
 
 from httplib2 import Http
@@ -263,6 +264,45 @@ def get_github_data(issue_url):
       }
     return git_data
 
+def get_github_project_data(issue_url):
+  ''' Converting -->
+      https://github.com/:org/:repo/issues/:no -->
+      https://api.github.com/repos/:org/:repo/issues/:no -->
+      https://api.github.com/repos/:org/:repo/events '''
+  if issue_url.startswith('https://github.com/'):
+    api_issue = "https://api.github.com/repos/" + issue_url[19:]
+    issue_var = api_issue.split("/")[7]
+    api_issue = api_issue.replace("issues/" + str(issue_var), 'events')
+    git_data = get_github_with_auth(api_issue).json()
+    return git_data
+  else:
+    print "Error in this issue url: " + str(issue_url)
+    return issue_url
+
+def get_click_activity(clicks):
+  activities = []
+  for click in clicks:
+    # issue_activity.append(get_github_project_data(click["issue_url"]))
+    activity_list = get_github_project_data(click["issue_url"])
+    # print activity_list
+    for activity in activity_list:
+      trimmed_activity = trim_activity(activity, click)
+      activities.append(trimmed_activity)
+      # print str(trimmed_activity) + "\n"
+  return activities
+
+def trim_activity(activities, db_data):
+  # print activities
+  trimmed_activities = {}
+
+  # print "this is how activities looks like" + str(activities)
+  # Once DB is working
+  trimmed_activities["issue_id"] = db_data["id"]
+  trimmed_activities["issue_url"] = db_data["issue_url"]
+  trimmed_activities["click_timestamp"] = db_data["timestamp"]
+  trimmed_activities["activity_type"] = activities["type"]
+  trimmed_activities["activity_timestamp"] = activities["created_at"]
+  return trimmed_activities
 
 def get_closed_count(db):
   ''' Pull out data from the database '''
@@ -271,3 +311,14 @@ def get_closed_count(db):
   db.execute(q)
   closed_count = db.fetchone()["count"]
   return closed_count
+
+def get_timestamped_clicks():
+  ''' Pull out data from database'''
+  with connect(os.environ['DATABASE_URL']) as conn:
+    with db_cursor(conn) as db:
+      q = ''' SELECT id,timestamp,issue_url FROM clicks '''
+
+      db.execute(q)
+      query = db.fetchall()
+  #print json_output
+  return query
