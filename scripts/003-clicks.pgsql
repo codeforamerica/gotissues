@@ -4,7 +4,8 @@
 
 CREATE TABLE clicks
 (
-    id          INT PRIMARY KEY,
+    id          SERIAL PRIMARY KEY,
     timestamp   TIMESTAMP,
-    issue_id    INT REFERENCES issues(id)
+    readable_date TEXT,
+    issue_url   TEXT
 );

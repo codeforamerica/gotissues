@@ -1,12 +1,11 @@
-import os, unittest, sys, inspect
+import os, unittest, sys, inspect, json
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0,parentdir) 
 from psycopg2 import connect, extras
 
-from gotissues import app
-from daily_update import *
-from testdata import *
+from gotissues import app, daily_update
+import testdata
 from data_helpers import *
 
 
@@ -15,7 +14,7 @@ class GotIssuesTestCase(unittest.TestCase):
     def setUp(self):
         # Runs before every tests
         # Build DB
-        with connect(DATABASE_URL) as conn:
+        with connect(testdata.DATABASE_URL) as conn:
             with conn.cursor() as db:
                 # Runs all the scripts to create tables
                 for filename in os.listdir("scripts"):
@@ -44,9 +43,9 @@ class GotIssuesTestCase(unittest.TestCase):
 
     def test_trim_github_issues(self):
         ''' Test that only the github attributes we want are left '''
-        trimmed_issues = trim_github_issues([full_issue])
+        trimmed_issues = daily_update.trim_github_issues([testdata.full_issue])
         result = json.dumps(trimmed_issues[0], sort_keys=True, indent=4)
-        control = json.dumps(trimmed_issue, sort_keys=True, indent=4)
+        control = json.dumps(testdata.trimmed_issue, sort_keys=True, indent=4)
 
         self.assertEqual(result,control)
 
@@ -56,15 +55,15 @@ class GotIssuesTestCase(unittest.TestCase):
         "Error":"Bad query request, not added to our dictionary"
         }
 
-        for k in bad_sample_dict.iterkeys():
-            bad_sample_dict[k] = get_analytics_query(k)
-            self.assertEqual(bad_sample_dict[k], error)
+        for k in testdata.bad_sample_dict.iterkeys():
+            testdata.bad_sample_dict[k] = get_analytics_query(k)
+            self.assertEqual(testdata.bad_sample_dict[k], error)
     
     def test_write_timestamp(self):
         ''' Test for taking a sample GA response for issues + date info
             and writing the timestamp to '''
-        timestamp_response = return_timestamp_dict(ga_timestamp_row)
-        control = json.dumps(timestamp_entry, sort_keys=True, indent=4)
+        timestamp_response = return_timestamp_dict(testdata.ga_timestamp_row)
+        control = json.dumps(testdata.timestamp_entry, sort_keys=True, indent=4)
         results = json.dumps(timestamp_response, sort_keys=True, indent=4)
 
         self.assertEqual(control, results)
@@ -78,9 +77,9 @@ class GotIssuesTestCase(unittest.TestCase):
 
     def test_write_issue_to_db(self):
         ''' Test that writing to the db works '''
-        with connect(DATABASE_URL) as conn:
+        with connect(testdata.DATABASE_URL) as conn:
             with db_cursor(conn) as db:
-                write_issue_to_db(db_issue, db)
+                daily_update.write_issue_to_db(testdata.db_issue, db)
 
                 q = ''' SELECT * FROM issues '''
                 db.execute(q)
@@ -88,6 +87,18 @@ class GotIssuesTestCase(unittest.TestCase):
                 self.assertEqual(issue["id"],87136867)
                 self.assertEqual(issue["clicks"],10000000)
                 self.assertEqual(issue["views"],777)
+
+    def test_write_click_to_db(self):
+        ''' Test that writing to the db works '''
+        with connect(testdata.DATABASE_URL) as conn:
+            with db_cursor(conn) as db:
+                daily_update.write_click_to_db(testdata.fake_click, db)
+
+                q = ''' SELECT * FROM clicks '''
+                db.execute(q)
+                issue = db.fetchone()
+                self.assertEqual(issue["id"],1)
+                self.assertEqual(issue["readable_date"],"Sunday, December 27 2015 07:30AM")
 
     # Test for valid timestamps
     # Capture datetime.datetime.now() and the month year day 

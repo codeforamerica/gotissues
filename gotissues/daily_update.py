@@ -139,7 +139,24 @@ def write_issue_to_db(issue, db):
                     "view_sources":issue["view_sources"]})
 
 
+def write_click_to_db(click, db):
+    """ Write the click to the database """
+    # Check if the click already exists
+    query = ''' SELECT * FROM clicks WHERE issue_url = %(issue_url)s AND timestamp = %(timestamp)s '''
+    db.execute(query, {"issue_url" : click["issue_url"], "timestamp": click["timestamp"]})
+
+    if not db.fetchone():
+        # INSERT
+        q = ''' INSERT INTO clicks (issue_url, timestamp, readable_date)
+                VALUES ( %(issue_url)s, %(timestamp)s, %(readable_date)s)
+            '''
+
+        db.execute(q, {"issue_url": click["issue_url"], "timestamp": click["timestamp"],
+                        "readable_date": click["readable_date"]})
+
+
 if __name__ == '__main__':
+
     # Get all the clicked issues from Google Analytics
     clicked_issues = get_analytics_query("clicked_issues")
     # Get the viewed issues from GA
@@ -154,8 +171,14 @@ if __name__ == '__main__':
 
     # print json.dumps(issues, indent=4, sort_keys=True)
 
+    # Get all clicks
+    clicks = get_analytics_query("all_clicks")
+
     # Add each issue to the db
     with connect(os.environ['DATABASE_URL']) as conn:
         with db_cursor(conn) as db:
             for issue in issues:
                 write_issue_to_db(issue, db)
+
+            for click in clicks:
+                write_click_to_db(click,db)
