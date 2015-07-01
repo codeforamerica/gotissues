@@ -108,7 +108,16 @@ choice_dict = {
       'filters':'ga:eventCategory==Civic Issue View',
       'max_results':20,
       'fields':None
-    }
+    },
+
+    "all_clicks": {
+      'metrics':'ga:totalEvents',
+      'dimensions':'ga:eventLabel, ga:dateHour, ga:minute',
+      'sort':'-ga:dateHour',
+      'filters':'ga:eventCategory==Civic Issues;ga:eventLabel=@github.com',
+      'max_results':10,
+      'fields':'rows'
+    },
 }
 
 def edit_request_query(choice_dict_query):
@@ -188,6 +197,18 @@ def get_analytics_query(choice):
             viewed_issues.append(viewed_issue)
     return viewed_issues
 
+  elif choice == "all_clicks":
+    results = edit_request_query(choice)
+    clicks = []
+    for row in results["rows"]:
+      click = {
+        "issue_url" : row[0],
+        "timestamp" : ga_time_to_timestamp(row[1], row[2])[0],
+        "readable_date" : ga_time_to_timestamp(row[1], row[2])[1]
+      }
+      clicks.append(click)
+    return clicks
+
   else:
     response = {
         "Error" : "Bad query request, not added to our dictionary"
@@ -241,3 +262,12 @@ def get_github_data(issue_url):
           "Error" : "Link invalid"
       }
     return git_data
+
+
+def get_closed_count(db):
+  ''' Pull out data from the database '''
+  q = ''' SELECT COUNT(*) FROM issues WHERE state = 'closed' '''
+
+  db.execute(q)
+  closed_count = db.fetchone()["count"]
+  return closed_count

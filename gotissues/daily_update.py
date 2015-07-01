@@ -43,10 +43,14 @@ def add_views_to_issues(trimmed_issues, viewed_issues):
     ''' Add the number of views and sources to each issue '''
     issues = []
     for issue in trimmed_issues:
+        issue["views"] = None
+        issue["view_sources"] = None
+
         found = find(viewed_issues,"url",issue["html_url"])
         if found:
             issue["views"] = viewed_issues[found]["views"]
             issue["view_sources"] = viewed_issues[found]["view_sources"]
+
 
     return trimmed_issues
 
@@ -114,27 +118,45 @@ def write_issue_to_db(issue, db):
 
     if db.fetchone():
         # UPDATE
-        q = ''' UPDATE issues SET (id, html_url, title, body, labels, state,
+        q = ''' UPDATE issues SET (html_url, title, body, labels, state,
                       comments, created_at, closed_at, closed_by, clicks,
                       views, view_sources)
-                = ( %s, %s, %s, %s, %s::json, %s, %s, %s, %s, %s::json, %s, %s, %s)
+                = ( %(html_url)s, %(title)s, %(body)s, %(labels)s::json, %(state)s, %(comments)s, %(created_at)s, %(closed_at)s, %(closed_by)s::json, %(clicks)s, %(views)s, %(view_sources)s)
+                WHERE id = %(id)s
             '''
     else:
         # INSERT
         q = ''' INSERT INTO issues (id, html_url, title, body, labels, state,
                       comments, created_at, closed_at, closed_by, clicks,
                       views, view_sources)
-                VALUES ( %s, %s, %s, %s, %s::json, %s, %s, %s, %s, %s::json, %s, %s, %s)
+                VALUES ( %(id)s, %(html_url)s, %(title)s, %(body)s, %(labels)s::json, %(state)s, %(comments)s, %(created_at)s, %(closed_at)s, %(closed_by)s::json, %(clicks)s, %(views)s, %(view_sources)s)
             '''
 
-    db.execute(q, (issue["id"], issue["html_url"], issue["title"], issue["body"],
-                       json.dumps(issue["labels"]), issue["state"],
-                       issue["comments"], issue["created_at"],issue["closed_at"],
-                       json.dumps(issue["closed_by"]), issue["clicks"],
-                       issue["views"], issue["view_sources"]))
+    db.execute(q, {"id":issue["id"], "html_url":issue["html_url"], "title":issue["title"],
+                    "body":issue["body"], "labels":json.dumps(issue["labels"]), "state":issue["state"],
+                    "comments":issue["comments"], "created_at": issue["created_at"], "closed_at": issue["closed_at"],
+                    "closed_by":json.dumps(issue["closed_by"]), "clicks":issue["clicks"], "views":issue["views"],
+                    "view_sources":issue["view_sources"]})
+
+
+def write_click_to_db(click, db):
+    """ Write the click to the database """
+    # Check if the click already exists
+    query = ''' SELECT * FROM clicks WHERE issue_url = %(issue_url)s AND timestamp = %(timestamp)s '''
+    db.execute(query, {"issue_url" : click["issue_url"], "timestamp": click["timestamp"]})
+
+    if not db.fetchone():
+        # INSERT
+        q = ''' INSERT INTO clicks (issue_url, timestamp, readable_date)
+                VALUES ( %(issue_url)s, %(timestamp)s, %(readable_date)s)
+            '''
+
+        db.execute(q, {"issue_url": click["issue_url"], "timestamp": click["timestamp"],
+                        "readable_date": click["readable_date"]})
 
 
 if __name__ == '__main__':
+
     # Get all the clicked issues from Google Analytics
     clicked_issues = get_analytics_query("clicked_issues")
     # Get the viewed issues from GA
@@ -149,8 +171,14 @@ if __name__ == '__main__':
 
     # print json.dumps(issues, indent=4, sort_keys=True)
 
+    # Get all clicks
+    clicks = get_analytics_query("all_clicks")
+
     # Add each issue to the db
     with connect(os.environ['DATABASE_URL']) as conn:
         with db_cursor(conn) as db:
             for issue in issues:
                 write_issue_to_db(issue, db)
+
+            for click in clicks:
+                write_click_to_db(click,db)

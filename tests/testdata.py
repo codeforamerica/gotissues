@@ -1,5 +1,11 @@
 DATABASE_URL = 'postgres:///gotissuestest'
 
+fake_click = {
+    "issue_url":"https://github.com/codeforamerica/gotissues/issues/8",
+    "timestamp":"2015-12-27T07:30:00",
+    "readable_date":"Sunday, December 27 2015 07:30AM"
+} 
+
 full_issue = {
   "url": "https://api.github.com/repos/codeforamerica/gotissues/issues/8",
   "labels_url": "https://api.github.com/repos/codeforamerica/gotissues/issues/8/labels{/name}",
