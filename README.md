@@ -39,4 +39,6 @@ foreman start
 ### To Test
 In the top level, run
 
-`python tests/tests.py`
+```
+python tests/tests.py
+```
