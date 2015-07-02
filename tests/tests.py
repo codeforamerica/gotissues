@@ -99,6 +99,16 @@ class GotIssuesTestCase(unittest.TestCase):
                 issue = db.fetchone()
                 self.assertEqual(issue["id"],1)
                 self.assertEqual(issue["readable_date"],"Sunday, December 27 2015 07:30AM")
+    
+    def test_write_activity_to_db(self):
+        with connect(testdata.DATABASE_URL) as conn:
+            with db_cursor(conn) as db:
+                daily_update.write_activities_to_db(testdata.fake_db_click, db)
+
+                q = ''' SELECT * FROM activity '''
+                db.execute(q)
+                activity = db.fetchone()
+                self.assertEqual(activity["issue_id"],111111)
 
     # Test for valid timestamps
     # Capture datetime.datetime.now() and the month year day 
