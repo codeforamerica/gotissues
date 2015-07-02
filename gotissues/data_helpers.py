@@ -1,5 +1,6 @@
 import datetime
 import requests
+import json
 from psycopg2 import connect, extras
 
 from httplib2 import Http
@@ -39,11 +40,13 @@ else:
 #
 choice_dict = {
     "clicked_issues": {
+      'start_date':'today',
+      'end_date':'today',
       'metrics':'ga:totalEvents',
       'dimensions':'ga:eventLabel',
       'sort':'-ga:totalEvents',
       'filters':'ga:eventCategory==Civic Issues;ga:eventLabel=@github.com',
-      'max_results':None,
+      'max_results':10000,
       'fields':None
     },
 
@@ -102,6 +105,8 @@ choice_dict = {
     },
 
     "viewed_issues": {
+      'start_date':'today',
+      'end_date':'today',
       'metrics':'ga:totalEvents',
       'dimensions':'ga:eventLabel',
       'sort':'-ga:totalEvents',
@@ -111,11 +116,13 @@ choice_dict = {
     },
 
     "all_clicks": {
+      'start_date':'today',
+      'end_date':'today',
       'metrics':'ga:totalEvents',
       'dimensions':'ga:eventLabel, ga:dateHour, ga:minute',
       'sort':'-ga:dateHour',
       'filters':'ga:eventCategory==Civic Issues;ga:eventLabel=@github.com',
-      'max_results':10,
+      'max_results':10000,
       'fields':'rows'
     },
 }
@@ -123,8 +130,8 @@ choice_dict = {
 def edit_request_query(choice_dict_query):
   results = service.data().ga().get(
           ids="ga:" + GOOGLE_ANALYTICS_PROFILE_ID,
-          start_date='2014-08-24',
-          end_date=datetime.date.today().strftime("%Y-%m-%d"),
+          start_date=choice_dict[choice_dict_query].get("start_date",'2014-08-24'),
+          end_date=choice_dict[choice_dict_query].get("end_date", datetime.date.today().strftime("%Y-%m-%d")),
           metrics=choice_dict[choice_dict_query]['metrics'],
           dimensions=choice_dict[choice_dict_query]['dimensions'],
           sort=choice_dict[choice_dict_query]['sort'],
@@ -263,6 +270,72 @@ def get_github_data(issue_url):
       }
     return git_data
 
+def get_github_project_data(issue_url):
+  ''' Converting -->
+      https://github.com/:org/:repo/issues/:no -->
+      https://api.github.com/repos/:org/:repo/issues/:no -->
+      https://api.github.com/repos/:org/:repo/events '''
+  if issue_url.startswith('https://github.com/'):
+    api_issue = "https://api.github.com/repos/" + issue_url[19:]
+    issue_var = api_issue.split("/")[7]
+    api_issue = api_issue.replace("issues/" + str(issue_var), 'events')
+    git_data = get_github_with_auth(api_issue).json()
+    return git_data
+  else:
+    print "Error in this issue url: " + str(issue_url)
+    return issue_url
+
+def get_click_activity(clicks):
+  activities = []
+  total = 0
+  for click in clicks:
+    activity_list = get_github_project_data(click["issue_url"])
+    for activity in activity_list:
+      if check_timestamp(activity, click, 5):
+        trimmed_activity = trim_activity(activity, click)
+        activities.append(trimmed_activity)
+      print str(trimmed_activity) + "\n"
+  return activities
+
+def write_activities_to_db(activity, db):
+    # print "This is the activity we are trying to write"
+    # print activity
+    q = ''' SELECT * FROM activity WHERE activity_type = %(activity_type)s AND activity_timestamp = %(activity_timestamp)s AND click_timestamp = %(click_timestamp)s'''
+
+    db.execute(q, {"issue_id": activity["issue_id"], "issue_url": activity["issue_url"],
+                "click_timestamp": activity["click_timestamp"], "activity_type": activity["activity_type"],
+                "activity_timestamp": activity["activity_timestamp"]})
+
+    q = ''' INSERT INTO activity (issue_id, issue_url, click_timestamp, activity_type, activity_timestamp)
+            VALUES ( %(issue_id)s, %(issue_url)s, %(click_timestamp)s, %(activity_type)s, %(activity_timestamp)s)
+        '''
+    db.execute(q, {"issue_id": activity["issue_id"], "issue_url": activity["issue_url"],
+               "click_timestamp": activity["click_timestamp"], "activity_type": activity["activity_type"],
+               "activity_timestamp": activity["activity_timestamp"]})
+
+def check_timestamp(activity, click, hours):
+
+  action_time = datetime.datetime.strptime(activity["created_at"], '%Y-%m-%dT%H:%M:%SZ')
+  # click_time = datetime.datetime.strptime(click["timestamp"], '%Y-%m-%dT%H:%M:%S')
+  click_time = click["timestamp"]
+  timedelta = action_time - click_time
+  if timedelta < datetime.timedelta(hours=hours) and timedelta > datetime.timedelta(minutes=0):
+    print timedelta
+    return True
+  else: return False
+
+def trim_activity(activities, db_data):
+  # print activities
+  trimmed_activities = {}
+
+  # print "this is how activities looks like" + str(activities)
+  # Once DB is working
+  trimmed_activities["issue_id"] = db_data["id"]
+  trimmed_activities["issue_url"] = db_data["issue_url"]
+  trimmed_activities["click_timestamp"] = db_data["timestamp"]
+  trimmed_activities["activity_type"] = activities["type"]
+  trimmed_activities["activity_timestamp"] = activities["created_at"]
+  return trimmed_activities
 
 def get_closed_count(db):
   ''' Pull out data from the database '''
@@ -271,3 +344,14 @@ def get_closed_count(db):
   db.execute(q)
   closed_count = db.fetchone()["count"]
   return closed_count
+
+def get_timestamped_clicks():
+  ''' Pull out data from database'''
+  with connect(os.environ['DATABASE_URL']) as conn:
+    with db_cursor(conn) as db:
+      q = ''' SELECT id,timestamp,issue_url FROM clicks '''
+
+      db.execute(q)
+      query = db.fetchall()
+  #print json_output
+  return query

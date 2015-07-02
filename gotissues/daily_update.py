@@ -103,9 +103,6 @@ def get_timestamp_issue_github_data(clicked_issues, limit=None):
         #   print json.dumps(issue, indent=4, sort_keys=True)
         # github_issues.append(timestamp_dict)
 
-
-
-
 # Get the Github data for those clicked issues
 # Set the limit to 1 for testing
 # github_issues = get_timestamp_issue_github_data(recent_issues, limit=100)
@@ -142,7 +139,7 @@ def write_issue_to_db(issue, db):
 def write_click_to_db(click, db):
     """ Write the click to the database """
     # Check if the click already exists
-    query = ''' SELECT * FROM clicks WHERE issue_url = %(issue_url)s AND timestamp = %(timestamp)s '''
+    query = ''' SELECT * FROM "clicks" WHERE issue_url = %(issue_url)s AND timestamp = %(timestamp)s '''
     db.execute(query, {"issue_url" : click["issue_url"], "timestamp": click["timestamp"]})
 
     if not db.fetchone():
@@ -154,25 +151,47 @@ def write_click_to_db(click, db):
         db.execute(q, {"issue_url": click["issue_url"], "timestamp": click["timestamp"],
                         "readable_date": click["readable_date"]})
 
+def write_activities_to_db(activity, db):
+    # print "This is the activity we are trying to write"
+    # print activity
+    # q = ''' SELECT * FROM activity WHERE activity_type = %(activity_type)s AND activity_timestamp = %(activity_timestamp)s AND click_timestamp = %(click_timestamp)s'''
+
+    # db.execute(q, {"issue_id": activity["issue_id"], "issue_url": activity["issue_url"],
+    #            "click_timestamp": activity["click_timestamp"], "activity_type": activity["activity_type"],
+    #            "activity_timestamp": activity["activity_timestamp"]})
+
+    q = ''' INSERT INTO activity (issue_id, issue_url, click_timestamp, activity_type, activity_timestamp)
+            VALUES ( %(issue_id)s, %(issue_url)s, %(click_timestamp)s, %(activity_type)s, %(activity_timestamp)s)
+        '''
+    db.execute(q, {"issue_id": activity["issue_id"], "issue_url": activity["issue_url"],
+               "click_timestamp": activity["click_timestamp"], "activity_type": activity["activity_type"],
+               "activity_timestamp": activity["activity_timestamp"]})
+
 
 if __name__ == '__main__':
 
-    # Get all the clicked issues from Google Analytics
+    # # Get all the clicked issues from Google Analytics
     clicked_issues = get_analytics_query("clicked_issues")
-    # Get the viewed issues from GA
+    # # Get the viewed issues from GA
     viewed_issues = get_analytics_query("viewed_issues")
 
-    # Get the Github data for those clicked issues
-    # Set the limit to 1 for testing
+    # # Get the Github data for those clicked issues
+    # # Set the limit to 1 for testing
     github_issues = get_clicked_issue_github_data(clicked_issues, limit=None)
     trimmed_issues = trim_github_issues(github_issues)
     issues = add_views_to_issues(github_issues, viewed_issues)
-    # recent_issues = get_analytics_query("recently_clicked")
+    # # recent_issues = get_analytics_query("recently_clicked")
 
-    # print json.dumps(issues, indent=4, sort_keys=True)
+    # # print json.dumps(issues, indent=4, sort_keys=True)
 
-    # Get all clicks
+    # # Get all clicks
     clicks = get_analytics_query("all_clicks")
+    
+    # Get all activity (related to a click)
+    # Queries the db for clicks and their ids
+    # this needs to be run twice, must fix
+    clicks_activity = get_timestamped_clicks()
+    activities = get_click_activity(clicks_activity)
 
     # Add each issue to the db
     with connect(os.environ['DATABASE_URL']) as conn:
@@ -182,3 +201,6 @@ if __name__ == '__main__':
 
             for click in clicks:
                 write_click_to_db(click,db)
+
+            for activity in activities:
+                write_activities_to_db(activity, db)
