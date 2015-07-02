@@ -286,10 +286,21 @@ def get_click_activity(clicks):
     activity_list = get_github_project_data(click["issue_url"])
     # print activity_list
     for activity in activity_list:
-      trimmed_activity = trim_activity(activity, click)
-      activities.append(trimmed_activity)
-      # print str(trimmed_activity) + "\n"
+      if check_timestamp(activity, click, 5):
+        trimmed_activity = trim_activity(activity, click)
+        activities.append(trimmed_activity)
+        print str(trimmed_activity) + "\n"
   return activities
+
+def check_timestamp(activity, click, hours):
+
+  action_time = datetime.datetime.strptime(activity["created_at"], '%Y-%m-%dT%H:%M:%SZ')
+  # click_time = datetime.datetime.strptime(click["timestamp"], '%Y-%m-%dT%H:%M:%S')
+  click_time = click["timestamp"]
+  timedelta = action_time - click_time
+  if timedelta < datetime.timedelta(hours=hours) and timedelta > datetime.timedelta(minutes=0):
+    return True
+  else: return False
 
 def trim_activity(activities, db_data):
   # print activities
