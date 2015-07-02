@@ -294,7 +294,7 @@ def get_click_activity(clicks):
       if check_timestamp(activity, click, 5):
         trimmed_activity = trim_activity(activity, click)
         activities.append(trimmed_activity)
-      print str(trimmed_activity) + "\n"
+        print str(trimmed_activity) + "\n"
   return activities
 
 def write_activities_to_db(activity, db):

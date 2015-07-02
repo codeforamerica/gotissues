@@ -152,20 +152,20 @@ def write_click_to_db(click, db):
                         "readable_date": click["readable_date"]})
 
 def write_activities_to_db(activity, db):
-    # print "This is the activity we are trying to write"
-    # print activity
-    # q = ''' SELECT * FROM activity WHERE activity_type = %(activity_type)s AND activity_timestamp = %(activity_timestamp)s AND click_timestamp = %(click_timestamp)s'''
+    # Make sure entry isn't already in the db
+    q = ''' SELECT * FROM activity WHERE activity_type = %(activity_type)s AND activity_timestamp = %(activity_timestamp)s AND click_timestamp = %(click_timestamp)s'''
 
-    # db.execute(q, {"issue_id": activity["issue_id"], "issue_url": activity["issue_url"],
-    #            "click_timestamp": activity["click_timestamp"], "activity_type": activity["activity_type"],
-    #            "activity_timestamp": activity["activity_timestamp"]})
-
-    q = ''' INSERT INTO activity (issue_id, issue_url, click_timestamp, activity_type, activity_timestamp)
-            VALUES ( %(issue_id)s, %(issue_url)s, %(click_timestamp)s, %(activity_type)s, %(activity_timestamp)s)
-        '''
     db.execute(q, {"issue_id": activity["issue_id"], "issue_url": activity["issue_url"],
                "click_timestamp": activity["click_timestamp"], "activity_type": activity["activity_type"],
                "activity_timestamp": activity["activity_timestamp"]})
+
+    if not db.fetchone():
+        q = ''' INSERT INTO activity (issue_id, issue_url, click_timestamp, activity_type, activity_timestamp)
+                VALUES ( %(issue_id)s, %(issue_url)s, %(click_timestamp)s, %(activity_type)s, %(activity_timestamp)s)
+            '''
+        db.execute(q, {"issue_id": activity["issue_id"], "issue_url": activity["issue_url"],
+                   "click_timestamp": activity["click_timestamp"], "activity_type": activity["activity_type"],
+                   "activity_timestamp": activity["activity_timestamp"]})
 
 
 if __name__ == '__main__':
