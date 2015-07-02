@@ -4,7 +4,15 @@ fake_click = {
     "issue_url":"https://github.com/codeforamerica/gotissues/issues/8",
     "timestamp":"2015-12-27T07:30:00",
     "readable_date":"Sunday, December 27 2015 07:30AM"
-} 
+}
+
+fake_activity = {
+  "issue_id": 111111,
+  "issue_url": "https://github.com/codeforamerica/gotissues/issues/8",
+  "click_timestamp": "2015-12-27 07:30:00"
+  "activity_type": "PushEvent",
+  "activity_timestamp": "2015-06-06 23:16:56"
+}
 
 full_issue = {
   "url": "https://api.github.com/repos/codeforamerica/gotissues/issues/8",
