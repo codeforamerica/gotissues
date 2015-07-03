@@ -255,7 +255,11 @@ def get_github_with_auth(url, headers=None):
   ''' Get authorized by github'''
   print "Asking github for: " + url
   got = requests.get(url, auth=github_auth, headers=headers)
-  return got
+  if got.status_code == 404:
+    print "404 Error: " + url 
+    return None
+  else:
+    return got
 
 def get_github_data(issue_url):
     url = "https://api.github.com/repos/"
@@ -276,33 +280,38 @@ def get_github_project_data(issue_url):
     api_issue = "https://api.github.com/repos/" + issue_url[19:]
     issue_var = api_issue.split("/")[7]
     api_issue = api_issue.replace("issues/" + str(issue_var), 'events')
-    git_data = get_github_with_auth(api_issue).json()
-    return git_data
+    result = get_github_with_auth(api_issue)
+    if result:
+      gitdata = result.json()
+      return gitdata
+    else:
+      return None
   else:
     print "Error in this issue url: " + str(issue_url)
-    return issue_url
+    return None
 
 def get_click_activity(clicks):
   activities = []
   total = 0
   for click in clicks:
     activity_list = get_github_project_data(click["issue_url"])
-    for activity in activity_list:
-      if check_timestamp(activity, click, 5):
-        trimmed_activity = trim_activity(activity, click)
-        activities.append(trimmed_activity)
-        print str(trimmed_activity) + "\n"
+    if activity_list:
+      for activity in activity_list:
+        if check_timestamp(activity, click, 1):
+          trimmed_activity = trim_activity(activity, click)
+          activities.append(trimmed_activity)
+          print str(trimmed_activity) + "\n"
   return activities
 
 def check_timestamp(activity, click, hours):
-
   action_time = datetime.datetime.strptime(activity["created_at"], '%Y-%m-%dT%H:%M:%SZ')
   click_time = datetime.datetime.strptime(click["timestamp"], '%Y-%m-%dT%H:%M:%S')
   timedelta = action_time - click_time
   if timedelta < datetime.timedelta(hours=hours) and timedelta > datetime.timedelta(minutes=0):
     print timedelta
     return True
-  else: return False
+  else:
+    return False
 
 def trim_activity(activities, click):
   trimmed_activities = {}
