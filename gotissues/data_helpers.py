@@ -355,14 +355,12 @@ def get_timestamped_clicks():
   return query
 
 
-def get_top_sources():
+def get_top_sources(db):
   ''' Get the top 10 view sources '''
-  with connect(DATABASE_URL) as conn:
-    with dict_cursor(conn) as db:
-      q = ''' SELECT DISTINCT view_sources FROM issues  '''
+  q = ''' SELECT DISTINCT view_sources FROM issues  '''
 
-      db.execute(q)
-      view_sources = db.fetchall()
+  db.execute(q)
+  view_sources = db.fetchall()
 
   sources = {}
   for row in view_sources:
