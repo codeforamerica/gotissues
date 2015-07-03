@@ -54,21 +54,31 @@
 
         </div>
 
-        <div id="topsources">
-
-          <div class="layout-minim">
-            <h2>Top Sources of Views</h2>
-            <ul>
-            {% for source in data["top_sources"] %}
+        <div class="layout-minim">
+          <h2>Embeds</h2>
+          <ul>
+            {% for source in data["sources"] | dictsort(false, 'value') | reverse %}
             <li>{{source[0]}}</li>
             {% endfor %}
-          </div>
-
-          <div class="layout-minim">
-          </div>
-
+          </ul>
         </div>
 
+      </div>
+    </section>
+
+    <section class="slab-teal">
+      <div class="layout-breve">
+
+        <h1>Github Activity</h1>
+
+        <div class="layout-minim">
+          <h2>Clicked caused activity</h2>
+          <ul>
+            {% for activity in data["activities"] | dictsort(false, 'value') | reverse %}
+            <li>{{activity[1]}} {{activity[0]}}</li>
+            {% endfor %}
+          </ul>
+        </div>
       </div>
     </section>
 

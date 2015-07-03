@@ -36,8 +36,7 @@ else:
 #
 choice_dict = {
     "clicked_issues": {
-      'start_date':'today',
-      'end_date':'today',
+      'start_date' : 'today',
       'metrics':'ga:totalEvents',
       'dimensions':'ga:eventLabel',
       'sort':'-ga:totalEvents',
@@ -95,14 +94,13 @@ choice_dict = {
       'metrics':'ga:totalEvents',
       'dimensions':None,
       'sort':None,
-      'filters':'ga:eventCategory=@Civic Issues',
+      'filters':'ga:eventCategory==Civic Issues',
       'max_results':None,
       'fields':None
     },
 
     "viewed_issues": {
-      'start_date':'today',
-      'end_date':'today',
+      'start_date' : 'today',
       'metrics':'ga:totalEvents',
       'dimensions':'ga:eventLabel',
       'sort':'-ga:totalEvents',
@@ -128,8 +126,8 @@ def edit_request_query(choice_dict_query):
   print "Asking GA for: " + choice_dict_query
   results = service.data().ga().get(
           ids="ga:" + GOOGLE_ANALYTICS_PROFILE_ID,
-          start_date=choice_dict[choice_dict_query].get("start_date",'2014-08-24'),
-          end_date=choice_dict[choice_dict_query].get("end_date", datetime.date.today().strftime("%Y-%m-%d")),
+          start_date=choice_dict[choice_dict_query].get("start_date",'2014-08-23'),
+          end_date=choice_dict[choice_dict_query].get("end_date", 'today'),
           metrics=choice_dict[choice_dict_query]['metrics'],
           dimensions=choice_dict[choice_dict_query]['dimensions'],
           sort=choice_dict[choice_dict_query]['sort'],
@@ -299,23 +297,17 @@ def get_click_activity(clicks):
 def check_timestamp(activity, click, hours):
 
   action_time = datetime.datetime.strptime(activity["created_at"], '%Y-%m-%dT%H:%M:%SZ')
-  # click_time = datetime.datetime.strptime(click["timestamp"], '%Y-%m-%dT%H:%M:%S')
-  click_time = click["timestamp"]
+  click_time = datetime.datetime.strptime(click["timestamp"], '%Y-%m-%dT%H:%M:%S')
   timedelta = action_time - click_time
   if timedelta < datetime.timedelta(hours=hours) and timedelta > datetime.timedelta(minutes=0):
     print timedelta
     return True
   else: return False
 
-def trim_activity(activities, db_data):
-  # print activities
+def trim_activity(activities, click):
   trimmed_activities = {}
-
-  # print "this is how activities looks like" + str(activities)
-  # Once DB is working
-  trimmed_activities["issue_id"] = db_data["id"]
-  trimmed_activities["issue_url"] = db_data["issue_url"]
-  trimmed_activities["click_timestamp"] = db_data["timestamp"]
+  trimmed_activities["issue_url"] = click["issue_url"]
+  trimmed_activities["click_timestamp"] = click["timestamp"]
   trimmed_activities["activity_type"] = activities["type"]
   trimmed_activities["activity_timestamp"] = activities["created_at"]
   return trimmed_activities
@@ -327,37 +319,4 @@ def get_closed_count(db):
   db.execute(q)
   closed_count = db.fetchone()["count"]
   return closed_count
-
-def get_timestamped_clicks():
-  ''' Pull out data from database'''
-  with connect(DATABASE_URL) as conn:
-    with dict_cursor(conn) as db:
-      q = ''' SELECT id,timestamp,issue_url FROM clicks '''
-
-      db.execute(q)
-      query = db.fetchall()
-  #print json_output
-  return query
-
-
-def get_top_sources(db):
-  ''' Get the top 5 view sources '''
-  q = ''' SELECT view_sources FROM issues WHERE view_sources IS NOT NULL '''
-
-  db.execute(q)
-  view_sources = db.fetchall()
-
-  sources = {}
-  for row in view_sources:
-    for source in row["view_sources"]:
-      source = source.replace("https://","").replace("http://","")
-      if source not in sources.keys():
-        sources[source] = 1
-      else:
-        sources[source] += 1
-
-  # A sorted list of tuples
-  sources = sorted(sources.items(), key=operator.itemgetter(1), reverse=True)
-  sources = sources[0:5]
-  return sources
 
