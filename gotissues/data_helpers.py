@@ -9,13 +9,8 @@ from apiclient.discovery import build
 
 from config import *
 
-#
-# Database setup
-#
-def db_connect(app):
-    return connect(app.config['DATABASE_URL'])
 
-def db_cursor(conn, cursor_factory=extras.RealDictCursor):
+def dict_cursor(conn, cursor_factory=extras.RealDictCursor):
     return conn.cursor(cursor_factory=cursor_factory)
 
 

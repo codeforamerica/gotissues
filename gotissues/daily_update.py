@@ -195,7 +195,7 @@ if __name__ == '__main__':
 
     # Add each issue to the db
     with connect(os.environ['DATABASE_URL']) as conn:
-        with db_cursor(conn) as db:
+        with dict_cursor(conn) as db:
             for issue in issues:
                 write_issue_to_db(issue, db)
 
