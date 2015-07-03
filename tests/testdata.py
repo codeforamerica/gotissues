@@ -9,7 +9,7 @@ fake_click = {
 fake_activity = {
   "issue_id": 111111,
   "issue_url": "https://github.com/codeforamerica/gotissues/issues/8",
-  "click_timestamp": "2015-12-27 07:30:00"
+  "click_timestamp": "2015-12-27 07:30:00",
   "activity_type": "PushEvent",
   "activity_timestamp": "2015-06-06 23:16:56"
 }
