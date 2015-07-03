@@ -78,9 +78,13 @@
 
         <div class="layout-minim">
           <h2>Clicked caused activity</h2>
-          <ul>
+          <p>Activity on a repo within one hour of a click</p>
+          <ul class="list-inline list-no-bullets">
             {% for activity in data["activities"] | dictsort(false, 'value') | reverse %}
-            <li>{{activity[1]}} {{activity[0]}}</li>
+            <li>
+              <h1>{{activity[1]}}</h1>
+              <h2>{{activity[0]}}</h2>
+            </li>
             {% endfor %}
           </ul>
         </div>
