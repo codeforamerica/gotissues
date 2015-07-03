@@ -357,8 +357,8 @@ def get_timestamped_clicks():
 
 
 def get_top_sources(db):
-  ''' Get the top 10 view sources '''
-  q = ''' SELECT view_sources FROM issues  '''
+  ''' Get the top 5 view sources '''
+  q = ''' SELECT view_sources FROM issues WHERE view_sources IS NOT NULL '''
 
   db.execute(q)
   view_sources = db.fetchall()
@@ -366,6 +366,7 @@ def get_top_sources(db):
   sources = {}
   for row in view_sources:
     for source in row["view_sources"]:
+      source = source.replace("https://","").replace("http://","")
       if source not in sources.keys():
         sources[source] = 1
       else:
@@ -373,5 +374,6 @@ def get_top_sources(db):
 
   # A sorted list of tuples
   sources = sorted(sources.items(), key=operator.itemgetter(1), reverse=True)
+  sources = sources[0:5]
   return sources
 

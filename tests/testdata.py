@@ -143,4 +143,4 @@ timestamp_entry = {
     "readable_date":"Sunday, December 27 2015 07:30AM"
 } 
 
-test_sources_result = {'http://testurl.com': 1, 'www.codeforamerica.org': 2}
+test_sources_result = [('www.codeforamerica.org', 2), ('testurl.com', 1)]
