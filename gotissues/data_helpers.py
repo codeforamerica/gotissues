@@ -1,6 +1,7 @@
 import datetime
 import requests
 import json
+import operator
 from psycopg2 import connect, extras
 
 from httplib2 import Http
@@ -357,7 +358,7 @@ def get_timestamped_clicks():
 
 def get_top_sources(db):
   ''' Get the top 10 view sources '''
-  q = ''' SELECT DISTINCT view_sources FROM issues  '''
+  q = ''' SELECT view_sources FROM issues  '''
 
   db.execute(q)
   view_sources = db.fetchall()
@@ -370,5 +371,7 @@ def get_top_sources(db):
       else:
         sources[source] += 1
 
+  # A sorted list of tuples
+  sources = sorted(sources.items(), key=operator.itemgetter(1), reverse=True)
   return sources
 

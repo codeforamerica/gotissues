@@ -59,8 +59,8 @@
           <div class="layout-minim">
             <h2>Top Sources of Views</h2>
             <ul>
-            {% for source in data["top_sources"].keys() %}
-            <li>{{source}}</li>
+            {% for source in data["top_sources"] %}
+            <li>{{source[0]}} Count: {{source[1]}}</li>
             {% endfor %}
           </div>
 
