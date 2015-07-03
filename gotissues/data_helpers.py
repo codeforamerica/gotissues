@@ -345,8 +345,8 @@ def get_closed_count(db):
 
 def get_timestamped_clicks():
   ''' Pull out data from database'''
-  with connect(os.environ['DATABASE_URL']) as conn:
-    with db_cursor(conn) as db:
+  with connect(DATABASE_URL) as conn:
+    with dict_cursor(conn) as db:
       q = ''' SELECT id,timestamp,issue_url FROM clicks '''
 
       db.execute(q)
