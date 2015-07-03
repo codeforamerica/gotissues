@@ -39,12 +39,12 @@
 
           <div class="layout-crotchet">
             <h2>Total Clicks</h2>
-            <h1 class="number">{{ choice_dict.total_clicks }}</h1>
+            <h1 class="number">{{ data.total_clicks }}</h1>
           </div>
 
           <div class="layout-crotchet">
             <h2>Total Page Views</h2>
-            <h1 class="number">{{ choice_dict.total_page_views }}</h1>
+            <h1 class="number">{{ data.total_page_views }}</h1>
           </div>
 
           <div class="layout-crotchet">
@@ -79,7 +79,7 @@ gapi.analytics.ready(function() {
    */
   gapi.analytics.auth.authorize({
     serverAuth: {
-      access_token: "{{ choice_dict['access_token'] }}"
+      access_token: "{{ data['access_token'] }}"
     }
   });
 
