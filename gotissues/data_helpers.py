@@ -116,13 +116,15 @@ choice_dict = {
       'metrics':'ga:totalEvents',
       'dimensions':'ga:eventLabel, ga:dateHour, ga:minute',
       'sort':'-ga:dateHour',
-      'filters':'ga:eventCategory==Civic Issues;ga:eventLabel=@github.com',
+      'filters':'ga:eventCategory==Civic Issues',
       'max_results':10000,
       'fields':'rows'
     },
+
 }
 
 def edit_request_query(choice_dict_query):
+  print "Asking GA for: " + choice_dict_query
   results = service.data().ga().get(
           ids="ga:" + GOOGLE_ANALYTICS_PROFILE_ID,
           start_date=choice_dict[choice_dict_query].get("start_date",'2014-08-24'),
@@ -252,6 +254,7 @@ def return_timestamp_dict(row):
 
 def get_github_with_auth(url, headers=None):
   ''' Get authorized by github'''
+  print "Asking github for: " + url
   got = requests.get(url, auth=github_auth, headers=headers)
   return got
 
@@ -289,7 +292,7 @@ def get_click_activity(clicks):
       if check_timestamp(activity, click, 5):
         trimmed_activity = trim_activity(activity, click)
         activities.append(trimmed_activity)
-      print str(trimmed_activity) + "\n"
+        print str(trimmed_activity) + "\n"
   return activities
 
 def write_activities_to_db(activity, db):
