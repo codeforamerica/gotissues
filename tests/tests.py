@@ -114,6 +114,19 @@ class GotIssuesTestCase(unittest.TestCase):
     # Capture datetime.datetime.now() and the month year day 
     # version of now() and assertEqual?
 
+    def test_get_top_sources(self):
+        ''' Test counting of view sources '''
+        # Add a few issues with different sources
+        # Test the output of get_top_sources
+        with connect(testdata.DATABASE_URL) as conn:
+            with data_helpers.dict_cursor(conn) as db:
+                daily_update.write_issue_to_db(testdata.db_issue, db)
+                daily_update.write_issue_to_db(testdata.test_issue, db)
+
+                sources = data_helpers.get_top_sources(db)
+                self.assertEqual(sources, testdata.test_sources_result)
+
+
 
 if __name__ == '__main__':
     unittest.main()
