@@ -48,8 +48,23 @@
           </div>
 
           <div class="layout-crotchet">
-            <h2>Clicks Per View</h2>
-            <h1 class="number">{{ choice_dict.clicks_per_view }} %</h1>
+            <h2>Clicks Per Page View</h2>
+            <h1 class="number">{{ data.clicks_per_view }} %</h1>
+          </div>
+
+        </div>
+
+        <div id="topsources">
+
+          <div class="layout-minim">
+            <h2>Top Sources of Views</h2>
+            <ul>
+            {% for source in data["top_sources"].keys() %}
+            <li>{{source}}</li>
+            {% endfor %}
+          </div>
+
+          <div class="layout-minim">
           </div>
 
         </div>
