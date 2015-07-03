@@ -15,7 +15,7 @@ def get_top_sources(db):
   sources = {}
   for row in view_sources:
     for source in row["view_sources"]:
-      source = source.replace("https://","").replace("http://","")
+      # source = source.replace("https://","").replace("http://","")
       if source not in sources.keys():
         sources[source] = 1
       else:

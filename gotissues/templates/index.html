@@ -54,13 +54,18 @@
 
         </div>
 
-        <div class="layout-minim">
-          <h2>Embeds</h2>
+        <div id="topembeds">
+
+          <h2>Top Embeds</h2>
+
           <ul>
-            {% for source in data["sources"] | dictsort(false, 'value') | reverse %}
-            <li>{{source[0]}}</li>
+            {% for source in data["sources"] | dictsort(false, 'value') | reverse | slice(3) %}
+            <li>
+              <a href="{{source[0][0]}}">{{source[0][0]}}</a>
+            </li>
             {% endfor %}
           </ul>
+
         </div>
 
       </div>
