@@ -4,7 +4,6 @@
 
 CREATE TABLE activity
 (
-    issue_id           INT,
     issue_url          TEXT,
     click_timestamp    TIMESTAMP,
     activity_type      TEXT,

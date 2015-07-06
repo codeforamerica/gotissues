@@ -1,19 +1,25 @@
 ''' views.py: This file contains all of the routes '''
 from data_helpers import *
+from view_helpers import *
 from gotissues import app
 from flask import render_template, request
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    choice_dict = {
+    data = {
         "total_page_views":"",
-        "total_clicks":""
+        "total_clicks":"",
     }
 
-    for k in choice_dict.iterkeys():
-        choice_dict[k] = get_analytics_query(k)
+    for k in data.iterkeys():
+        data[k] = get_analytics_query(k)
 
-    choice_dict["clicks_per_view"] = int(100 * int(choice_dict["total_clicks"])/float(int(choice_dict["total_page_views"])))
-    choice_dict["access_token"] = access_token
+    data["clicks_per_view"] = int(100 * int(data["total_clicks"])/float(int(data["total_page_views"])))
+    data["access_token"] = access_token
 
-    return render_template("index.html", choice_dict=choice_dict)
+    with connect(os.environ['DATABASE_URL']) as conn:
+        with dict_cursor(conn) as db:
+            data["sources"] = get_top_sources(db)
+            data["activities"] = get_top_acivity(db)
+
+    return render_template("index.html", data=data)

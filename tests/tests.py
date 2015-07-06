@@ -4,9 +4,8 @@ parentdir = os.path.dirname(currentdir)
 sys.path.insert(0,parentdir) 
 from psycopg2 import connect, extras
 
-from gotissues import app, daily_update
+from gotissues import app, daily_update, data_helpers
 import testdata
-from data_helpers import *
 
 
 class GotIssuesTestCase(unittest.TestCase):
@@ -56,13 +55,13 @@ class GotIssuesTestCase(unittest.TestCase):
         }
 
         for k in testdata.bad_sample_dict.iterkeys():
-            testdata.bad_sample_dict[k] = get_analytics_query(k)
+            testdata.bad_sample_dict[k] = data_helpers.get_analytics_query(k)
             self.assertEqual(testdata.bad_sample_dict[k], error)
     
     def test_write_timestamp(self):
         ''' Test for taking a sample GA response for issues + date info
             and writing the timestamp to '''
-        timestamp_response = return_timestamp_dict(testdata.ga_timestamp_row)
+        timestamp_response = data_helpers.return_timestamp_dict(testdata.ga_timestamp_row)
         control = json.dumps(testdata.timestamp_entry, sort_keys=True, indent=4)
         results = json.dumps(timestamp_response, sort_keys=True, indent=4)
 
@@ -78,7 +77,7 @@ class GotIssuesTestCase(unittest.TestCase):
     def test_write_issue_to_db(self):
         ''' Test that writing to the db works '''
         with connect(testdata.DATABASE_URL) as conn:
-            with db_cursor(conn) as db:
+            with data_helpers.dict_cursor(conn) as db:
                 daily_update.write_issue_to_db(testdata.db_issue, db)
 
                 q = ''' SELECT * FROM issues '''
@@ -91,7 +90,7 @@ class GotIssuesTestCase(unittest.TestCase):
     def test_write_click_to_db(self):
         ''' Test that writing to the db works '''
         with connect(testdata.DATABASE_URL) as conn:
-            with db_cursor(conn) as db:
+            with data_helpers.dict_cursor(conn) as db:
                 daily_update.write_click_to_db(testdata.fake_click, db)
 
                 q = ''' SELECT * FROM clicks '''
@@ -102,8 +101,8 @@ class GotIssuesTestCase(unittest.TestCase):
     
     def test_write_activity_to_db(self):
         with connect(testdata.DATABASE_URL) as conn:
-            with db_cursor(conn) as db:
-                daily_update.write_activities_to_db(testdata.fake_db_click, db)
+            with data_helpers.dict_cursor(conn) as db:
+                daily_update.write_activities_to_db(testdata.fake_activity, db)
 
                 q = ''' SELECT * FROM activity '''
                 db.execute(q)
@@ -113,6 +112,19 @@ class GotIssuesTestCase(unittest.TestCase):
     # Test for valid timestamps
     # Capture datetime.datetime.now() and the month year day 
     # version of now() and assertEqual?
+
+    def test_get_top_sources(self):
+        ''' Test counting of view sources '''
+        # Add a few issues with different sources
+        # Test the output of get_top_sources
+        with connect(testdata.DATABASE_URL) as conn:
+            with data_helpers.dict_cursor(conn) as db:
+                daily_update.write_issue_to_db(testdata.db_issue, db)
+                daily_update.write_issue_to_db(testdata.test_issue, db)
+
+                sources = data_helpers.get_top_sources(db)
+                self.assertEqual(sources, testdata.test_sources_result)
+
 
 
 if __name__ == '__main__':
