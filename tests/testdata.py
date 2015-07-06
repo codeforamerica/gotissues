@@ -9,7 +9,7 @@ fake_click = {
 fake_activity = {
   "issue_id": 111111,
   "issue_url": "https://github.com/codeforamerica/gotissues/issues/8",
-  "click_timestamp": "2015-12-27 07:30:00"
+  "click_timestamp": "2015-12-27 07:30:00",
   "activity_type": "PushEvent",
   "activity_timestamp": "2015-06-06 23:16:56"
 }
@@ -108,6 +108,22 @@ db_issue = {
   },
   "clicks" : 10000000,
   "views" : 777,
+  "view_sources" : ["www.codeforamerica.org","http://testurl.com"]
+}
+
+test_issue = {
+  "html_url": "https://github.com/codeforamerica/gotissues/issues/1",
+  "id": 1,
+  "title": "TEST",
+  "labels": [],
+  "state": "open",
+  "comments": 1,
+  "created_at": "2015-06-10T23:03:05Z",
+  "closed_at": "2015-06-23T00:43:26Z",
+  "body": "TEST BODY",
+  "closed_by": None,
+  "clicks" : 1,
+  "views" : 1,
   "view_sources" : ["www.codeforamerica.org"]
 }
 
@@ -126,3 +142,5 @@ timestamp_entry = {
     "timestamp":"2015-12-27T07:30:00",
     "readable_date":"Sunday, December 27 2015 07:30AM"
 } 
+
+test_sources_result = [('www.codeforamerica.org', 2), ('http://testurl.com', 1)]

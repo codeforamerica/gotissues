@@ -39,21 +39,55 @@
 
           <div class="layout-crotchet">
             <h2>Total Clicks</h2>
-            <h1 class="number">{{ choice_dict.total_clicks }}</h1>
+            <h1 class="number">{{ data.total_clicks }}</h1>
           </div>
 
           <div class="layout-crotchet">
             <h2>Total Page Views</h2>
-            <h1 class="number">{{ choice_dict.total_page_views }}</h1>
+            <h1 class="number">{{ data.total_page_views }}</h1>
           </div>
 
           <div class="layout-crotchet">
-            <h2>Clicks Per View</h2>
-            <h1 class="number">{{ choice_dict.clicks_per_view }} %</h1>
+            <h2>Clicks Per Page View</h2>
+            <h1 class="number">{{ data.clicks_per_view }} %</h1>
           </div>
 
         </div>
 
+        <div id="topembeds">
+
+          <h2>Top Embeds</h2>
+
+          <ul>
+            {% for source in data["sources"]%}
+            <li>
+              <a href="{{source[0]}}">{{source[0]}}</a> Views From Source: {{source[1]}}
+            </li>
+            {% endfor %}
+          </ul>
+
+        </div>
+
+      </div>
+    </section>
+
+    <section class="slab-teal">
+      <div class="layout-breve">
+
+        <h1>Github Activity</h1>
+
+        <div class="layout-minim">
+          <h2>Clicked caused activity</h2>
+          <p>Activity on a repo within one hour of a click</p>
+          <ul class="list-inline list-no-bullets">
+            {% for activity in data["activities"] | dictsort(false, 'value') | reverse %}
+            <li>
+              <h1>{{activity[1]}}</h1>
+              <h2>{{activity[0]}}</h2>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
       </div>
     </section>
 
@@ -79,7 +113,7 @@ gapi.analytics.ready(function() {
    */
   gapi.analytics.auth.authorize({
     serverAuth: {
-      access_token: "{{ choice_dict['access_token'] }}"
+      access_token: "{{ data['access_token'] }}"
     }
   });
 
