@@ -4,7 +4,7 @@ parentdir = os.path.dirname(currentdir)
 sys.path.insert(0,parentdir) 
 from psycopg2 import connect, extras
 
-from gotissues import app, daily_update, data_helpers
+from gotissues import app, daily_update, data_helpers, view_helpers
 import testdata
 
 
@@ -107,7 +107,7 @@ class GotIssuesTestCase(unittest.TestCase):
                 q = ''' SELECT * FROM activity '''
                 db.execute(q)
                 activity = db.fetchone()
-                self.assertEqual(activity["issue_id"],111111)
+                self.assertEqual(activity["issue_url"],"https://github.com/codeforamerica/gotissues/issues/8")
 
     # Test for valid timestamps
     # Capture datetime.datetime.now() and the month year day 
@@ -122,7 +122,7 @@ class GotIssuesTestCase(unittest.TestCase):
                 daily_update.write_issue_to_db(testdata.db_issue, db)
                 daily_update.write_issue_to_db(testdata.test_issue, db)
 
-                sources = data_helpers.get_top_sources(db)
+                sources = view_helpers.get_top_sources(db)
                 self.assertEqual(sources, testdata.test_sources_result)
 
 
