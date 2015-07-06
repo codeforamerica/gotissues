@@ -59,9 +59,9 @@
           <h2>Top Embeds</h2>
 
           <ul>
-            {% for source in data["sources"] | dictsort(false, 'value') | reverse | slice(3) %}
+            {% for source in data["sources"]%}
             <li>
-              <a href="{{source[0][0]}}">{{source[0][0]}}</a>
+              <a href="{{source[0]}}">{{source[0]}}</a> Views From Source: {{source[1]}}
             </li>
             {% endfor %}
           </ul>
