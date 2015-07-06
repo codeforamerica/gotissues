@@ -295,10 +295,10 @@ def get_click_activity(clicks):
   total = 0
   for click in clicks:
     activity_list = get_github_project_data(click["issue_url"])
-    if activity_list:
-      for activity in activity_list:
-        if check_timestamp(activity, click, 1):
-          trimmed_activity = trim_activity(activity, click)
+    for activity in activity_list:
+      if check_timestamp(activity, click, 1):
+        trimmed_activity = trim_activity(activity, click)
+        if check_events(trimmed_activity, activity):
           activities.append(trimmed_activity)
           print str(trimmed_activity) + "\n"
   return activities
@@ -320,6 +320,18 @@ def trim_activity(activities, click):
   trimmed_activities["activity_type"] = activities["type"]
   trimmed_activities["activity_timestamp"] = activities["created_at"]
   return trimmed_activities
+
+def check_events(trimmed_activity, activity_git):
+    filtered_activities = ["PushEvent","DeleteEvent"]
+    for activity in filtered_activities:
+      if trimmed_activity["activity_type"] == activity:
+        return False
+      if trimmed_activity["activity_type"] == "IssueCommentEvent":
+        if activity_git["payload"]["issue"]["html_url"] != trimmed_activity["issue_url"]:
+          print activity_git["payload"]["issue"]["html_url"] 
+          print trimmed_activity["issue_url"]
+          return False
+    return True
 
 def get_closed_count(db):
   ''' Pull out data from the database '''
