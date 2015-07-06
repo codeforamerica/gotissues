@@ -1,6 +1,7 @@
 ''' view_helpers.py: This file includes helper functions for the views
     redirects, logic for multiple views
 '''
+import operator
 
 #
 # Index
@@ -15,12 +16,14 @@ def get_top_sources(db):
   sources = {}
   for row in view_sources:
     for source in row["view_sources"]:
-      # source = source.replace("https://","").replace("http://","")
+      if source.startswith("https://"):
+        source = source.replace("https://","http://")
       if source not in sources.keys():
         sources[source] = 1
       else:
         sources[source] += 1
-  return sources
+  sorted_sources = sorted(sources.items(), key=operator.itemgetter(1), reverse=True)
+  return sorted_sources
 
 
 def get_top_acivity(db):

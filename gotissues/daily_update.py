@@ -167,7 +167,6 @@ def write_activities_to_db(activity, db):
                "click_timestamp": activity["click_timestamp"], "activity_type": activity["activity_type"],
                "activity_timestamp": activity["activity_timestamp"]})
 
-
 if __name__ == '__main__':
 
     # Get todays clicked issues from Google Analytics
