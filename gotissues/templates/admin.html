@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://style.codeforamerica.org/style/css/main.css">
     <link rel="stylesheet" href="https://style.codeforamerica.org/style/css/layout.css" media="all and (min-width: 40em)">
 
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
 
     <link rel="shortcut icon" type="image/x-icon" href="https://style.codeforamerica.org/1/favicon.ico">
     <link rel="apple-touch-icon-precomposed" href="https://style.codeforamerica.org/1/style/favicons/60x60/flag-red.png"/>
@@ -17,22 +17,52 @@
 
 <body>
 <div class="layout-breve">
-  <h2>Activity Verification</h2>
-  <table style="font-size:12px">
+<div class="layout-minim">
+  <h1>Activity Verification</h1>
+</div>
+<div class="layout-minim">
+  <form action="/admin" method="post">
+    <center>
+    <select name="category" style="margin-top:1.5em;margin-bottom:.5em;">
+      <option disabled selected hidden value=''>Filter DB By</option>
+      <option>Activity Type</option>
+      <option>Click Timestamp</option>
+      <option>Activity Timestamp</option>
+      <option>Issue Url</option>
+    </select>
+
+    <ul class="list-form">
+      <li>
+          <label for="radio1"><input id="radio1" name="radio" type="radio" value="ASC"checked/>Ascending</label>
+      </li>
+      <li>
+          <label for="radio2"><input id="radio2" name="radio" type="radio" value="DESC"/>Descending</label>
+      </li>
+    </ul>
+    <input type="submit" method="post" action="/admin" value="Change Order!"></input>
+    </center>
+    </div>
+  </form>
+  <table id="activity_table" class="tablesorter" style="font-size:12px;margin-top:5.0em;">
     <tr>
       <th>Activity Type</th>
+      <th>Minutes After Click</th>
       <th>Click Timestamp</th>
       <th>Activity Timestamp</th>
       <th>Issue Url</th>
     </tr>
-    {% for data in db_results%}
+    {% for data in db_results %}
       <tr>
         <td>{{data['activity_type']}}</td>
-        <td>{{data['click_timestamp']}}</td>
-        <td>{{data['activity_timestamp']}}</td>
-        <td>{{data['issue_url']}}</td>
+        <td>{{data['time_after']}}</td>
+        <td><b>{{data['click_timestamp']}}</b></td>
+        <td><b>{{data['activity_timestamp']}}</b></td>
+        <td><a href="{{data['issue_url']}}">{{data['issue_url']}}</a></td>
       </tr>
     {% endfor %}
   </table>
 </div>
 </body>
+
+<script>
+</script>

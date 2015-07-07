@@ -45,3 +45,23 @@ def get_all_activity(db):
   results = db.fetchall()
 
   return results
+
+def get_edited_activity(db, order, category):
+  ''' Get edited activity '''
+  categories = ["Activity Type", "Click Timestamp", "Activity Timestamp", "Issue Url"]
+  category = str(category)
+  if category == categories[0]:
+    category = "activity_type"
+  elif category == categories[1]:
+    category = "click_timestamp"
+  elif category == categories[2]:
+    category = "activity_timestamp"
+  elif category == categories[3]:
+    category = "issue_url"
+
+  string = '''SELECT * FROM activity ORDER BY %s %s''' % (category, order)
+  print string
+  db.execute(string)
+  results = db.fetchall()
+
+  return results

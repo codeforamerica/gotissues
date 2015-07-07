@@ -27,9 +27,21 @@ def index():
 @app.route("/admin", methods=["GET", "POST"])
 def admin():
     db_results = {}
-    
-    with connect(os.environ['DATABASE_URL']) as conn:
-        with dict_cursor(conn) as db:
-            db_results = get_all_activity(db)
+
+    if request.method == "POST":
+        with connect(os.environ['DATABASE_URL']) as conn:
+            with dict_cursor(conn) as db:
+                category = request.form['category']
+                order = request.form['radio']
+                db_results = get_edited_activity(db, order, category)
+                print "GOT HERE \n\n\n\n"
+
+    else:
+        with connect(os.environ['DATABASE_URL']) as conn:
+            with dict_cursor(conn) as db:
+                db_results = get_all_activity(db)
+        for result in db_results:
+            result['time_after'] = int((result['activity_timestamp'] - result['click_timestamp']).total_seconds()/60)
+
 
     return render_template("admin.html", db_results=db_results)
