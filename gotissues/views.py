@@ -23,3 +23,13 @@ def index():
             data["activities"] = get_top_acivity(db)
 
     return render_template("index.html", data=data)
+
+@app.route("/admin", methods=["GET", "POST"])
+def admin():
+    db_results = {}
+    
+    with connect(os.environ['DATABASE_URL']) as conn:
+        with dict_cursor(conn) as db:
+            db_results = get_all_activity(db)
+
+    return render_template("admin.html", db_results=db_results)

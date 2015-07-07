@@ -1,0 +1,38 @@
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Got Issues</title>
+    <!-- Check the CfA Style Guide at https://style.codeforamerica.org/ -->
+    <link rel="stylesheet" href="https://style.codeforamerica.org/style/css/main.css">
+    <link rel="stylesheet" href="https://style.codeforamerica.org/style/css/layout.css" media="all and (min-width: 40em)">
+
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <link rel="shortcut icon" type="image/x-icon" href="https://style.codeforamerica.org/1/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" href="https://style.codeforamerica.org/1/style/favicons/60x60/flag-red.png"/>
+
+  </head>
+
+
+<body>
+<div class="layout-breve">
+  <h2>Activity Verification</h2>
+  <table style="font-size:12px">
+    <tr>
+      <th>Activity Type</th>
+      <th>Click Timestamp</th>
+      <th>Activity Timestamp</th>
+      <th>Issue Url</th>
+    </tr>
+    {% for data in db_results%}
+      <tr>
+        <td>{{data['activity_type']}}</td>
+        <td>{{data['click_timestamp']}}</td>
+        <td>{{data['activity_timestamp']}}</td>
+        <td>{{data['issue_url']}}</td>
+      </tr>
+    {% endfor %}
+  </table>
+</div>
+</body>

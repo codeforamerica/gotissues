@@ -38,3 +38,10 @@ def get_top_acivity(db):
         else:
             activities[row["activity_type"]] += 1
     return activities
+
+def get_all_activity(db):
+  ''' Get all the activity '''
+  db.execute(''' SELECT * FROM activity ORDER BY activity_type''')
+  results = db.fetchall()
+
+  return results
