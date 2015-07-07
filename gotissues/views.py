@@ -34,7 +34,10 @@ def admin():
                 category = request.form['category']
                 order = request.form['radio']
                 db_results = get_edited_activity(db, order, category)
-                print "GOT HERE \n\n\n\n"
+                for result in db_results:
+                    result['time_after'] = int((result['activity_timestamp'] - result['click_timestamp']).total_seconds()/60)
+                    result['activity_timestamp'] = str(result['activity_timestamp'])
+                    result['click_timestamp'] = str(result['click_timestamp'])
 
     else:
         with connect(os.environ['DATABASE_URL']) as conn:
@@ -42,6 +45,8 @@ def admin():
                 db_results = get_all_activity(db)
         for result in db_results:
             result['time_after'] = int((result['activity_timestamp'] - result['click_timestamp']).total_seconds()/60)
+            result['activity_timestamp'] = str(result['activity_timestamp'])
+            result['click_timestamp'] = str(result['click_timestamp'])
 
 
     return render_template("admin.html", db_results=db_results)

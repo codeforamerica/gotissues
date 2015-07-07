@@ -23,11 +23,9 @@
 <div class="layout-minim">
   <form action="/admin" method="post">
     <center>
-    <select name="category" style="margin-top:1.5em;margin-bottom:.5em;">
+    <select required="" name="category" style="margin-top:1.5em;margin-bottom:.5em;">
       <option disabled selected hidden value=''>Filter DB By</option>
       <option>Activity Type</option>
-      <option>Click Timestamp</option>
-      <option>Activity Timestamp</option>
       <option>Issue Url</option>
     </select>
 
@@ -43,21 +41,21 @@
     </center>
     </div>
   </form>
-  <table id="activity_table" class="tablesorter" style="font-size:12px;margin-top:5.0em;">
+  <table id="activity_table" class="tablesorter" style="font-size:1rem;margin-top:5.0em;">
     <tr>
       <th>Activity Type</th>
       <th>Minutes After Click</th>
-      <th>Click Timestamp</th>
-      <th>Activity Timestamp</th>
       <th>Issue Url</th>
+      <th>Assistant</th>
     </tr>
     {% for data in db_results %}
       <tr>
         <td>{{data['activity_type']}}</td>
         <td>{{data['time_after']}}</td>
-        <td><b>{{data['click_timestamp']}}</b></td>
-        <td><b>{{data['activity_timestamp']}}</b></td>
         <td><a href="{{data['issue_url']}}">{{data['issue_url']}}</a></td>
+        <td><p>Look for a <b><em>{{data['activity_type']}}</b></em> <br>in the project on 
+          <em><b>{{data['activity_timestamp'][:10]}}</b></em> 
+          <br>around <em><b>{{data['activity_timestamp'][11:]}}</b></em> UTC time</p></td>
       </tr>
     {% endfor %}
   </table>
