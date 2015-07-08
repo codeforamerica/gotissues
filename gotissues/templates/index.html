@@ -25,16 +25,19 @@
 
     <section>
       <div class="layout-breve">
-        <ul class="bricks bricks-cta bricks-3">
+
 
         <div id="weeklyclicks">
-          <h2>Weekly Clicks</h2>
+          <div class="badge-heading badge-graph badge-gray">
+            <h2>Weekly Clicks</h2>
+          </div>
 
           <div id="embed-api-auth-container"></div>
           <div id="clickschart"></div>
           <div id="view-selector-container" hidden></div>
         </div>
 
+        <ul class="bricks bricks-cta bricks-3">
           <li class="brick badge-heading badge-blue">
         <a class="brick-link">
             <h4 class="brick-text">{{ data.total_clicks }}</h4>
@@ -60,47 +63,48 @@
     </li>
 
         </ul>
-
+      </div>
+    </section>
+        <div class="layout-breve">
         <div id="topembeds">
 
-          <h2>Top Embeds</h2>
+          <div class="badge-heading badge-glasses badge-gray">
+            <h2>Top Embeds</h2>
+          </div>
 
-          <ul>
+          <div class="layout-grid-crotchet">
             {% for source in data["sources"]%}
-            <li>
-              <h4 id="list"><em>{{source[1]}}</em> viewed from <h3 id="list"><strong><a href="{{source[0]}}">{{source[0]}}</a></strong></h3></h4>
-            </li>
+              <div>
+                <center>
+                  <h4 class="brick-text">{{source[1]}} Views </h4>
+                  <h2 style="font-size:.8em" class="brick-heading"><a href="{{source[0]}}">{{source[0]}}</a></h2>
+                </center>
+              </div>
             {% endfor %}
-          </ul>
+          </div>
 
         </div>
 
       </div>
-    </section>
 
-    <section class="slab-teal">
+    <section style="margin-top:5em" class="slab-teal">
       <div class="layout-breve">
-
-        <h1>Github Activity</h1>
-
-        <div class="layout-minim">
-          <h2>Clicked caused activity</h2>
-          <p>Activity on a repo within one hour of a click</p>
-          <ul class="list-inline list-no-bullets">
-            {% for activity in data["activities"] | dictsort(false, 'value') | reverse %}
-            <li>
-              <h1>{{activity[1]}}</h1>
-              <h2>{{activity[0]}}</h2>
-              {% for info in data.info[activity[0]] %}
-                <p>{{info['title']}}</p>
-              {% endfor %}
-            </li>
-            {% endfor %}
-          </ul>
+        <div class="badge-heading badge-github badge-gray">
+          <h1>Github Activity</h1>
         </div>
+
+          <h2>Caused by a Click</h2>
+          <p>Activity on a repo within <b>one hour of a click</b></p>
+          <div class="layout-grid-crotchet">
+            {% for activity in data["activities"] | dictsort(false, 'value') | reverse %}
+            <div>
+              <h1>{{activity[1]}}</h1>
+              <h2 style="margin-top:-.9em;font-size:1.6em">{{activity[0]}}s</h2>
+            </div>
+            {% endfor %}
+          </div>
       </div>
     </section>
-
   </body>
 
   <script>
