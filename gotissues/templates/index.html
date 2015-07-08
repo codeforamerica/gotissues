@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://style.codeforamerica.org/style/css/main.css">
     <link rel="stylesheet" href="https://style.codeforamerica.org/style/css/layout.css" media="all and (min-width: 40em)">
 
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
 
     <link rel="shortcut icon" type="image/x-icon" href="https://style.codeforamerica.org/1/favicon.ico">
     <link rel="apple-touch-icon-precomposed" href="https://style.codeforamerica.org/1/style/favicons/60x60/flag-red.png"/>
@@ -16,7 +16,6 @@
   </head>
 
   <body>
-
     <header class="slab-blue">
       <div class="layout-breve">
         <h1>Civic Issue Finder Analytics</h1>
@@ -26,6 +25,7 @@
 
     <section>
       <div class="layout-breve">
+        <ul class="bricks bricks-cta bricks-3">
 
         <div id="weeklyclicks">
           <h2>Weekly Clicks</h2>
@@ -35,24 +35,31 @@
           <div id="view-selector-container" hidden></div>
         </div>
 
-        <div id="totalclicks">
+          <li class="brick badge-heading badge-blue">
+        <a class="brick-link">
+            <h4 class="brick-text">{{ data.total_clicks }}</h4>
+            <h2 class="brick-heading">Total Clicks</h2>
+        </a>
+    </li>
 
-          <div class="layout-crotchet">
-            <h2>Total Clicks</h2>
-            <h1 class="number">{{ data.total_clicks }}</h1>
-          </div>
 
-          <div class="layout-crotchet">
-            <h2>Total Page Views</h2>
-            <h1 class="number">{{ data.total_page_views }}</h1>
-          </div>
+    
+    <li class="brick badge-heading badge-red">
+        <a class="brick-link">
+            <h4 class="brick-text">{{ data.total_page_views }}</h4>
+            <h2 class="brick-heading">Total Page Views</h2>
+        </a>
+    </li>
+    
 
-          <div class="layout-crotchet">
-            <h2>Clicks Per Page View</h2>
-            <h1 class="number">{{ data.clicks_per_view }} %</h1>
-          </div>
+    <li class="brick badge-heading badge-dark-blue">
+        <a class="brick-link">
+            <h4 class="brick-text">{{ data.clicks_per_view }}%</h4>
+            <h2 class="brick-heading">Clicks Per Page View</h2>
+        </a>
+    </li>
 
-        </div>
+        </ul>
 
         <div id="topembeds">
 
@@ -61,7 +68,7 @@
           <ul>
             {% for source in data["sources"]%}
             <li>
-              <a href="{{source[0]}}">{{source[0]}}</a> Views From Source: {{source[1]}}
+              <h4 id="list"><em>{{source[1]}}</em> viewed from <h3 id="list"><strong><a href="{{source[0]}}">{{source[0]}}</a></strong></h3></h4>
             </li>
             {% endfor %}
           </ul>
@@ -84,6 +91,9 @@
             <li>
               <h1>{{activity[1]}}</h1>
               <h2>{{activity[0]}}</h2>
+              {% for info in data.info[activity[0]] %}
+                <p>{{info['title']}}</p>
+              {% endfor %}
             </li>
             {% endfor %}
           </ul>
