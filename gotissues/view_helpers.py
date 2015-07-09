@@ -53,25 +53,56 @@ def get_info_activity(db):
     else:
       activities[row["activity_type"]].append(row["issue_url"])
 
-  title_array = {}
+  title_dict = {}
+  label_dict = {}
+  desc_dict = {}
   for key in activities.keys():
-    key_array = []
+    title_array = []
+    label_array = []
+    desc_array = []
     for activity in activities[key]:
-      # Write Test
+      # Write Test for these
       if get_title_info_db(db, activity):
-        key_array.append(get_title_info_db(db, activity)['title'])
+        db_response = get_title_info_db(db, activity)
+        title_array.append(db_response['title'])
+        label_array.append(filter_labels(db_response['labels'])) # db_resp is json
+        desc_array.append(db_response['body']) #db_resp is text
       else:
         print "\nThe url (%s) was not in our issues db!!!\n" % activity
-    title_array[key] = key_array
+    
+    final_label_arr = []
+    for array in label_array:
+      if len(array) != 0:
+        for tag in array:
+          if tag not in final_label_arr:
+            final_label_arr.append(tag)
 
+    title_dict[key] = title_array
+    label_dict[key] = final_label_arr
+    desc_dict[key] = desc_array
+  
+    title_dict = get_frequencies(title_dict)
+  #print "common labels"
+  #print label_dict
+    # print desc_dict
 
-  title_array = get_frequencies(title_array)
+  # final_dict = [title_dict, label_dict, desc_dict] #add title, label, desc
 
-  return title_array
+  return title_dict, label_dict
+
+def filter_labels(label_json):
+  label_arr = []
+  for label in label_json:
+    for key,val in label.iteritems():
+      if label['name'] != "help wanted" and label['name'] not in label_arr:
+        label_arr.append(label['name'])
+
+  
+  return label_arr
 
 def get_title_info_db(db, url):
   ''' Get title info based on url'''
-  string = ''' SELECT title FROM issues WHERE html_url=\'%s\'''' % (url)
+  string = ''' SELECT title,labels,body FROM issues WHERE html_url=\'%s\'''' % (url)
   db.execute(string)
   result = db.fetchone()
 
@@ -87,8 +118,8 @@ def get_frequencies(db_dict):
       string += title + " "
     freq = freq_function(string)
     db_dict[key] = freq
-  print "Events With Top Title Frequencies"
-  print db_dict
+  # print "Events With Top Title Frequencies"
+  # print db_dict
 
   return db_dict
 
@@ -110,7 +141,7 @@ def freq_function(string):
         wordcount[word] = 1
 
   sortedbyfrequency =  sorted(wordcount,key=wordcount.get,reverse=True)
-  print sortedbyfrequency
+  # print sortedbyfrequency
   return sortedbyfrequency
 
 def get_all_activity(db):

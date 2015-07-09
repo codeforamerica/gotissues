@@ -138,11 +138,30 @@
 				</div>
 			<div class="grid-layout">
 
-        	{% for title_arr in data["top_titles"] %}
+        	{% for title_arr in data["top_titles"][0] %}
         	<div class="layout-crotchet">
-        		<a class="billboard" id="{{title_arr}}" style="color:black"><h4 id="{{title_arr}}">{{title_arr}}</h4>{% for title in data["top_titles"][title_arr] %}
+        		<a class="billboard" id="{{title_arr}}" style="color:black"><h4 id="{{title_arr}}">{{title_arr}}</h4>{% for title in data["top_titles"][0][title_arr] %}
         			{{ title }}
         		{% endfor %}</a>
+        	</div>
+        	{% endfor %}
+				</div>
+			</div>
+
+			<div class="layout-breve">
+
+				<div class="badge-heading badge-graph badge-gray">
+					<h2>Key Tags by Event</h2>
+					<h4>Using these labels when creating issues in yields these actions</h4>
+				</div>
+			<div class="grid-layout">
+
+        	{% for label_arr in data["top_titles"][1] %}
+        	<div class="layout-crotchet">
+        		<a class="billboard" id="{{title_arr}}" style="color:black"><h4 id="{{label_arr}}">{{label_arr}}</h4>
+        			{% for label in data["top_titles"][1][label_arr] %}
+        				{{ label }}
+        			{% endfor %}</a>
         	</div>
         	{% endfor %}
 				</div>
