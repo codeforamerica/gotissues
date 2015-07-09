@@ -21,7 +21,7 @@ def index():
         with dict_cursor(conn) as db:
             data["sources"] = get_top_sources(db)
             data["activities"] = get_top_acivity(db)
-            # data["info"] = get_title_info(db, get_info_activity(db))
+            data["top_titles"] = get_info_activity(db)
 
     return render_template("index.html", data=data)
 

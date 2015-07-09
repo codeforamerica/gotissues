@@ -41,7 +41,7 @@ def get_top_acivity(db):
 
 def get_info_activity(db):
   '''Get top activity types and their urls'''
-  db.execute(''' SELECT activity_type,issue_url FROM activity ''')
+  db.execute(''' SELECT activity_type,issue_url FROM activity ORDER BY activity_type ''')
   results = db.fetchall()
 
   activities = {}
@@ -52,19 +52,22 @@ def get_info_activity(db):
       activities[row["activity_type"]].append(row["issue_url"])
     else:
       activities[row["activity_type"]].append(row["issue_url"])
-  return activities
 
-def get_title_info(db, activities):
-  title_dict = {}
-  for key,val in activities.iteritems():
-    for url in activities[key]:
-      if key in title_dict:
-        title_dict[key].append(get_title_info_db(db, url))
+  title_array = {}
+  for key in activities.keys():
+    key_array = []
+    for activity in activities[key]:
+      # Write Test
+      if get_title_info_db(db, activity):
+        key_array.append(get_title_info_db(db, activity)['title'])
       else:
-        title_dict[key] = []
-        title_dict[key].append(get_title_info_db(db, url))
-  print str(title_dict) + "\n\n"
-  return title_dict
+        print "\nThe url (%s) was not in our issues db!!!\n" % activity
+    title_array[key] = key_array
+
+
+  title_array = get_frequencies(title_array)
+
+  return title_array
 
 def get_title_info_db(db, url):
   ''' Get title info based on url'''
@@ -73,6 +76,42 @@ def get_title_info_db(db, url):
   result = db.fetchone()
 
   return result
+
+# def comment info is next
+
+def get_frequencies(db_dict):
+
+  for key,val in db_dict.iteritems():
+    string = ""
+    for title in db_dict[key]:
+      string += title + " "
+    freq = freq_function(string)
+    db_dict[key] = freq
+  print "Events With Top Title Frequencies"
+  print db_dict
+
+  return db_dict
+
+def freq_function(string):
+  words_to_ignore = ["that","what","with","this","would","from","your","which","while","these", "the"]
+  things_to_strip = [".",",","?",")","(","\"",":",";","'s"]
+  words_min_size = 3
+  words = string.lower().split()
+
+  wordcount = {}
+  for word in words:
+    for thing in things_to_strip:
+      if thing in word:
+        word = word.replace(thing,"")
+    if word not in words_to_ignore and len(word) >= words_min_size:
+      if word in wordcount:
+        wordcount[word] += 1
+      else:
+        wordcount[word] = 1
+
+  sortedbyfrequency =  sorted(wordcount,key=wordcount.get,reverse=True)
+  print sortedbyfrequency
+  return sortedbyfrequency
 
 def get_all_activity(db):
   ''' Get all the activity '''

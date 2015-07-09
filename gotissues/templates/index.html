@@ -115,7 +115,7 @@
 				
 				<div class="layout-grid">
 					{% for activity in data["activities"] | dictsort(false, 'value') | reverse %}
-						<div class="layout-crotchet hideme2"><a href="#{{activity[0]}}" class="billboard">
+						<div class="layout-crotchet hideme2"><a class="EventClick" href="#{{activity[0]}}" class="billboard">
 							<h1>{{activity[1]}}</h1>
 							<h2 style="margin-top:-.9em;font-size:1.4em;">{{activity[0]}}s</h2>
 						</a></div>
@@ -128,23 +128,19 @@
 		<!-- featured stats -->
 		<section class="slab-red">
 
-			<div class="layout-chimney-invert hideme">
-    
-        <div class="layout-minim">
-        	<h3> What do these stats look like up close? </h3>
-        	<p> Let's look at our top 3 Github Actions and see what</p>
-        </div>
+			<div class="layout-breve">
 
-        <div class="layout-minim slab-medium-red chimney">
-					<ul class="list-no-bullets layout-grid">
-				    
-				    <li class="layout-crotchet">
-				        <a href="#" class="billboard">
-				            <strong class="billboard-label"></strong>
-				        </a>
-				    </li>
-					</ul>
+			<div class="grid-layout">
+
+        	{% for title_arr in data["top_titles"] %}
+        	<div class="layout-crotchet">
+        		<a class="billboard" id="{{title_arr}}" style="color:black"><h4 id="{{title_arr}}">{{title_arr}}</h4>{% for title in data["top_titles"][title_arr] %}
+        			{{ title }}
+        		{% endfor %}</a>
+        	</div>
+        	{% endfor %}
 				</div>
+			</div>
 		</section>
 	
 	</body>
@@ -160,6 +156,14 @@
 <script>
 $(document).ready(function() {
     
+    $('.EventClick').click( function(){
+    	console.log($(this).attr('href'));
+    	var highlight = $(this).attr('href');
+    	$(highlight).fadeTo( 1500, 0.33, function(){
+    		$(highlight).fadeTo( "slow", 1 );
+    	});
+    })
+
     /* Every time the window is scrolled ... */
     $(window).scroll( function(){
     
@@ -234,7 +238,8 @@ gapi.analytics.ready(function() {
 			metrics: 'ga:totalEvents',
 			dimensions: 'ga:week',
 			filters : 'ga:eventCategory==Civic Issues',
-			'start-date': '2014-08-24',
+			sort : 'ga:week',
+			'start-date':'2014-08-24',
 			'end-date': 'today'
 		},
 		chart: {
