@@ -5,6 +5,10 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 		<title>Got Issues</title>
 
+		<!-- Chart.js graphing library and Moment.js to do date formatting and manipulation. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.2/moment.min.js"></script>
+
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 
 		<!-- Check the CfA Style Guide at https://style.codeforamerica.org/ -->
@@ -81,9 +85,16 @@
 					</div>
 
 				<div id="weeklyclicks" class="hideme" style="margin-top:11em">
+					<div class="badge-heading badge-gray">
+						<h2>Breaking it Down</h2>
+					</div>
 					<div id="embed-api-auth-container"></div>
+					<h3> Click Frequency By Month</h3>
 					<div id="clickschart" ></div>
 					<div id="view-selector-container" hidden></div>
+					<h3> Embed Sources: Visualized</h3>
+					<div id="chart-4-container"></div>
+					<div id="legend-4-container"></div>
 				</div>
 
 				</div>
@@ -98,7 +109,9 @@
 				</div>
 
 				<h2>Caused by a Click</h2>
-				<p>Activity on a repo within <b>one hour of a click</b></p>
+				<p>Measuring all activity on a repo within <b>24 hours of a click</b> 
+					related to that particular issue that was clicked on.
+				</p>
 				
 				<div class="layout-grid">
 					{% for activity in data["activities"] | dictsort(false, 'value') | reverse %}
@@ -124,35 +137,6 @@
 
         <div class="layout-minim slab-medium-red chimney">
 					<ul class="list-no-bullets layout-grid">
-				    
-				    <li class="layout-crotchet">
-				        <a href="#" class="billboard">
-				            <strong class="billboard-label"></strong>
-				        </a>
-				    </li>
-				    
-				    <li class="layout-crotchet">
-				        <a href="#" class="billboard">
-				            <strong class="billboard-label"></strong>
-				        </a>
-				    </li>
-				    
-				    <li class="layout-crotchet">
-				        <a href="#" class="billboard">
-				            <strong class="billboard-label"></strong>
-				        </a>
-				    </li>
-				    <li class="layout-crotchet">
-				        <a href="#" class="billboard">
-				            <strong class="billboard-label"></strong>
-				        </a>
-				    </li>
-				    
-				    <li class="layout-crotchet">
-				        <a href="#" class="billboard">
-				            <strong class="billboard-label"></strong>
-				        </a>
-				    </li>
 				    
 				    <li class="layout-crotchet">
 				        <a href="#" class="billboard">
@@ -258,7 +242,8 @@ gapi.analytics.ready(function() {
 			type: 'COLUMN',
 			options: {
 				legend: null,
-				width: '100%'
+				width: '100%',
+				title:'Number Of Times All Issues Have Been Clicked by Month'
 			}
 		}
 	});
@@ -268,7 +253,101 @@ gapi.analytics.ready(function() {
 	 */
 	viewSelector.on('change', function(ids) {
 		clicks.set({query: {ids: ids}}).execute();
+
+		renderTopSourcesChart(ids);
 	});
+
+	function renderTopSourcesChart(ids) {
+    query({
+      'ids': ids,
+      'dimensions': 'ga:eventLabel',
+      'metrics': 'ga:totalEvents',
+      'sort': '-ga:totalEvents',
+      'filters':'ga:eventCategory==Civic Issue View',
+      'start-date':'2014-08-24',
+			'end-date': 'today',
+      'max-results': 50
+    })
+    .then(function(response) {
+
+      var data = [];
+      var colors = ['#4D5360','#949FB1','#D4CCC5','#E2EAE9','#F7464A'];
+
+      response.rows.forEach(function(row, i) {
+        row[0] = row[0].split(',')[1];
+        row[0] = "http:" + row[0].split(':')[1];
+
+        i = data.length % 5; 
+        if (data.length == 0){
+		    	data.push({
+		        label: row[0],
+		        value: +row[1],
+		        color: colors[i]
+		      });
+		    } else {
+		    		for(var j=0; j<data.length; j++){
+		    			if(data[j]['label'] == row[0]){
+		    				j = data.length;
+		    			}
+		    			if(j == data.length - 1){
+		    				data.push({
+					        label: row[0],
+					        value: +row[1],
+					        color: colors[i]
+					      });
+		    			}
+		    		}
+		    	}
+      });
+
+      new Chart(makeCanvas('chart-4-container')).Doughnut(data);
+      //generateLegend('legend-4-container', data);
+    });
+  }
+
+
+  /**
+   * Extend the Embed APIs `gapi.analytics.report.Data` component to
+   * return a promise the is fulfilled with the value returned by the API.
+   * @param {Object} params The request parameters.
+   * @return {Promise} A promise.
+   */
+  function query(params) {
+    return new Promise(function(resolve, reject) {
+      var data = new gapi.analytics.report.Data({query: params});
+      data.once('success', function(response) { resolve(response); })
+          .once('error', function(response) { reject(response); })
+          .execute();
+    });
+  }
+
+
+  /**
+   * Create a new canvas inside the specified element. Set it to be the width
+   * and height of its container.
+   * @param {string} id The id attribute of the element to host the canvas.
+   * @return {RenderingContext} The 2D canvas context.
+   */
+  function makeCanvas(id) {
+    var container = document.getElementById(id);
+    var canvas = document.createElement('canvas');
+    var ctx = canvas.getContext('2d');
+
+    container.innerHTML = '';
+    canvas.width = container.offsetWidth;
+    canvas.height = container.offsetHeight;
+    container.appendChild(canvas);
+
+    return ctx;
+  }
+
+  // Set some global Chart.js defaults.
+  Chart.defaults.global.animationSteps = 60;
+  Chart.defaults.global.animationEasing = 'easeInOutQuart';
+  Chart.defaults.global.responsive = true;
+  Chart.defaults.global.maintainAspectRatio = false;
+
+
 
 });
 </script>
