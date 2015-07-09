@@ -66,11 +66,28 @@
 			<div style="padding-top:0"class="layout-breve">
 				<div id="topembeds">
 					
-					<div class="badge-heading badge-glasses badge-gray">
-						<h2>Top Embeds</h2>
-					</div>
 
-					<div class="layout-grid-crotchet">
+
+				<div id="weeklyclicks" style="margin-top:11em">
+					<div class="badge-heading badge-gray">
+						<h2>Breaking it Down</h2>
+					</div>
+					<div id="embed-api-auth-container"></div>
+					<h3> Click Frequency By Month</h3>
+					<div id="clickschart" ></div>
+					<div id="view-selector-container" hidden></div>
+					<div class="badge-heading badge-glasses badge-gray">
+					<h3> Top Embed Sources: Visualized</h3>
+				</div>
+					<div id="chart-4-container"></div>
+					<div id="legend-4-container"></div>
+				</div>
+
+				
+					<h3>Top Embeds</h3>
+					
+			
+			<div class="layout-grid-crotchet">
 						{% for source in data["sources"]%}
 							<div>
 								<center>
@@ -82,22 +99,9 @@
 								</center>
 							</div>
 						{% endfor %}
-					</div>
-
-				<div id="weeklyclicks" class="hideme" style="margin-top:11em">
-					<div class="badge-heading badge-gray">
-						<h2>Breaking it Down</h2>
-					</div>
-					<div id="embed-api-auth-container"></div>
-					<h3> Click Frequency By Month</h3>
-					<div id="clickschart" ></div>
-					<div id="view-selector-container" hidden></div>
-					<h3> Embed Sources: Visualized</h3>
-					<div id="chart-4-container"></div>
-					<div id="legend-4-container"></div>
-				</div>
-
-				</div>
+			</div>
+			</div>
+			
 			</div>
 		</section>
 
@@ -123,13 +127,15 @@
 				</div>
 			
 			</div>
-		</section>
 
 		<!-- featured stats -->
-		<section class="slab-red">
 
 			<div class="layout-breve">
 
+				<div class="badge-heading badge-graph badge-gray">
+					<h2>Key Title Words by Event</h2>
+					<h4>Using these words when creating titles in yields these actions</h4>
+				</div>
 			<div class="grid-layout">
 
         	{% for title_arr in data["top_titles"] %}
@@ -159,7 +165,7 @@ $(document).ready(function() {
     $('.EventClick').click( function(){
     	console.log($(this).attr('href'));
     	var highlight = $(this).attr('href');
-    	$(highlight).fadeTo( 1500, 0.33, function(){
+    	$(highlight).fadeTo( 1000, 0.65, function(){
     		$(highlight).fadeTo( "slow", 1 );
     	});
     })
