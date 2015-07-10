@@ -80,8 +80,9 @@ def get_info_activity(db):
     title_dict[key] = title_array
     label_dict[key] = final_label_arr
     desc_dict[key] = desc_array
-  
-    title_dict = get_frequencies(title_dict)
+
+  label_dict = get_frequencies(label_dict) 
+  title_dict = get_frequencies(title_dict)
   #print "common labels"
   #print label_dict
     # print desc_dict
@@ -116,7 +117,7 @@ def get_frequencies(db_dict):
     string = ""
     for title in db_dict[key]:
       string += title + " "
-    freq = freq_function(string)
+    freq = freq_function(string)[:5]
     db_dict[key] = freq
   # print "Events With Top Title Frequencies"
   # print db_dict
@@ -124,9 +125,9 @@ def get_frequencies(db_dict):
   return db_dict
 
 def freq_function(string):
-  words_to_ignore = ["that","what","with","this","would","from","your","which","while","these", "the"]
-  things_to_strip = [".",",","?",")","(","\"",":",";","'s"]
-  words_min_size = 3
+  words_to_ignore = ["that","what","with","this","would","from","your","which","while","these", "the", "their", "those", "earch"]
+  things_to_strip = [".",",","?",")","(","\"",":",";","'s","'"]
+  words_min_size = 4
   words = string.lower().split()
 
   wordcount = {}
@@ -140,7 +141,7 @@ def freq_function(string):
       else:
         wordcount[word] = 1
 
-  sortedbyfrequency =  sorted(wordcount,key=wordcount.get,reverse=True)[:5]
+  sortedbyfrequency =  sorted(wordcount,key=wordcount.get,reverse=True)
   # print sortedbyfrequency
   return sortedbyfrequency
 

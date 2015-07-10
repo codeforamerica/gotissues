@@ -322,7 +322,7 @@ def trim_activity(activities, click):
   return trimmed_activities
 
 def check_events(trimmed_activity, activity_git):
-    filtered_activities = ["PushEvent","DeleteEvent"]
+    filtered_activities = ["PushEvent","DeleteEvent","GollumEvent","IssueEvent"]
     for activity in filtered_activities:
       if trimmed_activity["activity_type"] == activity:
         return False
