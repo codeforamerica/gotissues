@@ -15,11 +15,12 @@ def get_clicked_issue_github_data(clicked_issues, limit=None):
     for github_issue in clicked_issues[0:limit]:
         # Convert to api url
         github_api_url = github_html_url_to_api(github_issue["url"])
-        got = get_github_with_auth(github_api_url)
-        issue = got.json()
-        issue["clicks"] = github_issue["clicks"]
-        # print json.dumps(issue, indent=4, sort_keys=True)
-        github_issues.append(issue)
+        if get_github_with_auth(github_api_url):
+            got = get_github_with_auth(github_api_url)
+            issue = got.json()
+            issue["clicks"] = github_issue["clicks"]
+            # print json.dumps(issue, indent=4, sort_keys=True)
+            github_issues.append(issue)
 
     return github_issues
 
