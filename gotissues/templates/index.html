@@ -119,53 +119,71 @@
 				
 				<div class="layout-grid">
 					{% for activity in data["activities"] | dictsort(false, 'value') | reverse %}
-						<div class="layout-crotchet hideme2"><a class="EventClick" href="#{{activity[0]}}" class="billboard">
+						<div style="margin-top:4em" class="layout-crotchet hideme">
+							<a class="billboard EventClick" href="#{{activity[0]}}">
 							<h1>{{activity[1]}}</h1>
-							<h2 style="margin-top:-.9em;font-size:1.4em;">{{activity[0]}}s</h2>
-						</a></div>
+							<h2 style="margin-top:2em;font-size:1.4em;">{{activity[0]}}s</h2>
+							</a>
+						</div>
 					{% endfor %}
 				</div>
 			
 			</div>
+			<div class="layout-breve">
+			<div class="grid-layout">
+			<div class="billboard" id="var"></div>
+		</div>
+		</div>
 
 		<!-- featured stats -->
-
-			<div class="layout-breve">
+			<div id="titles" class="layout-breve">
 
 				<div class="badge-heading badge-graph badge-gray">
 					<h2>Key Title Words by Event</h2>
-					<h4>Using these words when creating titles in yields these actions</h4>
+					<h4>Using these words when creating Github issue titles yields these actions</h4>
 				</div>
-			<div class="grid-layout">
 
+				<div class="grid-layout">
         	{% for title_arr in data["top_titles"][0] %}
-        	<div class="layout-crotchet">
-        		<a class="billboard" id="{{title_arr}}" style="color:black"><h4 id="{{title_arr}}">{{title_arr}}</h4>{% for title in data["top_titles"][0][title_arr] %}
-        			{{ title }}
-        		{% endfor %}</a>
+        	<div style="margin-top:4em" class="layout-crotchet hideme">
+        		<a class="billboard" id="{{title_arr}}" style="color:black">
+        			<h4 class="{{title_arr}}">{{title_arr}}</h4>
+        				common title key words:
+        				{% for title in data["top_titles"][0][title_arr] %}
+        					 {{ title }}
+        				{% endfor %}
+        		</a>
         	</div>
         	{% endfor %}
 				</div>
+			
 			</div>
 
-			<div class="layout-breve">
+			<div id="tags" class="layout-breve">
 
 				<div class="badge-heading badge-graph badge-gray">
 					<h2>Key Tags by Event</h2>
-					<h4>Using these labels when creating issues in yields these actions</h4>
+					<h4>Using these labels when creating Github issue labels in yields these actions</h4>
 				</div>
 			<div class="grid-layout">
 
         	{% for label_arr in data["top_titles"][1] %}
-        	<div class="layout-crotchet">
-        		<a class="billboard" id="{{title_arr}}" style="color:black"><h4 id="{{label_arr}}">{{label_arr}}</h4>
+        	<div style="margin-top:4em" class="layout-crotchet hideme">
+        		<a class="billboard {{label_arr}}" style="color:black"><h4 id="{{label_arr}}">{{label_arr}}</h4>
+        			labels: 
+        			{% if data["top_titles"][1][label_arr] %}
         			{% for label in data["top_titles"][1][label_arr] %}
         				{{ label }}
-        			{% endfor %}</a>
+        			{% endfor %}
+        			{% else %}
+        			There are no labels
+        			{% endif %}</a>
         	</div>
         	{% endfor %}
 				</div>
+			
 			</div>
+
 		</section>
 	
 	</body>
@@ -181,11 +199,13 @@
 <script>
 $(document).ready(function() {
     
-    $('.EventClick').click( function(){
-    	console.log($(this).attr('href'));
+    $('.EventClick').click(function(){
     	var highlight = $(this).attr('href');
-    	$(highlight).fadeTo( 1000, 0.65, function(){
-    		$(highlight).fadeTo( "slow", 1 );
+    	$('#tags').toggle({'opacity':'1'});
+    	$('#titles').toggle({'opacity':'1'});
+    	var highlight_var = highlight
+    	$(highlight_var).each(function(j){
+    		console.log($(this).html());
     	});
     })
 
@@ -201,25 +221,13 @@ $(document).ready(function() {
             /* If the object is completely visible in the window, fade it it */
             if( bottom_of_window > bottom_of_object ){
                 
-                $(this).animate({'opacity':'1'},500);
+                $(this).animate({'margin-top':'1em'}, function(){
+                });
+                $(this).animate({'opacity':'1'},1750);
                     
             }
             
         });
-
-        $('.hideme2').each( function(i){
-            
-            var bottom_of_object = $(this).offset().top + $(this).outerHeight();
-            var bottom_of_window = $(window).scrollTop() + $(window).height();
-            
-            /* If the object is completely visible in the window, fade it it */
-            if( bottom_of_window > bottom_of_object ){
-                
-                $(this).animate({'opacity':'1'},1500);
-                    
-            }
-            
-        }); 
     
     });
     
