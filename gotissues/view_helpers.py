@@ -140,7 +140,7 @@ def freq_function(string):
       else:
         wordcount[word] = 1
 
-  sortedbyfrequency =  sorted(wordcount,key=wordcount.get,reverse=True)
+  sortedbyfrequency =  sorted(wordcount,key=wordcount.get,reverse=True)[:5]
   # print sortedbyfrequency
   return sortedbyfrequency
 

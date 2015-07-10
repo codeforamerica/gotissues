@@ -69,37 +69,45 @@
 
 
 				<div id="weeklyclicks" style="margin-top:11em">
+					
 					<div class="badge-heading badge-gray">
 						<h2>Breaking it Down</h2>
 					</div>
+					
 					<div id="embed-api-auth-container"></div>
+					
 					<h3> Click Frequency By Month</h3>
 					<div id="clickschart" ></div>
 					<div id="view-selector-container" hidden></div>
-					<div class="badge-heading badge-glasses badge-gray">
-					<h3> Top Embed Sources: Visualized</h3>
-				</div>
-					<div id="chart-4-container"></div>
-					<div id="legend-4-container"></div>
-				</div>
 
-				
-					<h3>Top Embeds</h3>
+						<div class="badge-heading badge-glasses badge-gray">
+							<h3> Top Embed Sources: Visualized</h3>
+						</div>
+						<div class="layout-semibreve">
+						<div class="layout-minim">
+							<div id="chart-4-container"></div>
+						</div>
+						<div class="layout-minim">
+							<div class="layout-grid"><div id="legend-4-container"></div></div>
+						</div>
+					</div>
+					
+				</div>
 					
 			
-			<div class="layout-grid-crotchet">
-						{% for source in data["sources"]%}
-							<div>
-								<center>
+				<!--<div class="layout-grid-crotchet">
+							{% for source in data["sources"]%}
+								<div>
+									<center>
 
-									<h4 class="brick-text">{{source[1]}} Views </h4>
-									<h2 style="font-size:.8em" class="brick-heading">
-										<a href="{{source[0]}}">{{source[0]}}</a>
-									</h2>
-								</center>
-							</div>
-						{% endfor %}
-			</div>
+										<h4 class="brick-text">{{source[1]}} Views </h4>
+										<h2 style="font-size:.8em" class="brick-heading">
+											<a href="{{source[0]}}">{{source[0]}}</a>
+										</h2>
+									</center>
+								</div>
+							{% endfor %}
+				</div>-->
 			</div>
 			
 			</div>
@@ -120,11 +128,39 @@
 				<div class="layout-grid">
 					{% for activity in data["activities"] | dictsort(false, 'value') | reverse %}
 						<div style="margin-top:4em" class="layout-crotchet hideme">
-							<a class="billboard EventClick" href="#{{activity[0]}}">
+							<a id="{{activity[0]}}" class="billboard EventClick" href="#{{activity[0]}}">
 							<h1>{{activity[1]}}</h1>
-							<h2 style="margin-top:2em;font-size:1.4em;">{{activity[0]}}s</h2>
+							<h2 style="margin-top:1em;font-size:1.4em;">{{activity[0]}}s</h2>	        				
+								<div id="{{activity[0]}}1" class="slab-dark-blue">
+									<p><h2 class="brick-heading">Common Title Key Words</h2>
+								{% for title_arr in data["top_titles"][0] %}
+		        			{% for title in data["top_titles"][0][title_arr] %}
+	      						{% if activity[0] == title_arr %}
+	      							{% if title %}
+	      								{{title}}
+	      							{% else %}
+	      								No common title key words found
+	      							{% endif %}
+	      						{% endif %}
+		        			{% endfor %}
+	        			{% endfor %}
+	        			</p>
+	        			<p><h2 class="brick-heading">Common Top Labels</h2>
+	        			{% for label_arr in data["top_titles"][1] %}
+		        			{% for label in data["top_titles"][1][label_arr] %}
+	      						{% if activity[0] == label_arr %}
+	      							{% if label|length > 0 %}
+	      								{{label}}
+	      							{% else %}
+	      								No common labels found
+	      							{% endif %}
+	      						{% endif %}
+		        			{% endfor %}
+	        			{% endfor %}
+	        			</p></div>
 							</a>
 						</div>
+							
 					{% endfor %}
 				</div>
 			
@@ -148,10 +184,14 @@
         	<div style="margin-top:4em" class="layout-crotchet hideme">
         		<a class="billboard" id="{{title_arr}}" style="color:black">
         			<h4 class="{{title_arr}}">{{title_arr}}</h4>
-        				common title key words:
-        				{% for title in data["top_titles"][0][title_arr] %}
-        					 {{ title }}
-        				{% endfor %}
+        				{% if data["top_titles"][0][title_arr] %}
+	        				Common Title Key Words:
+	        				{% for title in data["top_titles"][0][title_arr] %}
+	        					 {{ title }}
+	        				{% endfor %}
+	        			{% else %}
+	        				No Common Title Key Words Found :(
+	        			{% endif %}
         		</a>
         	</div>
         	{% endfor %}
@@ -169,14 +209,15 @@
 
         	{% for label_arr in data["top_titles"][1] %}
         	<div style="margin-top:4em" class="layout-crotchet hideme">
-        		<a class="billboard {{label_arr}}" style="color:black"><h4 id="{{label_arr}}">{{label_arr}}</h4>
-        			labels: 
+        		<a class="billboard" id="{{label_arr}}" style="color:black">
+        			<h4 id="{{label_arr}}">{{label_arr}}</h4>
+        			Common Labels: 
         			{% if data["top_titles"][1][label_arr] %}
         			{% for label in data["top_titles"][1][label_arr] %}
         				{{ label }}
         			{% endfor %}
         			{% else %}
-        			There are no labels
+        			No Common Labels
         			{% endif %}</a>
         	</div>
         	{% endfor %}
@@ -199,14 +240,10 @@
 <script>
 $(document).ready(function() {
     
-    $('.EventClick').click(function(){
-    	var highlight = $(this).attr('href');
-    	$('#tags').toggle({'opacity':'1'});
-    	$('#titles').toggle({'opacity':'1'});
-    	var highlight_var = highlight
-    	$(highlight_var).each(function(j){
-    		console.log($(this).html());
-    	});
+    $('.EventClick').click(function(e){
+    	e.preventDefault();
+    	var info = $(this).attr("href") + "1";
+    	$(info).toggle({'opacity':'.25'}, 500);
     })
 
     /* Every time the window is scrolled ... */
@@ -309,6 +346,7 @@ gapi.analytics.ready(function() {
     .then(function(response) {
 
       var data = [];
+      var total = 0;
       var colors = ['#4D5360','#949FB1','#D4CCC5','#E2EAE9','#F7464A'];
 
       response.rows.forEach(function(row, i) {
@@ -322,6 +360,7 @@ gapi.analytics.ready(function() {
 		        value: +row[1],
 		        color: colors[i]
 		      });
+		      total = total + parseInt(row[1]);
 		    } else {
 		    		for(var j=0; j<data.length; j++){
 		    			if(data[j]['label'] == row[0]){
@@ -333,13 +372,14 @@ gapi.analytics.ready(function() {
 					        value: +row[1],
 					        color: colors[i]
 					      });
+					      total = total + parseInt(row[1]);
 		    			}
 		    		}
 		    	}
       });
 
       new Chart(makeCanvas('chart-4-container')).Doughnut(data);
-      //generateLegend('legend-4-container', data);
+      generateLegend('legend-4-container', data, total);
     });
   }
 
@@ -377,6 +417,16 @@ gapi.analytics.ready(function() {
     container.appendChild(canvas);
 
     return ctx;
+  }
+
+  function generateLegend(id, items, total) {
+    var legend = document.getElementById(id);
+    legend.innerHTML = items.map(function(item) {
+    	var value = 100*item.value/total;
+      var color = item.color || item.fillColor;
+      var label = item.label;
+      return '<p style="width:100%;display:inline;margin-left:1em;font-size:1.2rem;line-height:1.5em;">' + label + '</p><div class="heading" style="width:' + value +'%;padding:1em;margin:1em;background:' + color + ';"></div>';
+    }).join('');
   }
 
   // Set some global Chart.js defaults.
