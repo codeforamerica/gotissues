@@ -21,5 +21,4 @@ CREATE TABLE issues
     -- Google Analytics Data
     clicks      INT,
     views       INT,
-    view_sources TEXT[]
-);
+    view_sources TEXT[]);
