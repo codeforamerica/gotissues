@@ -363,7 +363,7 @@ gapi.analytics.ready(function() {
     	var value = 100*item.value/total;
       var color = item.color || item.fillColor;
       var label = item.label;
-      return '<span>' + label + '</span><div class="heading" style="width:' + value +'%;padding:1em;margin:1em;background:' + color + ';"><span style="width:100%;display:inline;color:white;">' +  parseInt(value)+ '% </span></div>';
+      return '<span><a href="' + label+ '">' + label + '</a></span><div class="heading" style="width:' + value +'%;padding:1em;margin:1em;background:' + color + ';"><span style="width:100%;display:inline;color:white;">' +  parseInt(value)+ '% </span></div>';
     }).join('');
   }
 
