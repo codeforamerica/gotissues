@@ -127,36 +127,28 @@
 				
 				<div class="layout-grid">
 					{% for activity in data["activities"] | dictsort(false, 'value') | reverse %}
-						<div style="margin-top:4em" class="layout-crotchet hideme">
+            <div style="margin-top:4em" class="layout-crotchet">
 							<a id="{{activity[0]}}" class="billboard EventClick" href="#{{activity[0]}}">
 							<h1>{{activity[1]}}</h1>
 							<h2 style="margin-top:1em;font-size:1.4em;">{{activity[0]}}s</h2>	        				
 								<div id="{{activity[0]}}1" class="slab-dark-blue">
 									<p><h2 class="brick-heading">Common Title Key Words</h2>
-								{% for title_arr in data["top_titles"][0] %}
-		        			{% for title in data["top_titles"][0][title_arr] %}
-	      						{% if activity[0] == title_arr %}
-	      							{% if title %}
-	      								{{title}}
-	      							{% else %}
-	      								No common title key words found
-	      							{% endif %}
-	      						{% endif %}
-		        			{% endfor %}
+								{% for title_arr in data["activity_summary"] %}
+                  {% if title_arr["activity_type"] == activity[0] %}
+                    {% for title in title_arr["common_titles"] %}
+	      					    {{title}}
+                    {% endfor %}
+                  {% endif %}
 	        			{% endfor %}
 	        			</p>
 	        			<p><h2 class="brick-heading">Common Top Labels</h2>
-	        			{% for label_arr in data["top_titles"][1] %}
-		        			{% for label in data["top_titles"][1][label_arr] %}
-	      						{% if activity[0] == label_arr %}
-	      							{% if label|length > 0 %}
-	      								{{label}}
-	      							{% else %}
-	      								No common labels found
-	      							{% endif %}
-	      						{% endif %}
-		        			{% endfor %}
-	        			{% endfor %}
+	        			{% for label_arr in data["activity_summary"] %}
+                  {% if label_arr["activity_type"] == activity[0] %}
+                    {% for label in label_arr["common_labels"] %}
+                      {{label}}
+                    {% endfor %}
+                  {% endif %}
+                {% endfor %}
 	        			</p></div>
 							</a>
 						</div>
@@ -170,60 +162,6 @@
 			<div class="billboard" id="var"></div>
 		</div>
 		</div>
-
-		<!-- featured stats -->
-			<div id="titles" class="layout-breve">
-
-				<div class="badge-heading badge-graph badge-gray">
-					<h2>Key Title Words by Event</h2>
-					<h4>Using these words when creating Github issue titles yields these actions</h4>
-				</div>
-
-				<div class="grid-layout">
-        	{% for title_arr in data["top_titles"][0] %}
-        	<div style="margin-top:4em" class="layout-crotchet hideme">
-        		<a class="billboard" id="{{title_arr}}" style="color:black">
-        			<h4 class="{{title_arr}}">{{title_arr}}</h4>
-        				{% if data["top_titles"][0][title_arr] %}
-	        				Common Title Key Words:
-	        				{% for title in data["top_titles"][0][title_arr] %}
-	        					 {{ title }}
-	        				{% endfor %}
-	        			{% else %}
-	        				No Common Title Key Words Found :(
-	        			{% endif %}
-        		</a>
-        	</div>
-        	{% endfor %}
-				</div>
-			
-			</div>
-
-			<div id="tags" class="layout-breve">
-
-				<div class="badge-heading badge-graph badge-gray">
-					<h2>Key Tags by Event</h2>
-					<h4>Using these labels when creating Github issue labels in yields these actions</h4>
-				</div>
-			<div class="grid-layout">
-
-        	{% for label_arr in data["top_titles"][1] %}
-        	<div style="margin-top:4em" class="layout-crotchet hideme">
-        		<a class="billboard" id="{{label_arr}}" style="color:black">
-        			<h4 id="{{label_arr}}">{{label_arr}}</h4>
-        			Common Labels: 
-        			{% if data["top_titles"][1][label_arr] %}
-        			{% for label in data["top_titles"][1][label_arr] %}
-        				{{ label }}
-        			{% endfor %}
-        			{% else %}
-        			No Common Labels
-        			{% endif %}</a>
-        	</div>
-        	{% endfor %}
-				</div>
-			
-			</div>
 
 		</section>
 	
@@ -256,11 +194,11 @@ $(document).ready(function() {
             var bottom_of_window = $(window).scrollTop() + $(window).height();
             
             /* If the object is completely visible in the window, fade it it */
-            if( bottom_of_window > bottom_of_object ){
+            if( bottom_of_window >= bottom_of_object ){
                 
                 $(this).animate({'margin-top':'1em'}, function(){
                 });
-                $(this).animate({'opacity':'1'},1750);
+                $(this).animate({'opacity':'1'},750);
                     
             }
             
@@ -425,7 +363,7 @@ gapi.analytics.ready(function() {
     	var value = 100*item.value/total;
       var color = item.color || item.fillColor;
       var label = item.label;
-      return '<p style="width:100%;display:inline;margin-left:1em;font-size:1.2rem;line-height:1.5em;">' + label + '</p><div class="heading" style="width:' + value +'%;padding:1em;margin:1em;background:' + color + ';"></div>';
+      return '<span>' + label + '</span><div class="heading" style="width:' + value +'%;padding:1em;margin:1em;background:' + color + ';"><span style="width:100%;display:inline;color:white;">' +  parseInt(value)+ '% </span></div>';
     }).join('');
   }
 
