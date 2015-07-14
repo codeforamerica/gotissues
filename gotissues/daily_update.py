@@ -205,11 +205,22 @@ def get_activity_summaries_array(db):
 
 def write_activity_summary_to_db(activity_info, db):
     # Check if the activity already exists
-    q = ''' SELECT * FROM activity_summary WHERE activity_type = %(activity_type)s AND common_titles = %(common_titles)s '''
-    db.execute(q, {"activity_type": activity_info["activity_type"],
-        "common_titles": activity_info["common_titles"]})
+    q = ''' SELECT * FROM activity_summary WHERE activity_type = %(activity_type)s '''
+    db.execute(q, {"activity_type": activity_info["activity_type"]})
+    exists = db.fetchone()
 
-    if not db.fetchone():
+    if exists:
+        # Update
+        q = ''' UPDATE activity_summary SET (common_titles, common_labels, count)
+            = ( %(common_titles)s, %(common_labels)s, %(count)s )
+                WHERE activity_type = %(activity_type)s
+            '''
+        db.execute(q, {"activity_type":activity_info["activity_type"], "common_titles":activity_info["common_titles"], 
+            "common_labels":activity_info["common_labels"], "count":activity_info["count"]})
+
+
+    if not exists:
+        # Insert
         q = ''' INSERT INTO activity_summary (activity_type, common_titles, common_labels, count)
             VALUES ( %(activity_type)s, %(common_titles)s, %(common_labels)s, %(count)s)
             '''
