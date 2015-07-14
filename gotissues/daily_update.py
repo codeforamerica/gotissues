@@ -171,9 +171,9 @@ def write_activities_to_db(activity, db):
         q = ''' INSERT INTO activity (issue_url, click_timestamp, activity_type, activity_timestamp)
             VALUES ( %(issue_url)s, %(click_timestamp)s, %(activity_type)s, %(activity_timestamp)s)
             '''
-    db.execute(q, {"issue_url": activity["issue_url"],
-        "click_timestamp": activity["click_timestamp"], "activity_type": activity["activity_type"],
-        "activity_timestamp": activity["activity_timestamp"]})
+        db.execute(q, {"issue_url": activity["issue_url"],
+            "click_timestamp": activity["click_timestamp"], "activity_type": activity["activity_type"],
+            "activity_timestamp": activity["activity_timestamp"]})
 
 
 def get_activity_summaries_array(db):
@@ -200,7 +200,7 @@ def get_activity_summaries_array(db):
             if key == entry["activity_type"]:
                 entry["count"] = value
 
-        return activity_summary_array
+    return activity_summary_array
 
 
 def write_activity_summary_to_db(activity_info, db):
