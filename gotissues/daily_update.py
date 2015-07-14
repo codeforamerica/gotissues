@@ -15,11 +15,10 @@ def get_clicked_issue_github_data(clicked_issues, limit=None):
     for github_issue in clicked_issues[0:limit]:
         # Convert to api url
         github_api_url = github_html_url_to_api(github_issue["url"])
-        if get_github_with_auth(github_api_url):
-            got = get_github_with_auth(github_api_url)
+        got = get_github_with_auth(github_api_url)
+        if got:
             issue = got.json()
             issue["clicks"] = github_issue["clicks"]
-            # print json.dumps(issue, indent=4, sort_keys=True)
             github_issues.append(issue)
 
     return github_issues
@@ -31,8 +30,8 @@ def trim_github_issues(github_issues):
     for issue in github_issues:
         for key in issue.keys():
             github_attr = ["id", "html_url", "title", "labels",
-                           "state", "comments", "created_at",
-                           "body", "closed_at", "closed_by", "clicks"]
+                "state", "comments", "created_at",
+                "body", "closed_at", "closed_by", "clicks"]
             if key not in github_attr:
                 del issue[key]
         trimmed_issues.append(issue)
@@ -47,13 +46,13 @@ def add_views_to_issues(trimmed_issues, viewed_issues):
         issue["views"] = None
         issue["view_sources"] = None
 
-        found = find(viewed_issues,"url",issue["html_url"])
-        if found:
-            issue["views"] = viewed_issues[found]["views"]
-            issue["view_sources"] = viewed_issues[found]["view_sources"]
-
+    found = find(viewed_issues,"url",issue["html_url"])
+    if found:
+        issue["views"] = viewed_issues[found]["views"]
+        issue["view_sources"] = viewed_issues[found]["view_sources"]
 
     return trimmed_issues
+
 
 def github_issue_url_to_project(url):
     ''' Convert https://api.github.com/repos/:org/:repo/issues/:no
@@ -84,29 +83,24 @@ def get_timestamp_issue_github_data(clicked_issues, limit=None):
                 action_time = datetime.datetime.strptime(action_time, '%Y-%m-%dT%H:%M:%SZ')
                 click_time = datetime.datetime.strptime(click_time, '%Y-%m-%dT%H:%M:%S')
 
-                result = click_time - action_time
-                if result < datetime.timedelta(days=2):
-                    nearby_dict = {
+            result = click_time - action_time
+            if result < datetime.timedelta(days=2):
+                nearby_dict = {
                     "type":project_event["type"],
                     "created_at":project_event["created_at"]
                     }
-                    project_event_array.append(nearby_dict)
-                
+                project_event_array.append(nearby_dict)
+
         timestamp_dict = {
             "timestamp":github_issue["timestamp"],
             "issue_id":issue["id"],
             "nearby_events":project_event_array
-        }
+            }
 
 
-        if timestamp_dict["nearby_events"]:
-            good_timestamps.append(timestamp_dict)
-        #   print json.dumps(issue, indent=4, sort_keys=True)
-        # github_issues.append(timestamp_dict)
+    if timestamp_dict["nearby_events"]:
+        good_timestamps.append(timestamp_dict)
 
-# Get the Github data for those clicked issues
-# Set the limit to 1 for testing
-# github_issues = get_timestamp_issue_github_data(recent_issues, limit=100)
 
 def write_issue_to_db(issue, db):
     """ Write the issue to the database """
@@ -117,24 +111,24 @@ def write_issue_to_db(issue, db):
     if db.fetchone():
         # UPDATE
         q = ''' UPDATE issues SET (html_url, title, body, labels, state,
-                      comments, created_at, closed_at, closed_by, clicks,
-                      views, view_sources)
-                = ( %(html_url)s, %(title)s, %(body)s, %(labels)s::json, %(state)s, %(comments)s, %(created_at)s, %(closed_at)s, %(closed_by)s::json, %(clicks)s, %(views)s, %(view_sources)s)
-                WHERE id = %(id)s
+            comments, created_at, closed_at, closed_by, clicks,
+            views, view_sources)
+            = ( %(html_url)s, %(title)s, %(body)s, %(labels)s::json, %(state)s, %(comments)s, %(created_at)s, %(closed_at)s, %(closed_by)s::json, %(clicks)s, %(views)s, %(view_sources)s)
+            WHERE id = %(id)s
             '''
     else:
         # INSERT
         q = ''' INSERT INTO issues (id, html_url, title, body, labels, state,
-                      comments, created_at, closed_at, closed_by, clicks,
-                      views, view_sources)
-                VALUES ( %(id)s, %(html_url)s, %(title)s, %(body)s, %(labels)s::json, %(state)s, %(comments)s, %(created_at)s, %(closed_at)s, %(closed_by)s::json, %(clicks)s, %(views)s, %(view_sources)s)
+            comments, created_at, closed_at, closed_by, clicks,
+            views, view_sources)
+            VALUES ( %(id)s, %(html_url)s, %(title)s, %(body)s, %(labels)s::json, %(state)s, %(comments)s, %(created_at)s, %(closed_at)s, %(closed_by)s::json, %(clicks)s, %(views)s, %(view_sources)s)
             '''
 
     db.execute(q, {"id":issue["id"], "html_url":issue["html_url"], "title":issue["title"],
-                    "body":issue["body"], "labels":json.dumps(issue["labels"]), "state":issue["state"],
-                    "comments":issue["comments"], "created_at": issue["created_at"], "closed_at": issue["closed_at"],
-                    "closed_by":json.dumps(issue["closed_by"]), "clicks":issue["clicks"], "views":issue["views"],
-                    "view_sources":issue["view_sources"]})
+            "body":issue["body"], "labels":json.dumps(issue["labels"]), "state":issue["state"],
+            "comments":issue["comments"], "created_at": issue["created_at"], "closed_at": issue["closed_at"],
+            "closed_by":json.dumps(issue["closed_by"]), "clicks":issue["clicks"], "views":issue["views"],
+            "view_sources":issue["view_sources"]})
 
 
 def write_click_to_db(click, db):
@@ -146,27 +140,82 @@ def write_click_to_db(click, db):
     if not db.fetchone():
         # INSERT
         q = ''' INSERT INTO clicks (issue_url, timestamp, readable_date)
-                VALUES ( %(issue_url)s, %(timestamp)s, %(readable_date)s)
+            VALUES ( %(issue_url)s, %(timestamp)s, %(readable_date)s)
             '''
 
         db.execute(q, {"issue_url": click["issue_url"], "timestamp": click["timestamp"],
-                        "readable_date": click["readable_date"]})
+            "readable_date": click["readable_date"]})
 
+
+def get_top_activity(db):
+    ''' Get the top five activity types '''
+    db.execute(''' SELECT activity_type FROM activity ''')
+    results = db.fetchall()
+
+    activities = {}
+    for row in results:
+        if row["activity_type"] not in activities.keys():
+            activities[row["activity_type"]] = 1
+        else:
+            activities[row["activity_type"]] += 1
+    return activities
 
 def write_activities_to_db(activity, db):
     # Check if the activity already exists
     q = ''' SELECT * FROM activity WHERE activity_type = %(activity_type)s AND activity_timestamp = %(activity_timestamp)s AND click_timestamp = %(click_timestamp)s'''
     db.execute(q, {"activity_type": activity["activity_type"],
-                   "activity_timestamp": activity["activity_timestamp"],
-                   "click_timestamp": activity["click_timestamp"]})
+        "activity_timestamp": activity["activity_timestamp"],
+        "click_timestamp": activity["click_timestamp"]})
 
     if not db.fetchone():
         q = ''' INSERT INTO activity (issue_url, click_timestamp, activity_type, activity_timestamp)
-                VALUES ( %(issue_url)s, %(click_timestamp)s, %(activity_type)s, %(activity_timestamp)s)
+            VALUES ( %(issue_url)s, %(click_timestamp)s, %(activity_type)s, %(activity_timestamp)s)
             '''
         db.execute(q, {"issue_url": activity["issue_url"],
-               "click_timestamp": activity["click_timestamp"], "activity_type": activity["activity_type"],
-               "activity_timestamp": activity["activity_timestamp"]})
+            "click_timestamp": activity["click_timestamp"], "activity_type": activity["activity_type"],
+            "activity_timestamp": activity["activity_timestamp"]})
+
+
+def get_activity_summaries_array(db):
+    activity_summary_array = []
+    activity_summary = get_info_activity(db)
+    counts = get_top_activity(db)
+    titles = activity_summary["titles"]
+    labels = activity_summary["labels"]
+
+    for key,value in titles.iteritems():
+        new_dict = {
+            "activity_type": key,
+            "common_titles": value
+            }
+        activity_summary_array.append(new_dict)
+
+    for key,value in labels.iteritems():
+        for entry in activity_summary_array:
+            if key == entry["activity_type"]:
+                entry["common_labels"] = value
+ 
+    for key,value in counts.iteritems():
+        for entry in activity_summary_array:
+            if key == entry["activity_type"]:
+                entry["count"] = value
+
+    return activity_summary_array
+
+
+def write_activity_summary_to_db(activity_info, db):
+    # Check if the activity already exists
+    q = ''' SELECT * FROM activity_summary WHERE activity_type = %(activity_type)s AND common_titles = %(common_titles)s '''
+    db.execute(q, {"activity_type": activity_info["activity_type"],
+        "common_titles": activity_info["common_titles"]})
+
+    if not db.fetchone():
+        q = ''' INSERT INTO activity_summary (activity_type, common_titles, common_labels, count)
+            VALUES ( %(activity_type)s, %(common_titles)s, %(common_labels)s, %(count)s)
+            '''
+        db.execute(q, {"activity_type":activity_info["activity_type"], "common_titles":activity_info["common_titles"], 
+            "common_labels":activity_info["common_labels"], "count":activity_info["count"]})
+
 
 if __name__ == '__main__':
 
@@ -198,3 +247,8 @@ if __name__ == '__main__':
 
             for activity in activities:
                 write_activities_to_db(activity, db)
+
+            activity_summary = get_activity_summaries_array(db)
+            for summary in activity_summary:
+                write_activity_summary_to_db(summary, db)
+

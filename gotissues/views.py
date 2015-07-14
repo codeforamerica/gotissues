@@ -20,8 +20,8 @@ def index():
     with connect(os.environ['DATABASE_URL']) as conn:
         with dict_cursor(conn) as db:
             data["sources"] = get_top_sources(db)
-            data["activities"] = get_top_acivity(db)
-            data["top_titles"] = get_info_activity(db)
+            data["activities"] = get_top_activity(db)
+            data["activity_summary"] = get_activity_summary(db)
 
     return render_template("index.html", data=data)
 
