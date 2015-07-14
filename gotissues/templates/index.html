@@ -1,179 +1,179 @@
 <!DOCTYPE html>
 <html lang="en-us">
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-		<title>Got Issues</title>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Got Issues</title>
 
-		<!-- Chart.js graphing library and Moment.js to do date formatting and manipulation. -->
+    <!-- Chart.js graphing library and Moment.js to do date formatting and manipulation. -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.2/moment.min.js"></script>
 
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 
-		<!-- Check the CfA Style Guide at https://style.codeforamerica.org/ -->
-		<link rel="stylesheet" href="https://style.codeforamerica.org/style/css/main.css">
-		<link rel="stylesheet" href="https://style.codeforamerica.org/style/css/layout.css" media="all and (min-width: 40em)">
+    <!-- Check the CfA Style Guide at https://style.codeforamerica.org/ -->
+    <link rel="stylesheet" href="https://style.codeforamerica.org/style/css/main.css">
+    <link rel="stylesheet" href="https://style.codeforamerica.org/style/css/layout.css" media="all and (min-width: 40em)">
 
-		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
 
-		<link rel="shortcut icon" type="image/x-icon" href="https://style.codeforamerica.org/1/favicon.ico">
-		<link rel="apple-touch-icon-precomposed" href="https://style.codeforamerica.org/1/style/favicons/60x60/flag-red.png"/>
+    <link rel="shortcut icon" type="image/x-icon" href="https://style.codeforamerica.org/1/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" href="https://style.codeforamerica.org/1/style/favicons/60x60/flag-red.png"/>
 
-	</head>
+  </head>
 
-	<body>
-		<header class="slab-blue">
-			<div class="layout-breve">
-				<h1>Civic Issue Finder Analytics</h1>
-				<p>Does the <a href="http:www.codeforamerica.org/geeks/civicissues">civic issue finder</a> actually work? Lets explore the data to find out.</p>
-			</div>
-		</header>
+  <body>
+    <header class="slab-blue">
+      <div class="layout-breve">
+        <h1>Civic Issue Finder Analytics</h1>
+        <p>Does the <a href="http:www.codeforamerica.org/geeks/civicissues">civic issue finder</a> actually work? Lets explore the data to find out.</p>
+      </div>
+    </header>
 
-		<section>
-			<div class="layout-breve">
-				
-				<div class="badge-heading badge-graph badge-gray">
-					<h2>Measuring Impact</h2>
-				</div>
+    <section>
+      <div class="layout-breve">
+        
+        <div class="badge-heading badge-graph badge-gray">
+          <h2>Measuring Impact</h2>
+        </div>
 
-				<ul class="bricks bricks-cta bricks-3">
-					
-					<li class="brick badge-heading badge-blue">
-						<a class="brick-link">
-							<h4 class="brick-text">{{ data.total_clicks }}</h4>
-							<h2 class="brick-heading">Total Clicks</h2>
-						</a>
-					</li>
+        <ul class="bricks bricks-cta bricks-3">
+          
+          <li class="brick badge-heading badge-blue">
+            <a class="brick-link">
+              <h4 class="brick-text">{{ data.total_clicks }}</h4>
+              <h2 class="brick-heading">Total Clicks</h2>
+            </a>
+          </li>
 
-					<li class="brick badge-heading badge-red">
-						<a class="brick-link">
-							<h4 class="brick-text">{{ data.total_page_views }}</h4>
-							<h2 class="brick-heading">Total Page Views</h2>
-						</a>
-					</li>
-		
-					<li class="brick badge-heading badge-dark-blue">
-							<a class="brick-link">
-									<h4 class="brick-text">{{ data.clicks_per_view }}%</h4>
-									<h2 class="brick-heading">Clicks Per Page View</h2>
-							</a>
-					</li>
-				
-				</ul>
-			
-			</div>
-			<div style="padding-top:0"class="layout-breve">
-				<div id="topembeds">
-					
+          <li class="brick badge-heading badge-red">
+            <a class="brick-link">
+              <h4 class="brick-text">{{ data.total_page_views }}</h4>
+              <h2 class="brick-heading">Total Page Views</h2>
+            </a>
+          </li>
+    
+          <li class="brick badge-heading badge-dark-blue">
+              <a class="brick-link">
+                  <h4 class="brick-text">{{ data.clicks_per_view }}%</h4>
+                  <h2 class="brick-heading">Clicks Per Page View</h2>
+              </a>
+          </li>
+        
+        </ul>
+      
+      </div>
+      <div style="padding-top:0"class="layout-breve">
+        <div id="topembeds">
+          
 
 
-				<div id="weeklyclicks" style="margin-top:11em">
-					
-					<div class="badge-heading badge-gray">
-						<h2>Breaking it Down</h2>
-					</div>
-					
-					<div id="embed-api-auth-container"></div>
-					
-					<h3> Click Frequency By Month</h3>
-					<div id="clickschart" ></div>
-					<div id="view-selector-container" hidden></div>
+        <div id="weeklyclicks" style="margin-top:11em">
+          
+          <div class="badge-heading badge-gray">
+            <h2>Breaking it Down</h2>
+          </div>
+          
+          <div id="embed-api-auth-container"></div>
+          
+          <h3> Click Frequency By Month</h3>
+          <div id="clickschart" ></div>
+          <div id="view-selector-container" hidden></div>
 
-						<div class="badge-heading badge-glasses badge-gray">
-							<h3> Top Embed Sources: Visualized</h3>
-						</div>
-						<div class="layout-semibreve">
-						<div class="layout-minim">
-							<div id="chart-4-container"></div>
-						</div>
-						<div class="layout-minim">
-							<div class="layout-grid"><div id="legend-4-container"></div></div>
-						</div>
-					</div>
-					
-				</div>
-					
-			
-				<!--<div class="layout-grid-crotchet">
-							{% for source in data["sources"]%}
-								<div>
-									<center>
+            <div class="badge-heading badge-glasses badge-gray">
+              <h3> Top Embed Sources: Visualized</h3>
+            </div>
+            <div class="layout-semibreve">
+            <div class="layout-minim">
+              <div id="chart-4-container"></div>
+            </div>
+            <div class="layout-minim">
+              <div class="layout-grid"><div id="legend-4-container"></div></div>
+            </div>
+          </div>
+          
+        </div>
+          
+      
+        <!--<div class="layout-grid-crotchet">
+              {% for source in data["sources"]%}
+                <div>
+                  <center>
 
-										<h4 class="brick-text">{{source[1]}} Views </h4>
-										<h2 style="font-size:.8em" class="brick-heading">
-											<a href="{{source[0]}}">{{source[0]}}</a>
-										</h2>
-									</center>
-								</div>
-							{% endfor %}
-				</div>-->
-			</div>
-			
-			</div>
-		</section>
+                    <h4 class="brick-text">{{source[1]}} Views </h4>
+                    <h2 style="font-size:.8em" class="brick-heading">
+                      <a href="{{source[0]}}">{{source[0]}}</a>
+                    </h2>
+                  </center>
+                </div>
+              {% endfor %}
+        </div>-->
+      </div>
+      
+      </div>
+    </section>
 
-		<section style="padding-bottom:3em" class="slab-teal">
-			<div class="layout-breve">
+    <section style="padding-bottom:3em" class="slab-teal">
+      <div class="layout-breve">
 
-				<div class="badge-heading badge-github badge-gray">
-					<h1>Github Activity</h1>
-				</div>
+        <div class="badge-heading badge-github badge-gray">
+          <h1>Github Activity</h1>
+        </div>
 
-				<h2>Caused by a Click</h2>
-				<p>Measuring all activity on a repo within <b>24 hours of a click</b> 
-					related to that particular issue that was clicked on.
-				</p>
-				
-				<div class="layout-grid">
-					{% for activity in data["activity_summary"] %}
+        <h2>Caused by a Click</h2>
+        <p>Measuring all activity on a repo within <b>24 hours of a click</b> 
+          related to that particular issue that was clicked on.
+        </p>
+        
+        <div class="layout-grid">
+          {% for activity in data["activity_summary"] %}
             <div style="margin-top:4em" class="layout-crotchet">
-							<a id="{{activity.activity_type}}" class="billboard EventClick" href="#{{activity.activity_type}}">
-							<h1>{{activity.count}}</h1>
-							<h2 style="margin-top:1em;font-size:1.4em;">{{activity.activity_type}}s</h2>	        				
-								<div id="{{activity.activity_type}}1" class="slab-dark-blue">
-									<p><h2 class="brick-heading">Common Title Key Words</h2>
+              <a id="{{activity.activity_type}}" class="billboard EventClick" href="#{{activity.activity_type}}">
+              <h1>{{activity.count}}</h1>
+              <h2 style="margin-top:1em;font-size:1.4em;">{{activity.activity_type}}s</h2>                  
+                <div id="{{activity.activity_type}}1" class="slab-dark-blue">
+                  <p><h2 class="brick-heading">Common Title Key Words</h2>
                   {% for title in activity.common_titles %}
                     {{title}}
                   {% endfor %}
-	        			</p>
-	        			<p><h2 class="brick-heading">Common Top Labels</h2>
+                </p>
+                <p><h2 class="brick-heading">Common Top Labels</h2>
                   {% for label in activity.common_labels %}
                     {{label}}
                   {% endfor %}
-	        			</p></div>
-							</a>
-						</div>
-							
-					{% endfor %}
-				</div>
-			
-			</div>
-			<div class="layout-breve">
-			<div class="grid-layout">
-			<div class="billboard" id="var"></div>
-		</div>
-		</div>
+                </p></div>
+              </a>
+            </div>
+              
+          {% endfor %}
+        </div>
+      
+      </div>
+      <div class="layout-breve">
+      <div class="grid-layout">
+      <div class="billboard" id="var"></div>
+    </div>
+    </div>
 
-		</section>
-	
-	</body>
+    </section>
+  
+  </body>
 
-	<script>
+  <script>
 (function(w,d,s,g,js,fs){
-	g=w.gapi||(w.gapi={});g.analytics={q:[],ready:function(f){this.q.push(f);}};
-	js=d.createElement(s);fs=d.getElementsByTagName(s)[0];
-	js.src='https://apis.google.com/js/platform.js';
-	fs.parentNode.insertBefore(js,fs);js.onload=function(){g.load('analytics');};
+  g=w.gapi||(w.gapi={});g.analytics={q:[],ready:function(f){this.q.push(f);}};
+  js=d.createElement(s);fs=d.getElementsByTagName(s)[0];
+  js.src='https://apis.google.com/js/platform.js';
+  fs.parentNode.insertBefore(js,fs);js.onload=function(){g.load('analytics');};
 }(window,document,'script'));
 </script>
 <script>
 $(document).ready(function() {
     
     $('.EventClick').click(function(e){
-    	e.preventDefault();
-    	var info = $(this).attr("href") + "1";
-    	$(info).toggle({'opacity':'.25'}, 500);
+      e.preventDefault();
+      var info = $(this).attr("href") + "1";
+      $(info).toggle({'opacity':'.25'}, 500);
     })
 
     /* Every time the window is scrolled ... */
@@ -204,65 +204,65 @@ $(document).ready(function() {
 
 gapi.analytics.ready(function() {
 
-	/**
-	 * Authorize the user immediately if the user has already granted access.
-	 * If no access has been created, render an authorize button inside the
-	 * element with the ID "embed-api-auth-container".
-	 */
-	gapi.analytics.auth.authorize({
-		serverAuth: {
-			access_token: "{{ data['access_token'] }}"
-		}
-	});
+  /**
+   * Authorize the user immediately if the user has already granted access.
+   * If no access has been created, render an authorize button inside the
+   * element with the ID "embed-api-auth-container".
+   */
+  gapi.analytics.auth.authorize({
+    serverAuth: {
+      access_token: "{{ data['access_token'] }}"
+    }
+  });
 
 
-	/**
-	 * Create a new ViewSelector instance to be rendered inside of an
-	 * element with the id "view-selector-container".
-	 */
-	var viewSelector = new gapi.analytics.ViewSelector({
-		container: 'view-selector-container'
-	});
+  /**
+   * Create a new ViewSelector instance to be rendered inside of an
+   * element with the id "view-selector-container".
+   */
+  var viewSelector = new gapi.analytics.ViewSelector({
+    container: 'view-selector-container'
+  });
 
-	 //Render the view selector to the page.
-	viewSelector.execute();
+   //Render the view selector to the page.
+  viewSelector.execute();
 
-	/**
-	 * Create a new DataChart instance with the given query parameters
-	 * and Google chart options. It will be rendered inside an element
-	 * with the id "chart-container".
-	 */
+  /**
+   * Create a new DataChart instance with the given query parameters
+   * and Google chart options. It will be rendered inside an element
+   * with the id "chart-container".
+   */
 
-	 var clicks = new gapi.analytics.googleCharts.DataChart({
-		query: {
-			metrics: 'ga:totalEvents',
-			dimensions: 'ga:week',
-			filters : 'ga:eventCategory==Civic Issues',
-			sort : 'ga:week',
-			'start-date':'2014-08-24',
-			'end-date': 'today'
-		},
-		chart: {
-			container: 'clickschart',
-			type: 'COLUMN',
-			options: {
-				legend: null,
-				width: '100%',
-				title:'Number Of Times All Issues Have Been Clicked by Month'
-			}
-		}
-	});
+   var clicks = new gapi.analytics.googleCharts.DataChart({
+    query: {
+      metrics: 'ga:totalEvents',
+      dimensions: 'ga:week',
+      filters : 'ga:eventCategory==Civic Issues',
+      sort : 'ga:week',
+      'start-date':'2014-08-24',
+      'end-date': 'today'
+    },
+    chart: {
+      container: 'clickschart',
+      type: 'COLUMN',
+      options: {
+        legend: null,
+        width: '100%',
+        title:'Number Of Times All Issues Have Been Clicked by Month'
+      }
+    }
+  });
 
-	/*
-	 * Render the dataChart on the page whenever a new view is selected.
-	 */
-	viewSelector.on('change', function(ids) {
-		clicks.set({query: {ids: ids}}).execute();
+  /*
+   * Render the dataChart on the page whenever a new view is selected.
+   */
+  viewSelector.on('change', function(ids) {
+    clicks.set({query: {ids: ids}}).execute();
 
-		renderTopSourcesChart(ids);
-	});
+    renderTopSourcesChart(ids);
+  });
 
-	function renderTopSourcesChart(ids) {
+  function renderTopSourcesChart(ids) {
     query({
       'ids': ids,
       'dimensions': 'ga:eventLabel',
@@ -270,7 +270,7 @@ gapi.analytics.ready(function() {
       'sort': '-ga:totalEvents',
       'filters':'ga:eventCategory==Civic Issue View',
       'start-date':'2014-08-24',
-			'end-date': 'today',
+      'end-date': 'today',
       'max-results': 50
     })
     .then(function(response) {
@@ -285,27 +285,27 @@ gapi.analytics.ready(function() {
 
         i = data.length % 5; 
         if (data.length == 0){
-		    	data.push({
-		        label: row[0],
-		        value: +row[1],
-		        color: colors[i]
-		      });
-		      total = total + parseInt(row[1]);
-		    } else {
-		    		for(var j=0; j<data.length; j++){
-		    			if(data[j]['label'] == row[0]){
-		    				j = data.length;
-		    			}
-		    			if(j == data.length - 1){
-		    				data.push({
-					        label: row[0],
-					        value: +row[1],
-					        color: colors[i]
-					      });
-					      total = total + parseInt(row[1]);
-		    			}
-		    		}
-		    	}
+          data.push({
+            label: row[0],
+            value: +row[1],
+            color: colors[i]
+          });
+          total = total + parseInt(row[1]);
+        } else {
+            for(var j=0; j<data.length; j++){
+              if(data[j]['label'] == row[0]){
+                j = data.length;
+              }
+              if(j == data.length - 1){
+                data.push({
+                  label: row[0],
+                  value: +row[1],
+                  color: colors[i]
+                });
+                total = total + parseInt(row[1]);
+              }
+            }
+          }
       });
 
       new Chart(makeCanvas('chart-4-container')).Doughnut(data);
@@ -352,7 +352,7 @@ gapi.analytics.ready(function() {
   function generateLegend(id, items, total) {
     var legend = document.getElementById(id);
     legend.innerHTML = items.map(function(item) {
-    	var value = 100*item.value/total;
+      var value = 100*item.value/total;
       var color = item.color || item.fillColor;
       var label = item.label;
       return '<span><a href="' + label+ '">' + label + '</a></span><div class="heading" style="width:' + value +'%;padding:1em;margin:1em;background:' + color + ';"><span style="width:100%;display:inline;color:white;">' +  parseInt(value)+ '% </span></div>';

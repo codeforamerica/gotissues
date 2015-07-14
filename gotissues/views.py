@@ -22,6 +22,7 @@ def index():
             data["sources"] = get_top_sources(db)
             data["activities"] = get_top_activity(db)
             data["activity_summary"] = get_activity_summary(db)
+            print data["activity_summary"]
 
     return render_template("index.html", data=data)
 
