@@ -45,60 +45,6 @@ choice_dict = {
       'fields':None
     },
 
-    "top_cities": {
-      'metrics':'ga:totalEvents',
-      'dimensions':'ga:city',
-      'sort':'-ga:totalEvents',
-      'filters':'ga:eventCategory==Civic Issues',
-      'max_results':5,
-      'fields':None
-    },
-
-    "least_clicked": {
-      'metrics':'ga:totalEvents',
-      'dimensions':'ga:eventLabel',
-      'sort':'ga:totalEvents',
-      'filters':'ga:eventCategory==Civic Issues;ga:eventLabel=@github.com',
-      'max_results':5,
-      'fields':'rows'
-    },
-
-    "most_clicked": {
-      'metrics':'ga:totalEvents',
-      'dimensions':'ga:eventLabel',
-      'sort':'-ga:totalEvents',
-      'filters':'ga:eventCategory==Civic Issues;ga:eventLabel=@github.com',
-      'max_results':5,
-      'fields':'rows'
-    },
-
-    "recently_clicked": {
-      'metrics':'ga:totalEvents',
-      'dimensions':'ga:eventLabel, ga:dateHour, ga:minute',
-      'sort':'-ga:dateHour',
-      'filters':'ga:eventCategory==Civic Issues;ga:eventLabel=@github.com',
-      'max_results':10000,
-      'fields':None
-    },
-
-    "total_page_views": {
-      'metrics':'ga:pageviews',
-      'dimensions':None,
-      'sort':None,
-      'filters':'ga:pagePath=@civicissues',
-      'max_results':10,
-      'fields':None
-    },
-    
-    "total_clicks": {
-      'metrics':'ga:totalEvents',
-      'dimensions':None,
-      'sort':None,
-      'filters':'ga:eventCategory==Civic Issues',
-      'max_results':None,
-      'fields':None
-    },
-
     "viewed_issues": {
       'start_date' : 'today',
       'metrics':'ga:totalEvents',
@@ -148,39 +94,6 @@ def get_analytics_query(choice):
         }
         clicked_issues.append(issue)
     return clicked_issues
-
-
-  elif choice == "top_cities":
-    results = edit_request_query(choice)
-    top_clicked_cities = results["rows"]
-    return top_clicked_cities
-
-  elif choice == "least_clicked":
-    results = edit_request_query(choice)
-    least_clicked_issues = results["rows"]
-    return least_clicked_issues
-
-  elif choice == "most_clicked":
-    results = edit_request_query(choice)
-    top_clicked_issues = results["rows"]
-    return top_clicked_issues
-
-  elif choice == "recently_clicked":
-    results = edit_request_query(choice)
-    clicked_timestamps = []
-    for row in results["rows"]:
-      clicked_timestamps.append(return_timestamp_dict(row))
-    return clicked_timestamps
-
-  elif choice == "total_page_views":
-    results = edit_request_query(choice)
-    total_page_views = results["rows"][0][0]
-    return total_page_views
-
-  elif choice == "total_clicks":
-    results = edit_request_query(choice)
-    total_clicks = results["rows"][0][0]
-    return total_clicks
 
   elif choice == "viewed_issues":
     results = edit_request_query(choice)
