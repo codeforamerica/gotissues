@@ -454,3 +454,61 @@ def freq_function(string):
   # print sortedbyfrequency
   return sortedbyfrequency
 
+def get_compare_activity_summary(db):
+  db.execute('''SELECT title,labels,html_url FROM issues''')
+
+  results = db.fetchall()
+
+  issues = []
+
+  for row in results:
+    if row["html_url"] not in issues:
+      issues.append({
+        "url":row["html_url"],
+        "title":row["title"],
+        "labels":row["labels"]
+        })
+
+  title_dict = {}
+  label_dict = {}
+
+  label_array = []
+  title_array = []
+
+  for issue in issues:
+    title_array.append(issue["title"])
+    label_array.append(filter_labels(issue["labels"])) # db_resp is json
+
+  final_label_arr = []
+  for array in label_array:
+    if len(array) != 0:
+      for tag in array:
+        if tag not in final_label_arr:
+          final_label_arr.append(tag)
+
+  # print final_label_arr
+  label_dict["labels"] = final_label_arr
+  title_dict["titles"] = title_array
+
+  final_dict = {
+      "titles": {},
+      "labels": {},
+  }
+  string = ""
+
+  for key in title_dict["titles"]:
+    string += key + " "
+  
+  freq = freq_function(string)[:5]
+  final_dict["titles"] = freq
+
+  string = ""
+
+  for key in label_dict["labels"]:
+    string += key + " "
+
+  freq = freq_function(string)[:5]
+  final_dict["labels"] = freq
+  
+  return final_dict
+

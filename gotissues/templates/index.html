@@ -156,6 +156,28 @@
     </div>
 
     </section>
+    <section>
+      <div class="layout-breve">
+        <h2>Not Caused by a click --> a look at all our issue's common traits</h2>
+          <div class="layout-grid">
+            <div style="margin-top:4em" class="layout-crotchet">
+              <a class="billboard">
+                <p style="color:black"><h2 class="brick-heading">Common Title Key Words</h2>
+                  {% for title in data["issue_summary"]["titles"] %}
+                    {{ title }}
+                  {% endfor %}
+                </p>
+                <p style="color:black"><h2 class="brick-heading">Common Top Labels</h2>
+                    {% for label in data["issue_summary"]["labels"] %}
+                      {{ label }}
+                    {% endfor %}
+                </p></div>
+              </a>
+            </div>
+          </div>
+      </div>
+
+    </section>
   
   </body>
 
