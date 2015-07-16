@@ -62,18 +62,22 @@ def github_issue_url_to_project(url):
     return url
 
 def get_timestamp_issue_github_data(clicked_issues, limit=None):
-    """ Get all the github data about all the clicked issues """
-    """ This has gotten pretty hairy. Please break into smaller pieces"""
+    """ Based on all clicked issues, get timestamps of actions in Github repo"""
     github_issues = []
     good_timestamps = []
+
     for github_issue in clicked_issues[0:limit]:
-        # Convert to api url
+        # Convert html_url to api url then request for issue data using
         github_api_url = github_html_url_to_api(github_issue["url"])
         got = get_github_with_auth(github_api_url)
-        issue = got.json() #response for issue call
-        github_project_api_url = github_issue_url_to_project(github_api_url)
+        issue = got.json()
+
+		# Get information about events in repository
+		github_project_api_url = github_issue_url_to_project(github_api_url)
         project = get_github_with_auth(github_project_api_url) 
-        all_project_events = project.json() # response for project call
+        all_project_events = project.json()
+		
+		# Compare the time of click and the time of action and keep within iff less than 2 days
         project_event_array = []
         for project_event in all_project_events:
             for key in project_event.iterkeys():
@@ -83,6 +87,7 @@ def get_timestamp_issue_github_data(clicked_issues, limit=None):
                 action_time = datetime.datetime.strptime(action_time, '%Y-%m-%dT%H:%M:%SZ')
                 click_time = datetime.datetime.strptime(click_time, '%Y-%m-%dT%H:%M:%S')
 
+			# Make sure the event is close enough add its event to an array of nearby events
             result = click_time - action_time
             if result < datetime.timedelta(days=2):
                 nearby_dict = {
@@ -91,16 +96,17 @@ def get_timestamp_issue_github_data(clicked_issues, limit=None):
                     }
                 project_event_array.append(nearby_dict)
 
+		# Enter into a dict to get ready for the database
         timestamp_dict = {
             "timestamp":github_issue["timestamp"],
             "issue_id":issue["id"],
             "nearby_events":project_event_array
             }
-
-
+	# Adds to final array only the clicked issues with events associated with them
+	# Would contend we don't need this so that we can now compare events w/o nearby events to those
+	# with nearby events
     if timestamp_dict["nearby_events"]:
         good_timestamps.append(timestamp_dict)
-
 
 def write_issue_to_db(issue, db):
     """ Write the issue to the database """
