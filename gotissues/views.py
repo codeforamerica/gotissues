@@ -23,6 +23,7 @@ def index():
             data["activities"] = get_top_activity(db)
             data["activity_summary"] = get_activity_summary(db)
             print data["activity_summary"]
+            data["issue_summary"] = get_compare_activity_summary(db)
 
     return render_template("index.html", data=data)
 
