@@ -61,43 +61,57 @@ def github_issue_url_to_project(url):
     url = url.replace("issues/" + str(issue_var), 'events')
     return url
 
-def get_timestamp_issue_github_data(clicked_issues, time_period, time_after, limit=None):
-    """ Based on all clicked issues, get timestamps of actions in Github repo"""
-    github_issues = []
+def get_timestamp_issue_github_data(clicked_issues, limit=None):
+    """ Based on clicked issues, get timestamps of all actions in Github repo"""
+    clicked_issue_project_data = []
 
     for github_issue in clicked_issues[0:limit]:
         # Convert html_url to api url then request for issue data using
         github_api_url = github_html_url_to_api(github_issue["url"])
+        
+        # Git request to find the project url
         got = get_github_with_auth(github_api_url)
         if got:
-            issue = got.json()
-            issue["clicks"] = github_issue["clicks"]
-            github_issues.append(issue)
-		# Get information about events in repository
-		github_project_api_url = github_issue_url_to_project(github_api_url)
-        project = get_github_with_auth(github_project_api_url) 
-        all_project_events = project.json()
-        for project_event in all_project_events:
-            result = compare_event_timestamps(project_event, github_issue)
+            all_project_events = get_project_data(github_api_url)
+            clicked_issue_project_data.append(all_project_events, github_issue)
+    
+    return clicked_issue_project_data
+
+
+def get_project_data(github_api_url):
+    '''Takes github api url and gets the project json '''
+    github_project_api_url = github_issue_url_to_project(github_api_url)
+    project = get_github_with_auth(github_project_api_url)
+    return project.json()
+
+def get_good_timestamps(all_project_events, time_period, time_after):
+    ''' Filter out all the project data for timestamps within our criteria '''
+    final_filtered_array = []
+    for project_event in all_project_events:
+        project_event_array = []
+        github_issue = project_event[1]
+        print github_issue
+        for event in project_event:
+            print event
+            result = compare_event_timestamps(event, github_issue)
             if result < datetime.timedelta(time_period=time_after):
                 nearby_dict = {
-                    "type":project_event["type"],
-                    "created_at":project_event["created_at"]
+                    "type":event["type"],
+                    "created_at":event["created_at"]
                     }
                 project_event_array.append(nearby_dict)
 
     # Enter into a dict to get ready for the database
     timestamp_dict = {
         "timestamp":github_issue["timestamp"],
-        "issue_id":issue["id"],
         "nearby_events":project_event_array
         }
+    if timestamp_dict["nearby_events"]:
+        final_filtered_array.append(timestamp_dict)
+    return final_filtered_array
 
-if timestamp_dict["nearby_events"]:
-    good_timestamps.append(timestamp_dict)
-    return all_project_events, github_issues
-		
 def compare_event_timestamps(project_event, github_issue):
+    '''Compares the time of click to time of action in repository '''
     for key in project_event.iterkeys():
         # compare_times
         action_time = project_event["created_at"]
@@ -106,7 +120,7 @@ def compare_event_timestamps(project_event, github_issue):
         action_time = datetime.datetime.strptime(action_time, '%Y-%m-%dT%H:%M:%SZ')
         click_time = datetime.datetime.strptime(click_time, '%Y-%m-%dT%H:%M:%S')
 
-    	# Make sure the event is close enough add its event to an array of nearby events
+        # Make sure the event is close enough add its event to an array of nearby events
         result = click_time - action_time
     return result
 
@@ -243,14 +257,18 @@ if __name__ == '__main__':
     # Get todays viewed issues from Google Analytics
     viewed_issues = get_analytics_query("viewed_issues")
 
-    # Get the Github data for todays clicked issues
+    # Get the Github data for todays clicked issues, clicks, and views
     # Set the limit to 1 for testing
-    github_issues = get_timestamp_issue_github_data(clicked_issues, "days", 2, limit=None)
+    github_issues = get_clicked_issue_github_data(clicked_issues, limit=None)
     trimmed_issues = trim_github_issues(github_issues)
     issues = add_views_to_issues(github_issues, viewed_issues)
 
     # Get all of todays clicks
     clicks = get_analytics_query("all_clicks")
+
+    # Get timestamps of activity near a click
+    click_activity = get_timestamp_issue_github_data(clicks, "days", 2, limit=None)
+
 
     # Get all of todays clicks activity
     activities = get_click_activity(clicks)
