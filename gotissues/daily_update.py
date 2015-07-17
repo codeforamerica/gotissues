@@ -61,52 +61,54 @@ def github_issue_url_to_project(url):
     url = url.replace("issues/" + str(issue_var), 'events')
     return url
 
-def get_timestamp_issue_github_data(clicked_issues, limit=None):
+def get_timestamp_issue_github_data(clicked_issues, time_period, time_after, limit=None):
     """ Based on all clicked issues, get timestamps of actions in Github repo"""
     github_issues = []
-    good_timestamps = []
 
     for github_issue in clicked_issues[0:limit]:
         # Convert html_url to api url then request for issue data using
         github_api_url = github_html_url_to_api(github_issue["url"])
         got = get_github_with_auth(github_api_url)
-        issue = got.json()
-
+        if got:
+            issue = got.json()
+            issue["clicks"] = github_issue["clicks"]
+            github_issues.append(issue)
 		# Get information about events in repository
 		github_project_api_url = github_issue_url_to_project(github_api_url)
         project = get_github_with_auth(github_project_api_url) 
         all_project_events = project.json()
-		
-		# Compare the time of click and the time of action and keep within iff less than 2 days
-        project_event_array = []
         for project_event in all_project_events:
-            for key in project_event.iterkeys():
-                action_time = project_event["created_at"]
-                click_time = github_issue["timestamp"]
-
-                action_time = datetime.datetime.strptime(action_time, '%Y-%m-%dT%H:%M:%SZ')
-                click_time = datetime.datetime.strptime(click_time, '%Y-%m-%dT%H:%M:%S')
-
-			# Make sure the event is close enough add its event to an array of nearby events
-            result = click_time - action_time
-            if result < datetime.timedelta(days=2):
+            result = compare_event_timestamps(project_event, github_issue)
+            if result < datetime.timedelta(time_period=time_after):
                 nearby_dict = {
                     "type":project_event["type"],
                     "created_at":project_event["created_at"]
                     }
                 project_event_array.append(nearby_dict)
 
-		# Enter into a dict to get ready for the database
-        timestamp_dict = {
-            "timestamp":github_issue["timestamp"],
-            "issue_id":issue["id"],
-            "nearby_events":project_event_array
-            }
-	# Adds to final array only the clicked issues with events associated with them
-	# Would contend we don't need this so that we can now compare events w/o nearby events to those
-	# with nearby events
-    if timestamp_dict["nearby_events"]:
-        good_timestamps.append(timestamp_dict)
+    # Enter into a dict to get ready for the database
+    timestamp_dict = {
+        "timestamp":github_issue["timestamp"],
+        "issue_id":issue["id"],
+        "nearby_events":project_event_array
+        }
+
+if timestamp_dict["nearby_events"]:
+    good_timestamps.append(timestamp_dict)
+    return all_project_events, github_issues
+		
+def compare_event_timestamps(project_event, github_issue):
+    for key in project_event.iterkeys():
+        # compare_times
+        action_time = project_event["created_at"]
+        click_time = github_issue["timestamp"]
+
+        action_time = datetime.datetime.strptime(action_time, '%Y-%m-%dT%H:%M:%SZ')
+        click_time = datetime.datetime.strptime(click_time, '%Y-%m-%dT%H:%M:%S')
+
+    	# Make sure the event is close enough add its event to an array of nearby events
+        result = click_time - action_time
+    return result
 
 def write_issue_to_db(issue, db):
     """ Write the issue to the database """
@@ -243,7 +245,7 @@ if __name__ == '__main__':
 
     # Get the Github data for todays clicked issues
     # Set the limit to 1 for testing
-    github_issues = get_clicked_issue_github_data(clicked_issues, limit=None)
+    github_issues = get_timestamp_issue_github_data(clicked_issues, "days", 2, limit=None)
     trimmed_issues = trim_github_issues(github_issues)
     issues = add_views_to_issues(github_issues, viewed_issues)
 
