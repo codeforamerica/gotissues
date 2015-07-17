@@ -174,6 +174,7 @@ def get_github_with_auth(url, headers=None):
   else:
     return got
 
+# Duplicate fxn
 def get_github_data(issue_url):
     url = "https://api.github.com/repos/"
     if issue_url.startswith('https://github.com/'):
@@ -183,6 +184,13 @@ def get_github_data(issue_url):
           "Error" : "Link invalid"
       }
     return git_data
+
+def github_html_url_to_api(url):
+    """ Convert https://github.com links to https://api.gitub.com """
+    if url.startswith('https://github.com/'):
+        return "https://api.github.com/repos/" + url[19:]
+    else:
+        return url
 
 def get_github_project_data(issue_url):
   ''' Converting -->
