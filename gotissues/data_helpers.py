@@ -10,11 +10,16 @@ from apiclient.discovery import build
 
 from config import *
 
-
+#
+# Setup for DB
+#
 def dict_cursor(conn, cursor_factory=extras.RealDictCursor):
     return conn.cursor(cursor_factory=cursor_factory)
 
 
+#
+# Setup for all GA queries
+#
 def login_to_google_analytics():
     credentials = SignedJwtAssertionCredentials(GOOGLE_SERVICE_ACCOUNT_EMAIL, GOOGLE_SERVICE_ACCOUNT_SECRET_KEY,
     'https://www.googleapis.com/auth/analytics.readonly')
@@ -25,14 +30,16 @@ def login_to_google_analytics():
 
 service, access_token = login_to_google_analytics()
 
-# Github Auth set up
+#
+# Setup for all Github queries
+#
 if 'GITHUB_TOKEN' in os.environ:
     github_auth = (os.environ['GITHUB_TOKEN'], '')
 else:
     github_auth = None
 
 #
-# Methods that return data from Google Analytics
+# Methods + data for Google Analytics requests
 #
 choice_dict = {
     "clicked_issues": {
@@ -66,6 +73,23 @@ choice_dict = {
       'fields':'rows'
     },
 
+    "total_page_views": {
+      'metrics':'ga:pageviews',
+      'dimensions':None,
+      'sort':None,
+      'filters':'ga:pagePath=@civicissues',
+      'max_results':10,
+      'fields':None
+    },
+    
+    "total_clicks": {
+      'metrics':'ga:totalEvents',
+      'dimensions':None,
+      'sort':None,
+      'filters':'ga:eventCategory==Civic Issues',
+      'max_results':None,
+      'fields':None
+    }
 }
 
 def edit_request_query(choice_dict_query):
@@ -125,12 +149,26 @@ def get_analytics_query(choice):
       clicks.append(click)
     return clicks
 
+  elif choice == "total_page_views":
+    results = edit_request_query(choice)
+    total_page_views = results["rows"][0][0]
+    return total_page_views
+
+  elif choice == "total_clicks":
+    results = edit_request_query(choice)
+    total_clicks = results["rows"][0][0]
+    return total_clicks
+
   else:
     response = {
         "Error" : "Bad query request, not added to our dictionary"
     }
     return response
 
+
+#
+# Helper functions to parse responses from Google Analytics for our DB
+#
 def find(lst, key, value):
     for i, dic in enumerate(lst):
         if dic[key] == value:
@@ -138,8 +176,7 @@ def find(lst, key, value):
     return False
 
 def ga_time_to_timestamp(date, minute):
-  # Format should be 2015-06-29T16:35:39Z
-  # or Year-Mo-DaTHr:Mi:00Z
+  '''Format should be 2015-06-29T16:35:39Z (Year-Mo-DaTHr:Mi:00Z) '''
   year = int(date[:4])
   month = int(date[4:6])
   day = int(date[6:8])
@@ -153,13 +190,14 @@ def ga_time_to_timestamp(date, minute):
 
 def return_timestamp_dict(row):
   new_time = ga_time_to_timestamp(row[1], row[2])
-  # print str(new_time) + "\n"
+
   clicked_timestamp = {
       "url": row[0],
       "timestamp": new_time[0],
       "readable_date" : new_time[1]
   }
   return clicked_timestamp
+
 #
 # Methods that return data from Github
 #
@@ -174,18 +212,15 @@ def get_github_with_auth(url, headers=None):
   else:
     return got
 
-def get_github_data(issue_url):
-    url = "https://api.github.com/repos/"
-    if issue_url.startswith('https://github.com/'):
-        git_data = get_github_with_auth(url + issue_url[19:]).json()
+def github_html_url_to_api(url):
+    """ Convert https://github.com links to https://api.gitub.com """
+    if url.startswith('https://github.com/'):
+        return "https://api.github.com/repos/" + url[19:]
     else:
-      git_data = {
-          "Error" : "Link invalid"
-      }
-    return git_data
+        return url
 
 def get_github_project_data(issue_url):
-  ''' Converting -->
+  ''' Converting link to API request link + data -->
       https://github.com/:org/:repo/issues/:no -->
       https://api.github.com/repos/:org/:repo/issues/:no -->
       https://api.github.com/repos/:org/:repo/events '''
@@ -203,7 +238,12 @@ def get_github_project_data(issue_url):
     print "Error in this issue url: " + str(issue_url)
     return None
 
+
+#
+# Methods for our 'clicked-activity' table and fetches all our clicks
+#
 def get_click_activity(clicks):
+  ''' Get github activity related to each click in our click table '''
   activities = []
   total = 0
   for click in clicks:
@@ -217,6 +257,7 @@ def get_click_activity(clicks):
   return activities
 
 def check_timestamp(activity, click, hours):
+  ''' Filter out activity that happened too far away from our clicks '''
   action_time = datetime.datetime.strptime(activity["created_at"], '%Y-%m-%dT%H:%M:%SZ')
   click_time = datetime.datetime.strptime(click["timestamp"], '%Y-%m-%dT%H:%M:%S')
   timedelta = action_time - click_time
@@ -227,6 +268,7 @@ def check_timestamp(activity, click, hours):
     return False
 
 def trim_activity(activities, click):
+  ''' Filter out extraneous Github data that was returned about the activity'''
   trimmed_activities = {}
   trimmed_activities["issue_url"] = click["issue_url"]
   trimmed_activities["click_timestamp"] = click["timestamp"]
@@ -235,26 +277,21 @@ def trim_activity(activities, click):
   return trimmed_activities
 
 def check_events(trimmed_activity, activity_git):
-    filtered_activities = ["PushEvent","DeleteEvent","GollumEvent","IssueEvent"]
-    for activity in filtered_activities:
-      if trimmed_activity["activity_type"] == activity:
+  ''' Filter out specific activities that we don't think are useful '''
+  filtered_activities = ["PushEvent","DeleteEvent","GollumEvent","IssueEvent"]
+  for activity in filtered_activities:
+    if trimmed_activity["activity_type"] == activity:
+      return False
+    if trimmed_activity["activity_type"] == "IssueCommentEvent":
+      if activity_git["payload"]["issue"]["html_url"] != trimmed_activity["issue_url"]:
+        print activity_git["payload"]["issue"]["html_url"] 
+        print trimmed_activity["issue_url"]
         return False
-      if trimmed_activity["activity_type"] == "IssueCommentEvent":
-        if activity_git["payload"]["issue"]["html_url"] != trimmed_activity["issue_url"]:
-          print activity_git["payload"]["issue"]["html_url"] 
-          print trimmed_activity["issue_url"]
-          return False
-    return True
+  return True
 
-def get_closed_count(db):
-  ''' Pull out data from the database '''
-  q = ''' SELECT COUNT(*) FROM issues WHERE state = 'closed' '''
-
-  db.execute(q)
-  closed_count = db.fetchone()["count"]
-  return closed_count
-
-''' Activity Related Data Fetching '''
+#
+# Methods for 'frequent-data' table that takes activity data and interprets them
+#
 def get_info_activity(db):
   '''Get top activity types and their urls'''
   db.execute(''' SELECT activity_type,issue_url FROM activity ORDER BY activity_type ''')
@@ -331,7 +368,6 @@ def get_title_info_db(db, url):
 
   return result
 
-# def comment info is next
 
 def get_frequencies(db_dict):
 
@@ -341,8 +377,6 @@ def get_frequencies(db_dict):
       string += title + " "
     freq = freq_function(string)[:5]
     db_dict[key] = freq
-  # print "Events With Top Title Frequencies"
-  # print db_dict
 
   return db_dict
 
@@ -364,7 +398,6 @@ def freq_function(string):
         wordcount[word] = 1
 
   sortedbyfrequency =  sorted(wordcount,key=wordcount.get,reverse=True)
-  # print sortedbyfrequency
   return sortedbyfrequency
 
 def get_compare_activity_summary(db):
