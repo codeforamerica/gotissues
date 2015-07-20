@@ -59,15 +59,48 @@
                   <h2 class="brick-heading">Clicks Per Page View</h2>
               </a>
           </li>
-        
         </ul>
-      
       </div>
+    </section>
+
+
+    <div class="layout-semibreve">
+
+        <div class="layout-minim">
+          <div id="stats">
+              <h4 class="brick-text">{{ data.closed_count }}</h4>
+              <h2 class="brick-heading">Closed Civic Issues</h2>
+            </div>
+          </div>
+
+          <div class="layout-minim">
+          <div id="stats">
+            <h4 class="brick-text">{{ data.open_count }}</h4>
+            <h2 class="brick-heading">Open Civic Issues</h2>
+        </div>
+      </div>
+    </div>
+
+    <div class="layout-semibreve">
+      <div class="layout-minim">
+      <div id="stats">
+            <h2 style="font-size:.75em; margin-bottom:0; padding-bottom:0" class="brick-heading">Out of</h2>
+            <h4 style="margin-top:.25em" class="brick-text">{{ data.issue_count}}</h4>
+            <h2 class="brick-heading">Civic Issues</h2>
+          </div>  
+      </div>
+
+      <div class="layout-minim">
+        <div id="stats">
+          <h4 class="brick-text">{{data.closed_percent}}%</h4>
+          <h2 class="brick-heading">of Civic Issues have been closed</h2>
+          <h2 style="font-size:.75em;" class="brick-heading">Since August 2014</h2>
+        </div>
+      </div>
+    </div>
+
       <div style="padding-top:0"class="layout-breve">
         <div id="topembeds">
-          
-
-
         <div id="weeklyclicks" style="margin-top:11em">
           
           <div class="badge-heading badge-gray">

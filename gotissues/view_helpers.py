@@ -67,3 +67,27 @@ def get_activity_summary(db):
   db.execute('''SELECT * FROM activity_summary ORDER BY activity_type''')
   results = db.fetchall()
   return results
+
+def get_closed_count(db):
+  ''' Pull out the number of closed issues from our database '''
+  q = ''' SELECT COUNT(*) FROM issues WHERE state = 'closed' '''
+
+  db.execute(q)
+  closed_count = db.fetchone()["count"]
+  return closed_count
+
+def get_total_count(db):
+  ''' Pull out the number of closed issues from our database '''
+  q = ''' SELECT COUNT(*) FROM issues '''
+
+  db.execute(q)
+  total_count = db.fetchone()["count"]
+  return total_count
+
+def get_open_count(db):
+  ''' Pull out the number of closed issues from our database '''
+  q = ''' SELECT COUNT(*) FROM issues WHERE state = 'open' '''
+
+  db.execute(q)
+  open_count = db.fetchone()["count"]
+  return open_count

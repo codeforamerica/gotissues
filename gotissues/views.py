@@ -24,6 +24,10 @@ def index():
             data["activity_summary"] = get_activity_summary(db)
             print data["activity_summary"]
             data["issue_summary"] = get_compare_activity_summary(db)
+            data["issue_count"] = get_total_count(db)
+            data["closed_count"] = get_closed_count(db)
+            data["open_count"] = get_open_count(db)
+            data["closed_percent"] = int(100*float(data["closed_count"])/int(data["issue_count"]))
 
     return render_template("index.html", data=data)
 
