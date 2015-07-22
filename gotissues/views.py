@@ -21,13 +21,15 @@ def index():
         with dict_cursor(conn) as db:
             data["sources"] = get_top_sources(db)
             data["activities"] = get_top_activity(db)
-            data["activity_summary"] = get_activity_summary(db)
-            print data["activity_summary"]
+            data["activity_summary"] = get_activity_summaries_array(db)
+            # print data["activity_summary"]
             data["issue_summary"] = get_compare_activity_summary(db)
             data["issue_count"] = get_total_count(db)
             data["closed_count"] = get_closed_count(db)
             data["open_count"] = get_open_count(db)
             data["closed_percent"] = int(100*float(data["closed_count"])/int(data["issue_count"]))
+            data["top_clicks"] = get_most_clicked(db, 6)
+            data["least_clicks"] = get_least_clicked(db, 6)
 
     return render_template("index.html", data=data)
 

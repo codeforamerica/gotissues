@@ -124,23 +124,56 @@
               <div class="layout-grid"><div id="legend-4-container"></div></div>
             </div>
           </div>
+          <div class="layout-breve">
+          <h2>What do Top Clicked Issues look like?</h2>
+          <p>If you want your issue to be clicked a lot when it's viewed, follow these guidlines for titles+labels</p>
+            <ul class="list-no-bullets layout-grid">
+            {%for stat in data["top_clicks"]%}
+              <li class="layout-crotchet">
+                <a style="padding-bottom:4.75em" class="billboard" href="{{stat["html_url"]}}">
+                  <strong class="billboard-label">{{stat["title"]}}</strong>
+                  {% for label in stat["labels"] %}
+                      <div class="label">{{label.name}}</div>
+                    {% endfor %}
+                   <div id="stat-label" class="layout-grid">
+                  <div class="layout-crotchet"><h2> {{stat["clicks"]}} </h2> <p class="text-whisper"> Clicks since Aug 2014</p></div>
+                <div class="layout-crotchet"><h2>{{stat["views"]}}</h2><p class="text-whisper"> Views since June 2015</p></div>
+                <div class="layout-crotchet"><h2>{{stat["click-ratio"]}}%</h2><p class="text-whisper"> Clicks-to-Views Ratio</p></div></div>
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+          </div>
+
+
+          <div class="layout-breve layout-grid"> 
+          <h2>What do less popular Clicked Issues look like?</h3>
+          <p>If you don't want your issue to be clicked a lot, when it's viewed, avoid these things</p>
+          <ul class="list-no-bullets layout-grid">
+            {%for stat in data["least_clicks"]%}
+              <li class="layout-crotchet">
+                <a style="padding-bottom:4.75em" class="billboard" href="{{stat["html_url"]}}">
+                  <strong style="padding-bottom:1.5em" class="billboard-label">{{stat["title"]}}</strong>
+                  
+                  {% if stat["labels"] %}
+                  {% for label in stat["labels"] %}
+                      <div class="label">{{label.name}}</div>
+                    {% endfor %}
+                  {%else%}
+                  No labels!
+                  {%endif%}
+                    <div id="stat-label" class="layout-grid">
+                  <div class="layout-crotchet"><h2> {{stat["clicks"]}} </h2> <h2 class="text-whisper"> Clicks since Aug 2014</h2></div>
+                <div class="layout-crotchet"><h2>{{stat["views"]}}</h2><h2 class="text-whisper"> Views since June 2015</h2></div>
+                <div class="layout-crotchet"><h2>{{stat["click-ratio"]}}%</h2><h2 class="text-whisper"> Clicks-to-Views Ratio</h2></div>
+                </div>
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+          </div>
           
         </div>
-          
-      
-        <!--<div class="layout-grid-crotchet">
-              {% for source in data["sources"]%}
-                <div>
-                  <center>
-
-                    <h4 class="brick-text">{{source[1]}} Views </h4>
-                    <h2 style="font-size:.8em" class="brick-heading">
-                      <a href="{{source[0]}}">{{source[0]}}</a>
-                    </h2>
-                  </center>
-                </div>
-              {% endfor %}
-        </div>-->
       </div>
       
       </div>
@@ -167,12 +200,24 @@
                 <div id="{{activity.activity_type}}1" class="slab-dark-blue">
                   <p><h2 class="brick-heading">Common Title Key Words</h2>
                   {% for title in activity.common_titles %}
-                    {{title}}
+                    {% for item in title["frequencies"][0]|dictsort(true, 'value') |reverse |slice(3) %}
+                      <span>{{ item[0][0] }}</span>
+                    {% endfor %}
                   {% endfor %}
                 </p>
                 <p><h2 class="brick-heading">Common Top Labels</h2>
                   {% for label in activity.common_labels %}
-                    {{label}}
+                    {% if label["frequencies"][0]|length > 0 %}
+                      {%for item in label["frequencies"][0] | dictsort(true, 'value') |reverse |slice(3) %}
+                        {% for i in item%}
+                          {{i[0]}}
+                        {% endfor %}
+                      {%endfor%}
+                    {% else %}
+                      No top labels
+                    {% endif %}
+
+                    
                   {% endfor %}
                 </p></div>
               </a>
@@ -189,28 +234,7 @@
     </div>
 
     </section>
-    <section>
-      <div class="layout-breve">
-        <h2>Not Caused by a click --> a look at all our issue's common traits</h2>
-          <div class="layout-grid">
-            <div style="margin-top:4em" class="layout-crotchet">
-              <a class="billboard">
-                <p style="color:black"><h2 class="brick-heading">Common Title Key Words</h2>
-                  {% for title in data["issue_summary"]["titles"] %}
-                    {{ title }}
-                  {% endfor %}
-                </p>
-                <p style="color:black"><h2 class="brick-heading">Common Top Labels</h2>
-                    {% for label in data["issue_summary"]["labels"] %}
-                      {{ label }}
-                    {% endfor %}
-                </p></div>
-              </a>
-            </div>
-          </div>
-      </div>
-
-    </section>
+    <!--  -->
   
   </body>
 

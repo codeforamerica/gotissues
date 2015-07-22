@@ -91,3 +91,21 @@ def get_open_count(db):
   db.execute(q)
   open_count = db.fetchone()["count"]
   return open_count
+
+def get_most_clicked(db, N):
+  ''' Pull out the top N issues from our database '''
+  q = ''' SELECT html_url,clicks,views,title,labels FROM issues WHERE views IS NOT NULL ORDER BY clicks DESC'''
+  db.execute(q)
+  most_count = db.fetchmany(size=N)
+  for dic in most_count:
+    dic["click-ratio"] = int(100*dic["clicks"]/float(dic["views"]))
+  return most_count
+
+def get_least_clicked(db, N):
+  ''' Pull out the bottom N issues from our database '''
+  q = ''' SELECT html_url,clicks,views,title,labels FROM issues WHERE views IS NOT NULL ORDER BY clicks ASC'''
+  db.execute(q)
+  least_count = db.fetchmany(size=N)
+  for dic in least_count:
+    dic["click-ratio"] = int(100*dic["clicks"]/float(dic["views"]))
+  return least_count
