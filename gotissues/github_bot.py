@@ -37,7 +37,7 @@ def get_urls(db, url=None):
   if url:
     q = ''' SELECT html_url,clicks,view_sources FROM issues WHERE html_url=\'%s\'''' % (url)
   else:
-    q = ''' SELECT html_url,clicks,view_sources,created_at FROM issues WHERE state='open' ORDER BY created_at ASC'''
+    q = ''' SELECT html_url,clicks,view_sources,created_at FROM issues WHERE state='open' and view_sources IS NOT NULL ORDER BY created_at ASC'''
 
   db.execute(q)
   results = db.fetchall()
@@ -52,13 +52,18 @@ def post_on_github(url, body=None, headers=None):
     if url["view_sources"] and url['clicks']:
       clicks = str(url["clicks"])
       top_source = str(url["view_sources"][0])
-      post = {"body":"""Hello! Do you still need help with this issue? It's been
+
+      text = '''Hello! Do you still need help with this issue? It's been
       clicked on %s times through the [Civic Issue Finder](https://www.codeforamerica.org/geeks/civicissues)
-      on %s.\nCan this issue be closed or does it still need some assistance? You can
+      on [%s](%s).\nCan this issue be closed or does it still need some assistance? You can
       always update the labels or add more info in the description to make it
       easier to contribute. \n Just doing a little open source gardening of Brigade 
       projects! For more info/tools for creating civic issues, check out [Got Issues](https://got-issues.herokuapp.com/)
-      Thank you!"""} % (clicks, top_source)
+      Thank you!''' % (clicks, top_source, top_source)
+
+      post = {
+        "body": text
+      }
     
     elif url['clicks']:
       clicks = str(url['clicks'])
@@ -75,8 +80,8 @@ def post_on_github(url, body=None, headers=None):
   print post["body"]
 
   if github_html_url_to_api(url["html_url"]):
-    #auth_url = github_html_url_to_api(url["html_url"]) + "/comments"
-    #r = requests.post(auth_url, json.dumps(post), auth=github_auth, headers=headers)
+    auth_url = github_html_url_to_api(url["html_url"]) + "/comments"
+    r = requests.post(auth_url, json.dumps(post), auth=github_auth, headers=headers)
     print "Successfully posted to %s" % (url["html_url"])
     return "success"
 
@@ -87,10 +92,10 @@ def post_on_github(url, body=None, headers=None):
 ''' Fetch urls from the db '''  
 with connect(os.environ['DATABASE_URL']) as conn:
   with dict_cursor(conn) as db:
-    # test issue url
+    url_list = get_urls(db)
+    # Test Issue Url
     # url = 'https://github.com/codeforamerica/gotissues/issues/36'
     # url_list = get_urls(db, url)
-    url_list = get_urls(db)
     posted_list = []
 
     for url in url_list:
