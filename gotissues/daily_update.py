@@ -187,8 +187,8 @@ if __name__ == '__main__':
     # Get all of todays clicks
     clicks = get_analytics_query("all_clicks")
 
-    # # Get all of todays clicks activity
-    # activities = get_click_activity(clicks)
+    # Get all of todays clicks activity
+    activities = get_click_activity(clicks)
 
     # Add each issue to the db
     with connect(os.environ['DATABASE_URL']) as conn:
@@ -201,9 +201,4 @@ if __name__ == '__main__':
 
             for activity in activities:
                 write_activities_to_db(activity, db)
-
-            # activity_summary = get_activity_summaries_array(db)
-            # print activity_summary
-            # for summary in activity_summary:
-            #     write_activity_summary_to_db(summary, db)
 

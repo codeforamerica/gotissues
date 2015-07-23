@@ -248,12 +248,15 @@ def get_click_activity(clicks):
   total = 0
   for click in clicks:
     activity_list = get_github_project_data(click["issue_url"])
-    for activity in activity_list:
-      if check_timestamp(activity, click, 1):
-        trimmed_activity = trim_activity(activity, click)
-        if check_events(trimmed_activity, activity):
-          activities.append(trimmed_activity)
-          print str(trimmed_activity) + "\n"
+    if activity_list:
+      for activity in activity_list:
+        if check_timestamp(activity, click, 4):
+
+          trimmed_activity = trim_activity(activity, click)
+          if check_events(trimmed_activity, activity):
+            activities.append(trimmed_activity)
+            print str(trimmed_activity) + "\n"
+
   return activities
 
 def check_timestamp(activity, click, hours):
@@ -262,7 +265,6 @@ def check_timestamp(activity, click, hours):
   click_time = datetime.datetime.strptime(click["timestamp"], '%Y-%m-%dT%H:%M:%S')
   timedelta = action_time - click_time
   if timedelta < datetime.timedelta(hours=hours) and timedelta > datetime.timedelta(minutes=0):
-    print timedelta
     return True
   else:
     return False
@@ -284,219 +286,5 @@ def check_events(trimmed_activity, activity_git):
       return False
     if trimmed_activity["activity_type"] == "IssueCommentEvent":
       if activity_git["payload"]["issue"]["html_url"] != trimmed_activity["issue_url"]:
-        print activity_git["payload"]["issue"]["html_url"] 
-        print trimmed_activity["issue_url"]
         return False
   return True
-
-#
-# Methods for 'frequent-data' table that takes activity data and interprets them
-#
-def get_info_activity(db):
-  '''Get top activity types and their urls'''
-  db.execute(''' SELECT activity_type,issue_url FROM activity ORDER BY activity_type ''')
-  results = db.fetchall()
-
-  activities = {}
-
-  for row in results:
-    if row["activity_type"] not in activities.keys():
-      activities[row["activity_type"]] = []
-      activities[row["activity_type"]].append(row["issue_url"])
-    else:
-      activities[row["activity_type"]].append(row["issue_url"])
-
-  final_dict = {
-        "titles": {},
-        "labels": {},
-  }
-
-  title_dict = {}
-  label_dict = {}
-  
-  for key in activities.keys():
-    title_array = []
-    label_array = []
-
-    for activity in activities[key]:
-      db_response = get_title_info_db(db, activity)
-      if db_response:
-        title_array.append(db_response['title'])
-        label_array.append(filter_labels(db_response['labels'])) # db_resp is json
-      else:
-        print "The url (%s) was not in our issues db!" % activity
-    
-    final_label_arr = []
-    for array in label_array:
-      if len(array) != 0:
-        for tag in array:
-          final_label_arr.append(tag)
-
-    title_dict[key] = title_array
-    label_dict[key] = final_label_arr
-
-
-    label_temp = {"frequencies" : get_frequencies(label_dict[key])}
-    title_temp = {"frequencies" : get_frequencies(title_dict[key])}
-
-    label_dict[key] = []
-    title_dict[key] = []
-
-    label_dict[key].append(label_temp)
-    title_dict[key].append(title_temp)
-
-  final_dict["titles"] = title_dict
-  final_dict["labels"] = label_dict
-  #print final_dict["labels"]
-
-  return final_dict["labels"], final_dict["titles"]
-
-def filter_labels(label_json):
-  label_arr = []
-  for label in label_json:
-    for key,val in label.iteritems():
-      if label['name'] != "help wanted" and label['name'] not in label_arr:
-        label_arr.append(label['name'])
-
-  
-  return label_arr
-
-def get_title_info_db(db, url):
-  ''' Get title info based on url'''
-  string = ''' SELECT title,labels,body FROM issues WHERE html_url=\'%s\'''' % (url)
-  db.execute(string)
-  result = db.fetchone()
-
-  return result
-
-
-def get_frequencies(db_array):
-  #print str(db_array) + "\n"
-  string = ""
-
-  for query in db_array:
-    string += query + " "
-    freq = freq_function(string)
-    db_array = freq
-
-  return db_array
-
-def freq_function(string):
-  words_to_ignore = ["that","what","with","this","would","from","your","which","while","these", "the", "their", "those", "earch"]
-  things_to_strip = [".",",","?",")","(","\"",":",";","'s","'","\\"]
-  words_min_size = 4
-  words = string.lower().split()
-
-  wordcount = {}
-  for word in words:
-    for thing in things_to_strip:
-      if thing in word:
-        word = word.replace(thing,"")
-    if word not in words_to_ignore and len(word) >= words_min_size:
-      if word in wordcount:
-        wordcount[word] += 1
-      else:
-        wordcount[word] = 1
-
-  sortedbyfrequency =  sorted(wordcount,key=wordcount.get,reverse=True)
-
-  return wordcount, sortedbyfrequency
-
-def get_compare_activity_summary(db):
-  db.execute('''SELECT title,labels,html_url FROM issues''')
-
-  results = db.fetchall()
-
-  issues = []
-
-  for row in results:
-    if row["html_url"] not in issues:
-      issues.append({
-        "url":row["html_url"],
-        "title":row["title"],
-        "labels":row["labels"]
-        })
-
-  title_dict = {}
-  label_dict = {}
-
-  label_array = []
-  title_array = []
-
-  for issue in issues:
-    if issue["title"] and issue["labels"]:
-      title_array.append(issue["title"])
-      label_array.append(filter_labels(issue["labels"])) # db_resp is json
-
-  final_label_arr = []
-  for array in label_array:
-    if len(array) != 0:
-      for tag in array:
-        if tag not in final_label_arr:
-          final_label_arr.append(tag)
-
-  # print final_label_arr
-  label_dict["labels"] = final_label_arr
-  title_dict["titles"] = title_array
-
-  final_dict = {
-      "titles": {},
-      "labels": {},
-  }
-  string = ""
-
-  for key in title_dict["titles"]:
-    string += key + " "
-  
-  freq = freq_function(string)
-  final_dict["titles"] = freq
-
-  string = ""
-
-  for key in label_dict["labels"]:
-    string += key + " "
-
-  freq = freq_function(string)
-  final_dict["labels"] = freq
-  
-  return final_dict
-
-def get_top_activity(db):
-    ''' Get the top five activity types '''
-    db.execute(''' SELECT activity_type FROM activity ''')
-    results = db.fetchall()
-
-    activities = {}
-    for row in results:
-        if row["activity_type"] not in activities.keys():
-            activities[row["activity_type"]] = 1
-        else:
-            activities[row["activity_type"]] += 1
-    return activities
-
-def get_activity_summaries_array(db):
-    activity_summary_array = []
-    activity_summary = get_info_activity(db)
-    counts = get_top_activity(db)
-    titles = activity_summary["titles"]
-    labels = activity_summary["labels"]
-
-    for key,value in titles.iteritems():
-        new_dict = {
-            "activity_type": key,
-            "common_titles": value
-            }
-        activity_summary_array.append(new_dict)
-
-    for key,value in labels.iteritems():
-        for entry in activity_summary_array:
-            if key == entry["activity_type"]:
-                entry["common_labels"] = value
- 
-    for key,value in counts.iteritems():
-        for entry in activity_summary_array:
-            if key == entry["activity_type"]:
-                entry["count"] = value
-
-    return activity_summary_array
-

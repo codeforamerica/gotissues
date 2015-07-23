@@ -32,6 +32,7 @@
 
     <section>
       <div class="layout-breve">
+        <p>Since we opened the Civic Issue Finder in August 2014, here are some stats</p>
         
         <div class="badge-heading badge-graph badge-gray">
           <h2>Measuring Impact</h2>
@@ -130,8 +131,8 @@
             <ul class="list-no-bullets layout-grid">
             {%for stat in data["top_clicks"]%}
               <li class="layout-crotchet">
-                <a style="padding-bottom:4.75em" class="billboard" href="{{stat["html_url"]}}">
-                  <strong class="billboard-label">{{stat["title"]}}</strong>
+                <a style="padding-bottom:.75em" class="billboard" href="{{stat["html_url"]}}">
+                  <strong style="padding-bottom:.75em" class="billboard-label">{{stat["title"]}}</strong>
                   {% for label in stat["labels"] %}
                       <div class="label">{{label.name}}</div>
                     {% endfor %}
@@ -139,10 +140,17 @@
                   <div class="layout-crotchet"><h2> {{stat["clicks"]}} </h2> <p class="text-whisper"> Clicks since Aug 2014</p></div>
                 <div class="layout-crotchet"><h2>{{stat["views"]}}</h2><p class="text-whisper"> Views since June 2015</p></div>
                 <div class="layout-crotchet"><h2>{{stat["click-ratio"]}}%</h2><p class="text-whisper"> Clicks-to-Views Ratio</p></div></div>
+                <h4> Mostly viewed on
+                <p class="text-whisper">
+                      {% for source in stat["view_sources"] %}
+                        {{source}}
+                      {% endfor%}
+                    </p></h4>
                 </a>
               </li>
             {% endfor %}
           </ul>
+          
           </div>
 
 
@@ -152,8 +160,9 @@
           <ul class="list-no-bullets layout-grid">
             {%for stat in data["least_clicks"]%}
               <li class="layout-crotchet">
-                <a style="padding-bottom:4.75em" class="billboard" href="{{stat["html_url"]}}">
-                  <strong style="padding-bottom:1.5em" class="billboard-label">{{stat["title"]}}</strong>
+                <a style="padding-bottom:.75em" class="billboard" href="{{stat["html_url"]}}">
+                  <strong class="billboard-label">{{stat["title"]}}</strong>
+  
                   
                   {% if stat["labels"] %}
                   {% for label in stat["labels"] %}
@@ -163,10 +172,44 @@
                   No labels!
                   {%endif%}
                     <div id="stat-label" class="layout-grid">
-                  <div class="layout-crotchet"><h2> {{stat["clicks"]}} </h2> <h2 class="text-whisper"> Clicks since Aug 2014</h2></div>
+                  <div class="layout-crotchet"><h2> {{stat["clicks"]}} </h2> <h2 class="text-whisper"> Clicks since {{stat.created_at}}</h2></div>
                 <div class="layout-crotchet"><h2>{{stat["views"]}}</h2><h2 class="text-whisper"> Views since June 2015</h2></div>
                 <div class="layout-crotchet"><h2>{{stat["click-ratio"]}}%</h2><h2 class="text-whisper"> Clicks-to-Views Ratio</h2></div>
                 </div>
+                <h2> Mostly viewed on
+                <p class="text-whisper">
+                      {% for source in stat["view_sources"] %}
+                        {{source}}
+                      {% endfor%}
+                    </p></h2>
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+          </div>
+
+
+          <div class="layout-breve layout-grid"> 
+          <h2>What do closed clicked Issues look like?</h3>
+          <p>If you don't want your issue to be closed eventually, check out these things</p>
+          <ul class="list-no-bullets layout-grid">
+            {%for stat in data["closed_clicks"]|sort(attribute='days_open')%}
+              <li class="layout-crotchet">
+                <a style="padding-bottom:.75em" class="billboard" href="{{stat["html_url"]}}">
+                  <strong class="billboard-label">{{stat["title"]}}</strong>
+                  {% if stat["labels"] %}
+                  {% for label in stat["labels"] %}
+                      <div class="label">{{label.name}}</div>
+                    {% endfor %}
+                  {%else%}
+                  No labels!
+                  {%endif%}
+                    <div id="stat-label" class="layout-grid">
+                  <div class="layout-crotchet"><h2> {{stat["clicks"]}} </h2> <h2 class="text-whisper"> Clicks since {{stat.created_at}}</h2></div>
+                <div class="layout-crotchet"><h2>{{stat["days_open"]}}</h2><h2 class="text-whisper"> Days it took to close the issue </h2></div>
+                <div class="layout-crotchet"><h2>{{stat["comments"]}}</h2><h2 class="text-whisper"> Comments to get the issue resolved</h2></div>
+                </div>
+                <h2> Closed {{stat.closed_at}}</h2>
                 </a>
               </li>
             {% endfor %}
@@ -192,7 +235,7 @@
         </p>
         
         <div class="layout-grid">
-          {% for activity in data["activity_summary"] %}
+          {% for activity in data["activity_summary"]|sort(reverse=True, attribute='count') %}
             <div style="margin-top:4em" class="layout-crotchet">
               <a id="{{activity.activity_type}}" class="billboard EventClick" href="#{{activity.activity_type}}">
               <h1>{{activity.count}}</h1>
@@ -201,7 +244,9 @@
                   <p><h2 class="brick-heading">Common Title Key Words</h2>
                   {% for title in activity.common_titles %}
                     {% for item in title["frequencies"][0]|dictsort(true, 'value') |reverse |slice(3) %}
-                      <span>{{ item[0][0] }}</span>
+                      {%for i in item %}
+                        <b>{{i[0]}}</b>-{{i[1]}}x
+                      {% endfor %}
                     {% endfor %}
                   {% endfor %}
                 </p>
@@ -210,7 +255,8 @@
                     {% if label["frequencies"][0]|length > 0 %}
                       {%for item in label["frequencies"][0] | dictsort(true, 'value') |reverse |slice(3) %}
                         {% for i in item%}
-                          {{i[0]}}
+                          <b>{{i[0]}}</b>-{{i[1]}}x
+
                         {% endfor %}
                       {%endfor%}
                     {% else %}
@@ -234,7 +280,6 @@
     </div>
 
     </section>
-    <!--  -->
   
   </body>
 
@@ -246,7 +291,9 @@
   fs.parentNode.insertBefore(js,fs);js.onload=function(){g.load('analytics');};
 }(window,document,'script'));
 </script>
+
 <script>
+
 $(document).ready(function() {
     
     $('.EventClick').click(function(e){

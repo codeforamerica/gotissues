@@ -6,9 +6,10 @@ from flask import render_template, request
 
 @app.route("/", methods=["GET", "POST"])
 def index():
+    # View data that we don't need to access the db for
     data = {
-        "total_page_views":"",
-        "total_clicks":"",
+    "total_page_views":"",
+    "total_clicks":"",
     }
 
     for k in data.iterkeys():
@@ -17,19 +18,21 @@ def index():
     data["clicks_per_view"] = int(100 * int(data["total_clicks"])/float(int(data["total_page_views"])))
     data["access_token"] = access_token
 
+    no_results = 6
+
+    # View data that we need to access the db for
     with connect(os.environ['DATABASE_URL']) as conn:
         with dict_cursor(conn) as db:
             data["sources"] = get_top_sources(db)
-            data["activities"] = get_top_activity(db)
-            data["activity_summary"] = get_activity_summaries_array(db)
-            # print data["activity_summary"]
-            data["issue_summary"] = get_compare_activity_summary(db)
+            data["activities"] = get_activity_types(db)
             data["issue_count"] = get_total_count(db)
             data["closed_count"] = get_closed_count(db)
             data["open_count"] = get_open_count(db)
             data["closed_percent"] = int(100*float(data["closed_count"])/int(data["issue_count"]))
-            data["top_clicks"] = get_most_clicked(db, 6)
-            data["least_clicks"] = get_least_clicked(db, 6)
+            data["top_clicks"] = get_most_clicked(db, 100)[:no_results]
+            data["least_clicks"] = get_least_clicked(db, 100)[:no_results]
+            data["closed_clicks"] = get_closed_clicked(db, 100)[:no_results]
+            data["activity_summary"] = get_activity_summaries_array(db)
 
     return render_template("index.html", data=data)
 
