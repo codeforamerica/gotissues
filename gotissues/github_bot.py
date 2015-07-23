@@ -37,7 +37,7 @@ def get_urls(db, url=None):
   if url:
     q = ''' SELECT html_url,clicks,view_sources FROM issues WHERE html_url=\'%s\'''' % (url)
   else:
-    q = ''' SELECT html_url,clicks,view_sources,created_at FROM issues WHERE state='open' and view_sources IS NOT NULL ORDER BY created_at ASC'''
+    q = ''' SELECT html_url,clicks,view_sources,created_at FROM issues WHERE state='open' ORDER BY created_at ASC'''
 
   db.execute(q)
   results = db.fetchall()
