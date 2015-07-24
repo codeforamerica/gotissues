@@ -131,8 +131,7 @@ def get_activity_summaries_array(db):
       for entry in activity_summary_array:
           if key == entry["activity_type"]:
               entry["count"] = value
-
-    return activity_summary_array
+  return activity_summary_array
 
 def get_activity_types(db):
   ''' Get frequency of activity types in our activity db'''
@@ -273,4 +272,14 @@ def get_pinged_issues(db):
 
   db.execute(q)
   results = db.fetchall()
+  return results
+
+#
+# db_results in admin
+#
+def get_all_activity(db):
+  ''' Get all the activity '''
+  db.execute(''' SELECT * FROM activity ORDER BY activity_type''')
+  results = db.fetchall()
+
   return results

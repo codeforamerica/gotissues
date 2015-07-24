@@ -32,7 +32,7 @@ def index():
             data["top_clicks"] = get_most_clicked(db, 100)[:no_results]
             data["least_clicks"] = get_least_clicked(db, 100)[:no_results]
             data["closed_clicks"] = get_closed_clicked(db, 100)[:no_results]
-            data["activity_summary"] = get_activity_summaries_array(db)
+            #data["activity_summary"] = get_activity_summaries_array(db)
             data["pinged_issues"] = get_pinged_issues(db)
 
     return render_template("index.html", data=data)
@@ -53,13 +53,19 @@ def admin():
                     result['click_timestamp'] = str(result['click_timestamp'])
 
     else:
+        data = {}
         with connect(os.environ['DATABASE_URL']) as conn:
             with dict_cursor(conn) as db:
+                data["pinged_issues"] = get_pinged_issues(db)
                 db_results = get_all_activity(db)
+        
         for result in db_results:
             result['time_after'] = int((result['activity_timestamp'] - result['click_timestamp']).total_seconds()/60)
             result['activity_timestamp'] = str(result['activity_timestamp'])
             result['click_timestamp'] = str(result['click_timestamp'])
 
+        for date in data["pinged_issues"]:
+            date["date_pinged"] = date["date_pinged"].strftime('%B %d %Y')
 
-    return render_template("admin.html", db_results=db_results)
+
+    return render_template("admin.html", db_results=db_results, data=data)
