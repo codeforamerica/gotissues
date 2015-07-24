@@ -283,3 +283,22 @@ def get_all_activity(db):
   results = db.fetchall()
 
   return results
+
+#
+# changing db_results in admin
+#
+def get_edited_activity(db, order, category):
+  ''' Get edited activity '''
+  categories = ["Activity Type", "Issue Url"]
+  category = str(category)
+  if category == categories[0]:
+    category = "activity_type"
+  elif category == categories[1]:
+    category = "issue_url"
+
+  string = '''SELECT * FROM activity ORDER BY %s %s''' % (category, order)
+  print string
+  db.execute(string)
+  results = db.fetchall()
+
+  return results

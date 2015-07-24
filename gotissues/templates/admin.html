@@ -17,6 +17,23 @@
 
 <body>
 <div class="layout-breve">
+  <h1>Pinged Issues</h1>
+  <table>
+    <tr>
+      <th>Issue Url</th>
+      <th>Date Pinged</th>
+      <th>Status</th>
+    </tr>
+
+     {% for issue in data["pinged_issues"] %}
+    <tr>
+      <td><a href="{{issue["html_url"]}}">{{issue["html_url"]}}</a></td>
+      <td>{{issue["date_pinged"]}}</td>
+      <td>{{issue["status"]}}</td>
+    </tr>
+    {%endfor%}
+  </table>
+  
 <div class="layout-minim">
   <h1>Activity Verification</h1>
 </div>
@@ -37,28 +54,12 @@
           <label for="radio2"><input id="radio2" name="radio" type="radio" value="DESC"/>Descending</label>
       </li>
     </ul>
-    <input type="submit" method="post" action="/admin" value="Change Order!"></input>
-    </center>
+    
+    <center>
+    <input type="submit" method="post" action="/admin" value="Change Order!"></input></center>
     </div>
+    </center>
   </form>
-
-  <h1>Pinged Issues</h1>
-  <table>
-    <tr>
-      <th>Issue Url</th>
-      <th>Date Pinged</th>
-      <th>Status</th>
-    </tr>
-
-     {% for issue in data["pinged_issues"] %}
-    <tr>
-      <td><a href="{{issue["html_url"]}}">{{issue["html_url"]}}</a></td>
-      <td>{{issue["date_pinged"]}}</td>
-      <td>{{issue["status"]}}</td>
-    </tr>
-    {%endfor%}
-  </table>
-  
   <table id="activity_table" class="tablesorter" style="font-size:1rem;margin-top:5.0em;">
     <tr>
       <th>Activity Type</th>

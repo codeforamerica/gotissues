@@ -41,9 +41,12 @@ def index():
 def admin():
     db_results = {}
 
+    data = {}
+
     if request.method == "POST":
         with connect(os.environ['DATABASE_URL']) as conn:
             with dict_cursor(conn) as db:
+                data["pinged_issues"] = get_pinged_issues(db)
                 category = request.form['category']
                 order = request.form['radio']
                 db_results = get_edited_activity(db, order, category)
@@ -52,8 +55,10 @@ def admin():
                     result['activity_timestamp'] = str(result['activity_timestamp'])
                     result['click_timestamp'] = str(result['click_timestamp'])
 
+                for date in data["pinged_issues"]:
+                    date["date_pinged"] = date["date_pinged"].strftime('%B %d %Y')
+
     else:
-        data = {}
         with connect(os.environ['DATABASE_URL']) as conn:
             with dict_cursor(conn) as db:
                 data["pinged_issues"] = get_pinged_issues(db)
