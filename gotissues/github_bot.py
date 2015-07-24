@@ -117,7 +117,7 @@ with connect(os.environ['DATABASE_URL']) as conn:
         response = None
         while not response:
           print "Reply 'y' or 'n'. We are about to post on %s. \n Last Updated: %s" % (url["html_url"], url["created_at"])
-          response = raw_input()
+          response = raw_input("> ")
           if response == "y":
             ping = {
               "html_url":url["html_url"],
