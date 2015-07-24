@@ -35,13 +35,29 @@ def get_urls(db, url=None):
   ''' Search the issues table for specific issues we want to ping, Testing w/ fake added issue'''
   #testing if url is not none
   if url:
-    q = ''' SELECT html_url,clicks,view_sources FROM issues WHERE html_url=\'%s\'''' % (url)
+    q = ''' SELECT html_url,clicks,view_sources,created_at FROM issues WHERE html_url=\'%s\'''' % (url)
   else:
     q = ''' SELECT html_url,clicks,view_sources,created_at FROM issues WHERE state='open' ORDER BY created_at ASC'''
 
   db.execute(q)
   results = db.fetchall()
   return results
+
+#
+# Write the urls that we posted to a db
+#
+def write_pinged_to_db(ping, db):
+  q = '''SELECT * FROM pinged_issues WHERE html_url = %(html_url)s '''
+
+  db.execute(q, {"html_url": ping["html_url"]})
+  exists = db.fetchone()
+
+  if not exists:
+    q = ''' INSERT INTO pinged_issues (html_url, status)
+        VALUES ( %(html_url)s, %(status)s) '''
+
+  db.execute(q, {"html_url":ping["html_url"], "status":ping["status"]})
+
 
 def post_on_github(url, body=None, headers=None):
   ''' Post either a specific message to the brigades or a generic one based on if there are sources or not '''
@@ -92,11 +108,11 @@ def post_on_github(url, body=None, headers=None):
 ''' Fetch urls from the db '''  
 with connect(os.environ['DATABASE_URL']) as conn:
   with dict_cursor(conn) as db:
-    url_list = get_urls(db)
-    # Test Issue Url
-    # url = 'https://github.com/codeforamerica/gotissues/issues/36'
-    # url_list = get_urls(db, url)
-    posted_list = []
+    # url_list = get_urls(db)
+    #Test Issue Url must have clicks, html_url. created_at and view_sources optional
+    url = 'https://github.com/codeforamerica/gotissues/issues/36'
+    url_list = get_urls(db, url)
+    # posted_list = []
 
     for url in url_list:
       response = None
@@ -104,10 +120,11 @@ with connect(os.environ['DATABASE_URL']) as conn:
         print "Reply 'y' or 'n'. We are about to post on %s. \n Last Updated: %s" % (url["html_url"], url["created_at"])
         response = raw_input()
         if response == "y":
-          posted_list.append({
-            "url":url["html_url"],
+          ping = {
+            "html_url":url["html_url"],
             "status":post_on_github(url)
-          })
+          }
+          write_pinged_to_db(ping, db)
         elif response == "n":
           print "Not posted to Github"
         else:

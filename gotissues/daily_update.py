@@ -190,6 +190,8 @@ if __name__ == '__main__':
     # Get all of todays clicks activity
     activities = get_click_activity(clicks)
 
+    # Write check each entry in the database and see if the status has changed
+
     # Add each issue to the db
     with connect(os.environ['DATABASE_URL']) as conn:
         with dict_cursor(conn) as db:
