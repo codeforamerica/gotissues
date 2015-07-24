@@ -1,5 +1,5 @@
 from psycopg2 import connect, extras
-from random import randrange
+import random
 
 import requests
 import json
@@ -124,8 +124,7 @@ def run_civic_bot(dailyupdate = None):
             new_url_list.append(url)
 
         if len(new_url_list) > 0:
-          random_index = randrange(0,len(new_url_list))
-          url = new_url_list[random_index]
+          url = random.choice(new_url_list)
           print "We are about to post on %s.\nLast Updated: %s" % (url["html_url"], url["created_at"])
           
           ping = {
