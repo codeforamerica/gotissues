@@ -1,6 +1,9 @@
 from psycopg2 import connect, extras
+from random import randrange
+
 import requests
 import json
+
 
 from config import *
 
@@ -105,27 +108,51 @@ def write_pinged_to_db(ping, db):
 #
 # Fetch urls from the db
 #
-with connect(os.environ['DATABASE_URL']) as conn:
-  with dict_cursor(conn) as db:
-    # url_list = get_urls(db)
-    # Test Issue Url must have clicks, html_url. created_at and view_sources optional
-    url = 'https://github.com/codeforamerica/gotissues/issues/36'
-    url_list = get_urls(db, url)
+def run_civic_bot(dailyupdate = None):
+  with connect(os.environ['DATABASE_URL']) as conn:
+    with dict_cursor(conn) as db:
+      url_list = get_urls(db)
+      # Test Issue Url must have clicks, html_url. created_at and view_sources optional
 
-    for url in url_list:
-      if check_pinged(url, db):
-        response = None
-        while not response:
-          print "Reply 'y' or 'n'. We are about to post on %s. \n Last Updated: %s" % (url["html_url"], url["created_at"])
-          response = raw_input("> ")
-          if response == "y":
-            ping = {
-              "html_url":url["html_url"],
-              "status":post_on_github(url)
-            }
-            write_pinged_to_db(ping, db)
-          elif response == "n":
-            print "Not posted to Github"
-          else:
-            print "Please re-enter a valid character\n"
+      if dailyupdate:
+        # Since this will ping one random url in our url list, make sure the list
+        # We are working with doesn't have urls that are already in the database
+        new_url_list = []
+        
+        for url in url_list:
+          if check_pinged(url, db):
+            new_url_list.append(url)
+
+        if len(new_url_list) > 0:
+          random_index = randrange(0,len(new_url_list))
+          url = new_url_list[random_index]
+          print "We are about to post on %s.\nLast Updated: %s" % (url["html_url"], url["created_at"])
+          
+          ping = {
+            "html_url":url["html_url"],
+            "status":post_on_github(url)
+          }
+          write_pinged_to_db(ping, db)
+
+
+      if not dailyupdate:
+        # Go through each url manually
+        for url in url_list:
+          if check_pinged(url, db):
             response = None
+            while not response:
+              print "Reply 'y' or 'n'. We are about to post on %s.\nLast Updated: %s" % (url["html_url"], url["created_at"])
+              response = raw_input("> ")
+              if response == "y":
+                ping = {
+                  "html_url":url["html_url"],
+                  "status":post_on_github(url)
+                }
+                write_pinged_to_db(ping, db)
+              elif response == "n":
+                print "Not posted to Github"
+              else:
+                print "Please re-enter a valid character\n"
+                response = None
+
+#run_civic_bot()

@@ -33,6 +33,7 @@ def index():
             data["least_clicks"] = get_least_clicked(db, 100)[:no_results]
             data["closed_clicks"] = get_closed_clicked(db, 100)[:no_results]
             data["activity_summary"] = get_activity_summaries_array(db)
+            data["pinged_issues"] = get_pinged_issues(db)
 
     return render_template("index.html", data=data)
 

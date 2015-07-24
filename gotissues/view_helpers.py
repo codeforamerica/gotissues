@@ -263,3 +263,14 @@ def freq_function(string):
   sortedbyfrequency =  sorted(wordcount,key=wordcount.get,reverse=True)
 
   return wordcount, sortedbyfrequency
+
+
+#
+# data['pinged_issues']
+#
+def get_pinged_issues(db):
+  q = '''SELECT * FROM pinged_issues '''
+
+  db.execute(q)
+  results = db.fetchall()
+  return results

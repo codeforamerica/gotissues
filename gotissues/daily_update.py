@@ -1,5 +1,6 @@
 import json
 from data_helpers import *
+from github_bot import *
 
 def get_clicked_issue_github_data(clicked_issues, limit=None):
     """ Get all the github data about all the clicked issues """
@@ -191,6 +192,7 @@ if __name__ == '__main__':
     activities = get_click_activity(clicks)
 
     # Write check each entry in the database and see if the status has changed
+    run_civic_bot(True)
 
     # Add each issue to the db
     with connect(os.environ['DATABASE_URL']) as conn:
