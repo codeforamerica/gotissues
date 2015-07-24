@@ -18,9 +18,6 @@ if 'GITHUB_TOKEN' in os.environ:
 else:
     github_auth = None
 
-#
-# Github url related methods
-#
 def github_html_url_to_api(url):
     """ Convert https://github.com links to https://api.gitub.com """
     if url.startswith('https://github.com/'):
@@ -28,12 +25,45 @@ def github_html_url_to_api(url):
     else:
         return None
 
+def post_on_github(url, body=None, headers=None):
+  ''' Post either a specific message to the brigades or a generic one based on if there are sources or not '''
+  print "Requesting %s" % (url["html_url"])
+  if body:
+    post = {"body":body}
+  else:
+    if url["view_sources"] and url['clicks']:
+      clicks = str(url["clicks"])
+      top_source = str(url["view_sources"][0])
+
+      text = '''Hello! Do you still need help with this issue? It's been clicked on %s times through the [Civic Issue Finder](https://www.codeforamerica.org/geeks/civicissues) on [%s](%s). \n\nCan this issue be closed or does it still need some assistance? You can always update the labels or add more info in the description to make it easier to contribute. \n\n Just doing a little open source gardening of Brigade projects! For more info/tools for creating civic issues, check out [Got Issues](https://got-issues.herokuapp.com/) Thank you!''' % (clicks, top_source, top_source)
+      post = {
+        "body": text
+      }
+    
+    elif url['clicks']:
+      clicks = str(url['clicks'])
+      text = ''' Hello! Do you still need help with this issue? It's been clicked on %s times through the [Civic Issue Finder](https://www.codeforamerica.org/geeks/civicissues)! \n\nCan this issue be closed or does it still need some assistance? You can always update the labels or add more info in the description to make it easier to contribute. \n\n Just doing a little open source gardening of Brigade projects! For more info/tools for creating civic issues, check out [Got Issues](https://got-issues.herokuapp.com/). Thank you!''' % (clicks)
+      post = {
+        "body": text
+      }
+  print "You just posted: \n" + str(post["body"])
+
+  if github_html_url_to_api(url["html_url"]):
+    auth_url = github_html_url_to_api(url["html_url"]) + "/comments"
+    r = requests.post(auth_url, json.dumps(post), auth=github_auth, headers=headers)
+    print "Successfully posted to %s" % (url["html_url"])
+    return "success"
+
+  else:
+    print "Error. Could not post to invalid url: %s" % (url["html_url"])
+    return "error"
+
 #
 # Fetch urls that we want to ping
 #
 def get_urls(db, url=None):
   ''' Search the issues table for specific issues we want to ping, Testing w/ fake added issue'''
-  #testing if url is not none
+  # this is when we're testing w/ a test issue
   if url:
     q = ''' SELECT html_url,clicks,view_sources,created_at FROM issues WHERE html_url=\'%s\'''' % (url)
   else:
@@ -42,6 +72,20 @@ def get_urls(db, url=None):
   db.execute(q)
   results = db.fetchall()
   return results
+
+#
+# Check if we have already pinged an issue
+#
+def check_pinged(ping, db):
+  q = '''SELECT * FROM pinged_issues '''
+
+  db.execute(q, {"html_url": ping["html_url"]})
+  exists = db.fetchone()
+
+  if exists:
+    return False
+  else:
+    return True
 
 #
 # Write the urls that we posted to a db
@@ -58,75 +102,30 @@ def write_pinged_to_db(ping, db):
 
   db.execute(q, {"html_url":ping["html_url"], "status":ping["status"]})
 
-
-def post_on_github(url, body=None, headers=None):
-  ''' Post either a specific message to the brigades or a generic one based on if there are sources or not '''
-  print "Requesting %s" % (url["html_url"])
-  if body:
-    post = {"body":body}
-  else:
-    if url["view_sources"] and url['clicks']:
-      clicks = str(url["clicks"])
-      top_source = str(url["view_sources"][0])
-
-      text = '''Hello! Do you still need help with this issue? It's been
-      clicked on %s times through the [Civic Issue Finder](https://www.codeforamerica.org/geeks/civicissues)
-      on [%s](%s).\nCan this issue be closed or does it still need some assistance? You can
-      always update the labels or add more info in the description to make it
-      easier to contribute. \n Just doing a little open source gardening of Brigade 
-      projects! For more info/tools for creating civic issues, check out [Got Issues](https://got-issues.herokuapp.com/)
-      Thank you!''' % (clicks, top_source, top_source)
-
-      post = {
-        "body": text
-      }
-    
-    elif url['clicks']:
-      clicks = str(url['clicks'])
-      text = ''' Hello! Do you still need help with this issue? It's been clicked 
-      on %s times through the [Civic Issue Finder](https://www.codeforamerica.org/geeks/civicissues)!
-      \nCan this issue be closed or does it still need some assistance? You can
-      always update the labels or add more info in the description to make it
-      easier to contribute. \n\n Just doing a little open source gardening of Brigade 
-      projects! For more info/tools for creating civic issues, check out [Got Issues](https://got-issues.herokuapp.com/).
-      Thank you!''' % (clicks)
-      post = {
-        "body": text
-      }
-  print post["body"]
-
-  if github_html_url_to_api(url["html_url"]):
-    auth_url = github_html_url_to_api(url["html_url"]) + "/comments"
-    r = requests.post(auth_url, json.dumps(post), auth=github_auth, headers=headers)
-    print "Successfully posted to %s" % (url["html_url"])
-    return "success"
-
-  else:
-    print "Error. Could not post to invalid url: %s" % (url["html_url"])
-    return "error"
-
-''' Fetch urls from the db '''  
+#
+# Fetch urls from the db
+#
 with connect(os.environ['DATABASE_URL']) as conn:
   with dict_cursor(conn) as db:
     # url_list = get_urls(db)
-    #Test Issue Url must have clicks, html_url. created_at and view_sources optional
+    # Test Issue Url must have clicks, html_url. created_at and view_sources optional
     url = 'https://github.com/codeforamerica/gotissues/issues/36'
     url_list = get_urls(db, url)
-    # posted_list = []
 
     for url in url_list:
-      response = None
-      while not response:
-        print "Reply 'y' or 'n'. We are about to post on %s. \n Last Updated: %s" % (url["html_url"], url["created_at"])
-        response = raw_input()
-        if response == "y":
-          ping = {
-            "html_url":url["html_url"],
-            "status":post_on_github(url)
-          }
-          write_pinged_to_db(ping, db)
-        elif response == "n":
-          print "Not posted to Github"
-        else:
-          print "Please re-enter a valid character\n"
-          response = None
+      if check_pinged(url, db):
+        response = None
+        while not response:
+          print "Reply 'y' or 'n'. We are about to post on %s. \n Last Updated: %s" % (url["html_url"], url["created_at"])
+          response = raw_input()
+          if response == "y":
+            ping = {
+              "html_url":url["html_url"],
+              "status":post_on_github(url)
+            }
+            write_pinged_to_db(ping, db)
+          elif response == "n":
+            print "Not posted to Github"
+          else:
+            print "Please re-enter a valid character\n"
+            response = None
