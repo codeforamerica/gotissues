@@ -242,29 +242,22 @@
               <h2 style="margin-top:1em;font-size:1.4em;">{{activity.activity_type}}s</h2>                  
                 <div id="{{activity.activity_type}}1" class="slab-dark-blue">
                   <p><h2 class="brick-heading">Common Title Key Words</h2>
-                  {% for title in activity.common_titles %}
-                    {% for item in title["frequencies"][0]|dictsort(true, 'value') |reverse |slice(3) %}
-                      {%for i in item %}
-                        <b>{{i[0]}}</b>-{{i[1]}}x
-                      {% endfor %}
+                  {% if activity["common_titles"] %}
+                    {% for title in activity.common_titles %}
+                      {{title}}
                     {% endfor %}
-                  {% endfor %}
+                  {% else %}
+                    No titles!
+                  {% endif %}
                 </p>
                 <p><h2 class="brick-heading">Common Top Labels</h2>
-                  {% for label in activity.common_labels %}
-                    {% if label["frequencies"][0]|length > 0 %}
-                      {%for item in label["frequencies"][0] | dictsort(true, 'value') |reverse |slice(3) %}
-                        {% for i in item%}
-                          <b>{{i[0]}}</b>-{{i[1]}}x
-
-                        {% endfor %}
-                      {%endfor%}
-                    {% else %}
-                      No top labels
-                    {% endif %}
-
-                    
-                  {% endfor %}
+                  {% if activity["common_labels"]%}
+                    {% for label in activity.common_labels %}
+                      {{label}}
+                    {% endfor %}
+                  {% else %}
+                    No top labels!
+                  {% endif %}
                 </p></div>
               </a>
             </div>

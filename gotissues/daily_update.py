@@ -119,34 +119,6 @@ def write_activities_to_db(activity, db):
             "click_timestamp": activity["click_timestamp"], "activity_type": activity["activity_type"],
             "activity_timestamp": activity["activity_timestamp"]})
 
-
-def get_activity_summaries_array(db):
-    activity_summary_array = []
-    activity_summary = get_info_activity(db)
-    counts = get_top_activity(db)
-    titles = activity_summary["titles"]
-    labels = activity_summary["labels"]
-
-    for key,value in titles.iteritems():
-        new_dict = {
-            "activity_type": key,
-            "common_titles": value
-            }
-        activity_summary_array.append(new_dict)
-
-    for key,value in labels.iteritems():
-        for entry in activity_summary_array:
-            if key == entry["activity_type"]:
-                entry["common_labels"] = value
- 
-    for key,value in counts.iteritems():
-        for entry in activity_summary_array:
-            if key == entry["activity_type"]:
-                entry["count"] = value
-
-    return activity_summary_array
-
-
 def write_activity_summary_to_db(activity_info, db):
     # Check if the activity already exists
     q = ''' SELECT * FROM activity_summary WHERE activity_type = %(activity_type)s '''
@@ -174,35 +146,59 @@ def write_activity_summary_to_db(activity_info, db):
 
 if __name__ == '__main__':
 
-    # Get todays clicked issues from Google Analytics
-    clicked_issues = get_analytics_query("clicked_issues")
-    # Get todays viewed issues from Google Analytics
-    viewed_issues = get_analytics_query("viewed_issues")
+    # # Get todays clicked issues from Google Analytics
+    # clicked_issues = get_analytics_query("clicked_issues")
+    # # Get todays viewed issues from Google Analytics
+    # viewed_issues = get_analytics_query("viewed_issues")
 
-    # Get the Github data for todays clicked issues, clicks, and views
-    # Set the limit to 1 for testing
-    github_issues = get_clicked_issue_github_data(clicked_issues, limit=None)
-    trimmed_issues = trim_github_issues(github_issues)
-    issues = add_views_to_issues(github_issues, viewed_issues)
+    # # Get the Github data for todays clicked issues, clicks, and views
+    # # Set the limit to 1 for testing
+    # github_issues = get_clicked_issue_github_data(clicked_issues, limit=None)
+    # trimmed_issues = trim_github_issues(github_issues)
+    # issues = add_views_to_issues(github_issues, viewed_issues)
 
-    # Get all of todays clicks
-    clicks = get_analytics_query("all_clicks")
+    # # Get all of todays clicks
+    # clicks = get_analytics_query("all_clicks")
 
-    # Get all of todays clicks activity
-    activities = get_click_activity(clicks)
+    # # Get all of todays clicks activity
+    # activities = get_click_activity(clicks)
 
-    # Write check each entry in the database and see if the status has changed
-    run_civic_bot(True)
+    # # Write check each entry in the database and see if the status has changed
+    # run_civic_bot(True)
 
     # Add each issue to the db
     with connect(os.environ['DATABASE_URL']) as conn:
         with dict_cursor(conn) as db:
-            for issue in issues:
-                write_issue_to_db(issue, db)
+            # for issue in issues:
+            #     write_issue_to_db(issue, db)
 
-            for click in clicks:
-                write_click_to_db(click,db)
+            # for click in clicks:
+            #     write_click_to_db(click,db)
 
-            for activity in activities:
-                write_activities_to_db(activity, db)
+            # for activity in activities:
+            #     write_activities_to_db(activity, db)
+
+            activity_summary = get_activity_summaries_array(db)
+
+            for summary in activity_summary:
+                # Labels
+                if summary["common_labels"][0]["frequencies"]:
+                    labels = summary["common_labels"][0]["frequencies"][1][:5]
+                else:
+                    labels = None
+
+                # Titles
+                if summary["common_titles"][0]["frequencies"]:
+                    titles = summary["common_titles"][0]["frequencies"][1][:5]
+                else:
+                    titles = None
+                
+                new_dict = {
+                    "activity_type": summary["activity_type"],
+                    "common_labels": labels,
+                    "common_titles": titles,
+                    "count": summary["count"]
+                }
+
+                write_activity_summary_to_db(new_dict, db)
 
