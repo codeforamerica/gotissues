@@ -24,20 +24,19 @@
 
   <body>
     <header class="slab-blue">
-      <div class="layout-breve">
-        <h1>Civic Issue Finder Analytics</h1>
-        <p>Does the <a href="http:www.codeforamerica.org/geeks/civicissues">civic issue finder</a> actually work? Lets explore the data to find out.</p>
-      </div>
+      
+        <h1 style="margin:0 auto">Civic Issue Finder Analytics</h1>
+        <p style="margin-top:0">Does the <a href="http:www.codeforamerica.org/geeks/civicissues">civic issue finder</a> actually work? Lets explore the data to find out.</p>
+      
     </header>
 
     <section>
-      <div class="layout-breve">
-        
+      <div class="layout-minim">
         <div class="badge-heading badge-graph badge-gray">
-          <h2>Measuring Impact</h2>
+          <h2 style="margin-bottom: 0">Measuring Impact</h2>
         </div>
 
-        <ul class="bricks bricks-cta bricks-3">
+        <ul style="margin-bottom:0;"class="bricks bricks-cta bricks-3">
           
           <li class="brick badge-heading badge-blue">
             <a class="brick-link">
@@ -59,16 +58,24 @@
                   <h2 class="brick-heading">Clicks Per Page View</h2>
               </a>
           </li>
-        
         </ul>
-      
       </div>
-      <div style="padding-top:0"class="layout-breve">
+      <div class="layout-minim">
+      <div class="badge-heading badge-glasses badge-gray">
+              <h3> Top Embed Sources: Visualized</h3>
+            </div>
+            <div class="layout-minim">
+              <div id="chart-4-container"></div>
+            </div>
+            <div class="layout-minim">
+              <div class="layout-grid"><div id="legend-4-container"></div></div>
+            </div>
+        </div>
+    </section>
+
+      <div style="padding-top:0"class="layout-minim">
         <div id="topembeds">
-          
-
-
-        <div id="weeklyclicks" style="margin-top:11em">
+        <div id="weeklyclicks">
           
           <div class="badge-heading badge-gray">
             <h2>Breaking it Down</h2>
@@ -76,38 +83,141 @@
           
           <div id="embed-api-auth-container"></div>
           
-          <h3> Click Frequency By Month</h3>
           <div id="clickschart" ></div>
           <div id="view-selector-container" hidden></div>
 
-            <div class="badge-heading badge-glasses badge-gray">
-              <h3> Top Embed Sources: Visualized</h3>
+
+          <div class="layout-breve">
+          <h2>What do Top Clicked Issues look like?</h2>
+          <p>If you want your issue to be clicked a lot when it's viewed, follow these guidlines for titles+labels</p>
+            <ul class="list-no-bullets layout-grid">
+            {%for stat in data["top_clicks"]%}
+              <li class="layout-crotchet">
+                <a style="padding-bottom:.75em" class="billboard" href="{{stat["html_url"]}}">
+                  <strong style="padding-bottom:.75em" class="billboard-label">{{stat["title"]}}</strong>
+                  {% for label in stat["labels"] %}
+                      <div class="label">{{label.name}}</div>
+                    {% endfor %}
+                   <div id="stat-label" class="layout-grid">
+                  <div class="layout-crotchet"><h2> {{stat["clicks"]}} </h2> <p class="text-whisper"> Clicks since Aug 2014</p></div>
+                <div class="layout-crotchet"><h2>{{stat["views"]}}</h2><p class="text-whisper"> Views since June 2015</p></div>
+                <div class="layout-crotchet"><h2>{{stat["click-ratio"]}}%</h2><p class="text-whisper"> Clicks-to-Views Ratio</p></div></div>
+                <h4> Mostly viewed on
+                <p class="text-whisper">
+                      {% for source in stat["view_sources"] %}
+                        {{source}}
+                      {% endfor%}
+                    </p></h4>
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+          
+          </div>
+
+
+          <div class="layout-breve layout-grid"> 
+          <h2>What do less popular Clicked Issues look like?</h3>
+          <p>If you want your issue to be clicked a lot, when it's viewed, avoid these things</p>
+          <ul class="list-no-bullets layout-grid">
+            {%for stat in data["least_clicks"]%}
+              <li class="layout-crotchet">
+                <a style="padding-bottom:.75em" class="billboard" href="{{stat["html_url"]}}">
+                  <strong class="billboard-label">{{stat["title"]}}</strong>
+  
+                  
+                  {% if stat["labels"] %}
+                  {% for label in stat["labels"] %}
+                      <div class="label">{{label.name}}</div>
+                    {% endfor %}
+                  {%else%}
+                  No labels!
+                  {%endif%}
+                    <div id="stat-label" class="layout-grid">
+                  <div class="layout-crotchet"><h2> {{stat["clicks"]}} </h2> <h2 class="text-whisper"> Clicks since {{stat.created_at}}</h2></div>
+                <div class="layout-crotchet"><h2>{{stat["views"]}}</h2><h2 class="text-whisper"> Views since June 2015</h2></div>
+                <div class="layout-crotchet"><h2>{{stat["click-ratio"]}}%</h2><h2 class="text-whisper"> Clicks-to-Views Ratio</h2></div>
+                </div>
+                <h2> Mostly viewed on
+                <p class="text-whisper">
+                      {% for source in stat["view_sources"] %}
+                        {{source}}
+                      {% endfor%}
+                    </p></h2>
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+          </div>
+
+        <div class="layout-breve">
+          <h2>Have issues been getting help?</h2>
+        <div style="margin-bottom:0" class="layout-minim">
+          <div class="layout-minim">
+          <div id="stats">
+              <h4 class="brick-text">{{ data.closed_count }}</h4>
+              <h2 class="brick-heading">Closed Civic Issues</h2>
             </div>
-            <div class="layout-semibreve">
-            <div class="layout-minim">
-              <div id="chart-4-container"></div>
-            </div>
-            <div class="layout-minim">
-              <div class="layout-grid"><div id="legend-4-container"></div></div>
-            </div>
+          </div>
+          <div class="layout-minim">
+          <div id="stats">
+            <h4 class="brick-text">{{ data.open_count }}</h4>
+            <h2 class="brick-heading">Open Civic Issues</h2>
+          </div>
+        </div>
+        
+
+        </div>
+
+    
+      <div style="margin-bottom:0" class="layout-minim">
+      <div class="layout-minim">
+      <div id="stats">
+            <h2 style="font-size:.75em; margin-bottom:0; padding-bottom:0" class="brick-heading">Out of</h2>
+            <h4 style="margin-top:.25em" class="brick-text">{{ data.issue_count}}</h4>
+            <h2 class="brick-heading">Civic Issues</h2>
+          </div>  
+      </div>
+
+      <div class="layout-minim">
+        <div id="stats">
+          <h4 class="brick-text">{{data.closed_percent}}%</h4>
+          <h2 class="brick-heading">of Civic Issues have been closed</h2>
+          <h2 style="font-size:.75em;" class="brick-heading">Since August 2014</h2>
+        </div>
+      </div>
+    </div>
+
+    </div>
+
+          <div class="layout-breve layout-grid"> 
+          <h2>What do closed clicked Issues look like?</h3>
+          <p>If you don't want your issue to be closed eventually, check out these things</p>
+          <ul class="list-no-bullets layout-grid">
+            {%for stat in data["closed_clicks"]|sort(attribute='days_open')%}
+              <li class="layout-crotchet">
+                <a style="padding-bottom:.75em" class="billboard" href="{{stat["html_url"]}}">
+                  <strong class="billboard-label">{{stat["title"]}}</strong>
+                  {% if stat["labels"] %}
+                  {% for label in stat["labels"] %}
+                      <div class="label">{{label.name}}</div>
+                    {% endfor %}
+                  {%else%}
+                  No labels!
+                  {%endif%}
+                    <div id="stat-label" class="layout-grid">
+                  <div class="layout-crotchet"><h2> {{stat["clicks"]}} </h2> <h2 class="text-whisper"> Clicks since {{stat.created_at}}</h2></div>
+                <div class="layout-crotchet"><h2>{{stat["days_open"]}}</h2><h2 class="text-whisper"> Days it took to close the issue </h2></div>
+                <div class="layout-crotchet"><h2>{{stat["comments"]}}</h2><h2 class="text-whisper"> Comments to get the issue resolved</h2></div>
+                </div>
+                <h2> Closed {{stat.closed_at}}</h2>
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
           </div>
           
         </div>
-          
-      
-        <!--<div class="layout-grid-crotchet">
-              {% for source in data["sources"]%}
-                <div>
-                  <center>
-
-                    <h4 class="brick-text">{{source[1]}} Views </h4>
-                    <h2 style="font-size:.8em" class="brick-heading">
-                      <a href="{{source[0]}}">{{source[0]}}</a>
-                    </h2>
-                  </center>
-                </div>
-              {% endfor %}
-        </div>-->
       </div>
       
       </div>
@@ -126,21 +236,29 @@
         </p>
         
         <div class="layout-grid">
-          {% for activity in data["activity_summary"] %}
+          {% for activity in data["activity_summary"]|sort(reverse=True, attribute='count') %}
             <div style="margin-top:4em" class="layout-crotchet">
               <a id="{{activity.activity_type}}" class="billboard EventClick" href="#{{activity.activity_type}}">
               <h1>{{activity.count}}</h1>
               <h2 style="margin-top:1em;font-size:1.4em;">{{activity.activity_type}}s</h2>                  
                 <div id="{{activity.activity_type}}1" class="slab-dark-blue">
                   <p><h2 class="brick-heading">Common Title Key Words</h2>
-                  {% for title in activity.common_titles %}
-                    {{title}}
-                  {% endfor %}
+                  {% if activity["common_titles"] %}
+                    {% for title in activity.common_titles %}
+                      {{title}}
+                    {% endfor %}
+                  {% else %}
+                    No titles!
+                  {% endif %}
                 </p>
                 <p><h2 class="brick-heading">Common Top Labels</h2>
-                  {% for label in activity.common_labels %}
-                    {{label}}
-                  {% endfor %}
+                  {% if activity["common_labels"]%}
+                    {% for label in activity.common_labels %}
+                      {{label}}
+                    {% endfor %}
+                  {% else %}
+                    No top labels!
+                  {% endif %}
                 </p></div>
               </a>
             </div>
@@ -167,7 +285,9 @@
   fs.parentNode.insertBefore(js,fs);js.onload=function(){g.load('analytics');};
 }(window,document,'script'));
 </script>
+
 <script>
+
 $(document).ready(function() {
     
     $('.EventClick').click(function(e){
