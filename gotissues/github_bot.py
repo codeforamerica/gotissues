@@ -1,9 +1,7 @@
 from psycopg2 import connect, extras
-import random
 
 import requests
 import json
-
 
 from config import *
 
@@ -13,6 +11,7 @@ from config import *
 def dict_cursor(conn, cursor_factory=extras.RealDictCursor):
     return conn.cursor(cursor_factory=cursor_factory)
 
+
 #
 # Setup for all Github queries
 #
@@ -20,6 +19,7 @@ if 'GITHUB_TOKEN' in os.environ:
     github_auth = (os.environ['BOT_GITHUB_TOKEN'], '')
 else:
     github_auth = None
+
 
 def github_html_url_to_api(url):
     """ Convert https://github.com links to https://api.gitub.com """
@@ -64,18 +64,13 @@ def get_urls(db, url=None):
 
   return filtered_issues
 
+
 #
 # Write the urls that we posted to a db
 #
 def write_pinged_to_db(ping, db):
-  q = '''SELECT * FROM pinged_issues WHERE html_url = %(html_url)s '''
-
-  db.execute(q, {"html_url": ping["html_url"]})
-  exists = db.fetchone()
-
-  if not exists:
-    q = ''' INSERT INTO pinged_issues (html_url, status)
-        VALUES ( %(html_url)s, %(status)s) '''
+  q = ''' INSERT INTO pinged_issues (html_url, status) 
+          VALUES ( %(html_url)s, %(status)s) '''
 
   db.execute(q, {"html_url":ping["html_url"], "status":ping["status"]})
 
@@ -143,51 +138,34 @@ def write_pinged_to_db(ping, db):
 
   db.execute(q, {"html_url":ping["html_url"], "status":ping["status"]})
 
+
 #
 # Fetch urls from the db
 #
-def run_civic_bot(dailyupdate = None):
+def run_civic_bot():
   with connect(os.environ['DATABASE_URL']) as conn:
     with dict_cursor(conn) as db:
+
       url_list = get_urls(db)
       # Test Issue Url must have clicks, html_url. created_at and view_sources optional
 
-      if dailyupdate:
-        # Since this will ping one random url in our url list, make sure the list
-        # We are working with doesn't have urls that are already in the database
-        new_url_list = []
-        
-        for url in url_list:
-          if not check_pinged(url, db):
-            new_url_list.append(url)
+      # Since this will ping one random url in our url list, make sure the list
+      # We are working with doesn't have urls that are already in the database
+      new_url_list = []
+      for url in url_list:
+        if not check_pinged(url, db):
+          new_url_list.append(url)
 
-        if new_url_list:
-          url = new_url_list[0]
-          print "We are about to post on %s.\nLast Updated: %s" % (url["html_url"], url["created_at"])
-          
-          ping = {
-            "html_url":url["html_url"],
-            "status":post_on_github(url)
-          }
-          write_pinged_to_db(ping, db)
+      if new_url_list:
+        url = new_url_list[0]
+        print "We are about to post on %s.\nLast Updated: %s" % (url["html_url"], url["created_at"])
+
+        ping = {
+          "html_url":url["html_url"],
+          "status":post_on_github(url)
+        }
+        write_pinged_to_db(ping, db)
 
 
-      if not dailyupdate:
-        # Go through each url manually
-        for url in url_list:
-          if check_pinged(url, db):
-            response = None
-            while not response:
-              print "Reply 'y' or 'n'. We are about to post on %s.\nLast Updated: %s" % (url["html_url"], url["created_at"])
-              response = raw_input("> ")
-              if response == "y":
-                ping = {
-                  "html_url":url["html_url"],
-                  "status":post_on_github(url)
-                }
-                write_pinged_to_db(ping, db)
-              elif response == "n":
-                print "Not posted to Github"
-              else:
-                print "Please re-enter a valid character\n"
-                response = None
+if __name__ == '__main__':
+  run_civic_bot()
