@@ -2,3 +2,4 @@ DROP TABLE IF EXISTS issues CASCADE;
 DROP TABLE IF EXISTS clicks;
 DROP TABLE IF EXISTS activity;
 DROP TABLE IF EXISTS activity_summary;
+DROP TABLE IF EXISTS pinged_issues;

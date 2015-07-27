@@ -42,6 +42,9 @@ def get_urls(db, url=None):
 
   db.execute(q)
   results = db.fetchall()
+  return results
+
+def filter_issues(results):
 
   # Only return help wanted labels
   hw_issues = []
@@ -57,7 +60,7 @@ def get_urls(db, url=None):
   for issue in hw_issues:
     dont_add_flag = False
     for gov_github in ["https://github.com/presidential-innovation-fellows", "https://github.com/uscensusbureau", "https://github.com/chicago", "https://github.com/GSA", "https://github.com/project-open-data", "https://github.com/datasf","https://github.com/18f"]:
-      if issue["html_url"].startswith(gov_github):
+      if issue["html_url"].lower().startswith(gov_github.lower()):
         dont_add_flag = True
     if not dont_add_flag:
       filtered_issues.append(issue)

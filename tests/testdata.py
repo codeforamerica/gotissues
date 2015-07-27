@@ -144,3 +144,52 @@ timestamp_entry = {
 } 
 
 test_sources_result = [('www.codeforamerica.org', 2), ('http://testurl.com', 1)]
+
+fake_issue_bad = {
+    "html_url":"lalala",
+    "clicks":9000,
+    "view_sources":[],
+    "created_at": "2015-06-06 23:16:56",
+    "labels":[
+        {
+            "name":"help/wanted",
+            "url":"api.github.com/fun",
+            "color":"bfe5bf"
+        },
+        {
+            "name":"help!wanted",
+            "url":"api.github.com/fun",
+            "color":"bfe5bf"
+        }
+    ]
+}
+
+fake_issue_good = {
+    "html_url":"https://github.com/codeforamerica/gotissues/issues/36",
+    "clicks":9000,
+    "view_sources":["https://www.codeforamerica.org/"],
+    "created_at": "2015-06-06 23:16:56",
+    "labels":[
+        {
+            "name":"help wanted",
+            "url":"api.github.com/fun",
+            "color":"bfe5bf"
+        },
+        {
+            "name":"content",
+            "url":"api.github.com/fun",
+            "color":"bfe5bf"
+        }
+    ]
+}
+
+fake_issue_bad_gov = {
+    "html_url":"https://github.com/18F/C2/issues/246",
+    "labels":[
+        {
+            "name":"help wanted",
+            "url":"api.github.com/fun",
+            "color":"bfe5bf"
+        }
+    ]
+}

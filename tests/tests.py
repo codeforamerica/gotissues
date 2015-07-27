@@ -3,10 +3,10 @@ currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentfram
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0,parentdir) 
 from psycopg2 import connect, extras
+import datetime
 
-from gotissues import app, daily_update, data_helpers, view_helpers
+from gotissues import app, daily_update, data_helpers, view_helpers, github_bot
 import testdata
-
 
 class GotIssuesTestCase(unittest.TestCase):
 
@@ -124,6 +124,31 @@ class GotIssuesTestCase(unittest.TestCase):
 
                 sources = view_helpers.get_top_sources(db)
                 self.assertEqual(sources, testdata.test_sources_result)
+
+    #
+    # github_bot.py tests
+    #
+
+    # Filters
+
+    def test_label_filter(self):
+
+        issues_array = []
+        expected_final = []
+        expected_final.append(testdata.fake_issue_good)
+        issues_array.append(testdata.fake_issue_good)
+        issues_array.append(testdata.fake_issue_bad)
+
+        final_array = github_bot.filter_issues(issues_array)
+
+        self.assertEqual(len(final_array), 1)
+        self.assertEqual(expected_final, final_array)
+
+        issues_array.append(testdata.fake_issue_bad_gov)
+        final_array = github_bot.filter_issues(issues_array)
+
+        self.assertEqual(len(final_array), 1)
+        self.assertEqual(expected_final, final_array)
 
 
 
