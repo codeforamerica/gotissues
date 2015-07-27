@@ -32,8 +32,6 @@
 
     <section>
       <div class="layout-breve">
-        <p>Since we opened the Civic Issue Finder in August 2014, here are some stats</p>
-        
         <div class="badge-heading badge-graph badge-gray">
           <h2>Measuring Impact</h2>
         </div>
@@ -64,42 +62,6 @@
       </div>
     </section>
 
-
-    <div class="layout-semibreve">
-
-        <div class="layout-minim">
-          <div id="stats">
-              <h4 class="brick-text">{{ data.closed_count }}</h4>
-              <h2 class="brick-heading">Closed Civic Issues</h2>
-            </div>
-          </div>
-
-          <div class="layout-minim">
-          <div id="stats">
-            <h4 class="brick-text">{{ data.open_count }}</h4>
-            <h2 class="brick-heading">Open Civic Issues</h2>
-        </div>
-      </div>
-    </div>
-
-    <div class="layout-semibreve">
-      <div class="layout-minim">
-      <div id="stats">
-            <h2 style="font-size:.75em; margin-bottom:0; padding-bottom:0" class="brick-heading">Out of</h2>
-            <h4 style="margin-top:.25em" class="brick-text">{{ data.issue_count}}</h4>
-            <h2 class="brick-heading">Civic Issues</h2>
-          </div>  
-      </div>
-
-      <div class="layout-minim">
-        <div id="stats">
-          <h4 class="brick-text">{{data.closed_percent}}%</h4>
-          <h2 class="brick-heading">of Civic Issues have been closed</h2>
-          <h2 style="font-size:.75em;" class="brick-heading">Since August 2014</h2>
-        </div>
-      </div>
-    </div>
-
       <div style="padding-top:0"class="layout-breve">
         <div id="topembeds">
         <div id="weeklyclicks" style="margin-top:11em">
@@ -125,6 +87,7 @@
               <div class="layout-grid"><div id="legend-4-container"></div></div>
             </div>
           </div>
+
           <div class="layout-breve">
           <h2>What do Top Clicked Issues look like?</h2>
           <p>If you want your issue to be clicked a lot when it's viewed, follow these guidlines for titles+labels</p>
@@ -188,6 +151,45 @@
           </ul>
           </div>
 
+        <div class="layout-breve">
+          <h2>Have issues been getting help?</h2>
+        <div style="margin-bottom:0" class="layout-minim">
+          <div class="layout-minim">
+          <div id="stats">
+              <h4 class="brick-text">{{ data.closed_count }}</h4>
+              <h2 class="brick-heading">Closed Civic Issues</h2>
+            </div>
+          </div>
+          <div class="layout-minim">
+          <div id="stats">
+            <h4 class="brick-text">{{ data.open_count }}</h4>
+            <h2 class="brick-heading">Open Civic Issues</h2>
+          </div>
+        </div>
+        
+
+        </div>
+
+    
+      <div style="margin-bottom:0" class="layout-minim">
+      <div class="layout-minim">
+      <div id="stats">
+            <h2 style="font-size:.75em; margin-bottom:0; padding-bottom:0" class="brick-heading">Out of</h2>
+            <h4 style="margin-top:.25em" class="brick-text">{{ data.issue_count}}</h4>
+            <h2 class="brick-heading">Civic Issues</h2>
+          </div>  
+      </div>
+
+      <div class="layout-minim">
+        <div id="stats">
+          <h4 class="brick-text">{{data.closed_percent}}%</h4>
+          <h2 class="brick-heading">of Civic Issues have been closed</h2>
+          <h2 style="font-size:.75em;" class="brick-heading">Since August 2014</h2>
+        </div>
+      </div>
+    </div>
+
+    </div>
 
           <div class="layout-breve layout-grid"> 
           <h2>What do closed clicked Issues look like?</h3>
