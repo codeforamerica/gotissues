@@ -185,6 +185,8 @@ fake_issue_good = {
 
 fake_issue_bad_gov = {
     "html_url":"https://github.com/18F/C2/issues/246",
+    "view_sources":["https://www.codeforamerica.org/"],
+    "clicks":9000,
     "labels":[
         {
             "name":"help wanted",

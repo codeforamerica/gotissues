@@ -28,18 +28,6 @@ class GotIssuesTestCase(unittest.TestCase):
         pass
 
 
-    # def test_main_view(self):
-    #     ''' Test the main gotissues view '''
-    #     response = self.app.get("/")
-    #     self.assertEqual(response.status_code, 200)
-
-
-    # def test_test_view(self):
-    #     ''' Test the test gotissues view '''
-    #     response = self.app.get("/test")
-    #     self.assertEqual(response.status_code, 200)
-
-
     def test_trim_github_issues(self):
         ''' Test that only the github attributes we want are left '''
         trimmed_issues = daily_update.trim_github_issues([testdata.full_issue])
@@ -47,6 +35,7 @@ class GotIssuesTestCase(unittest.TestCase):
         control = json.dumps(testdata.trimmed_issue, sort_keys=True, indent=4)
 
         self.assertEqual(result,control)
+
 
     def test_writing_bad_GA_request(self):
         ''' Test for writing a bad key to GA'''
@@ -58,6 +47,7 @@ class GotIssuesTestCase(unittest.TestCase):
             testdata.bad_sample_dict[k] = data_helpers.get_analytics_query(k)
             self.assertEqual(testdata.bad_sample_dict[k], error)
     
+
     def test_write_timestamp(self):
         ''' Test for taking a sample GA response for issues + date info
             and writing the timestamp to '''
@@ -67,6 +57,7 @@ class GotIssuesTestCase(unittest.TestCase):
 
         self.assertEqual(control, results)
 
+
     '''def test_writing_good_GA_request(self):
         Test that fetching from GA is working
 
@@ -74,6 +65,10 @@ class GotIssuesTestCase(unittest.TestCase):
             good_sample_dict[k] = get_analytics_query(k)
             self.assertEqual(good_sample_dict[k], error)'''
 
+
+    #
+    # daily_update tests
+    #
     def test_write_issue_to_db(self):
         ''' Test that writing to the db works '''
         with connect(testdata.DATABASE_URL) as conn:
@@ -87,6 +82,7 @@ class GotIssuesTestCase(unittest.TestCase):
                 self.assertEqual(issue["clicks"],10000000)
                 self.assertEqual(issue["views"],777)
 
+
     def test_write_click_to_db(self):
         ''' Test that writing to the db works '''
         with connect(testdata.DATABASE_URL) as conn:
@@ -99,6 +95,7 @@ class GotIssuesTestCase(unittest.TestCase):
                 self.assertEqual(issue["id"],1)
                 self.assertEqual(issue["readable_date"],"Sunday, December 27 2015 07:30AM")
     
+
     def test_write_activity_to_db(self):
         with connect(testdata.DATABASE_URL) as conn:
             with data_helpers.dict_cursor(conn) as db:
@@ -113,6 +110,7 @@ class GotIssuesTestCase(unittest.TestCase):
     # Capture datetime.datetime.now() and the month year day 
     # version of now() and assertEqual?
 
+
     def test_get_top_sources(self):
         ''' Test counting of view sources '''
         # Add a few issues with different sources
@@ -125,31 +123,38 @@ class GotIssuesTestCase(unittest.TestCase):
                 sources = view_helpers.get_top_sources(db)
                 self.assertEqual(sources, testdata.test_sources_result)
 
+
     #
     # github_bot.py tests
     #
-
-    # Filters
-
     def test_label_filter(self):
-
-        issues_array = []
+        ''' Test that array that's returned after filtering through methods is okay '''
         expected_final = []
         expected_final.append(testdata.fake_issue_good)
+
+        issues_array = []
         issues_array.append(testdata.fake_issue_good)
         issues_array.append(testdata.fake_issue_bad)
 
-        final_array = github_bot.filter_issues(issues_array)
+        # test w/ a non 'help wanted' filter
+        returned_array = github_bot.filter_issues(issues_array)
+        self.assertEqual(len(returned_array), 1)
+        self.assertEqual(expected_final, returned_array)
 
-        self.assertEqual(len(final_array), 1)
-        self.assertEqual(expected_final, final_array)
-
+        # test w/ sample issue from a gov repo
         issues_array.append(testdata.fake_issue_bad_gov)
-        final_array = github_bot.filter_issues(issues_array)
+        returned_array = github_bot.filter_issues(issues_array)
+        self.assertEqual(len(returned_array), 1)
+        self.assertEqual(expected_final, returned_array)
 
-        self.assertEqual(len(final_array), 1)
-        self.assertEqual(expected_final, final_array)
-
+    def test_post_body_to_github(self):
+        issues_array = []
+        issues_array.append(testdata.fake_issue_good)
+        issues_array.append(testdata.fake_issue_bad)
+        issues_array.append(testdata.fake_issue_bad_gov)
+        
+        for issue in issues_array:
+            print str(github_bot.get_github_post(issue)) + "\n"
 
 
 if __name__ == '__main__':

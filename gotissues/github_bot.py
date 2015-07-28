@@ -77,33 +77,37 @@ def write_pinged_to_db(ping, db):
 
   db.execute(q, {"html_url":ping["html_url"], "status":ping["status"]})
 
-
-def post_on_github(url, body=None, headers=None):
-  ''' Post either a specific message to the brigades or a generic one based on if there are sources or not '''
+def get_github_post(url):
+  ''' Post a generic message to github based on if there are sources or not '''
   print "Requesting %s" % (url["html_url"])
-  if body:
-    post = {"body":body}
-  else:
-    if url["view_sources"] and url['clicks']:
-      clicks = str(url["clicks"])
-      top_source = str(url["view_sources"][0])
 
-      text = '''Hello! Do you still need help with this issue? It's been clicked on %s times through the [Civic Issue Finder](https://www.codeforamerica.org/geeks/civicissues) on [%s](%s). \n\nCan this issue be closed or does it still need some assistance? You can always update the labels or add more info in the description to make it easier to contribute. \n\n Just doing a little open source gardening of Brigade projects! For more info/tools for creating civic issues, check out [Got Issues](https://got-issues.herokuapp.com/) Thank you!''' % (clicks, top_source, top_source)
-      post = {
-        "body": text
-      }
-    
-    elif url['clicks']:
-      clicks = str(url['clicks'])
-      text = ''' Hello! Do you still need help with this issue? It's been clicked on %s times through the [Civic Issue Finder](https://www.codeforamerica.org/geeks/civicissues)! \n\nCan this issue be closed or does it still need some assistance? You can always update the labels or add more info in the description to make it easier to contribute. \n\n Just doing a little open source gardening of Brigade projects! For more info/tools for creating civic issues, check out [Got Issues](https://got-issues.herokuapp.com/). Thank you!''' % (clicks)
-      post = {
-        "body": text
-      }
-  print "You just posted: \n" + str(post["body"])
+  if url["view_sources"] and url['clicks']:
+    clicks = str(url["clicks"])
+    top_source = str(url["view_sources"][0])
 
+    text = '''Hello! Do you still need help with this issue? It's been clicked on %s times through the [Civic Issue Finder](https://www.codeforamerica.org/geeks/civicissues) on [%s](%s). \n\nCan this issue be closed or does it still need some assistance? You can always update the labels or add more info in the description to make it easier to contribute. \n\n Just doing a little open source gardening of Brigade projects! For more info/tools for creating civic issues, check out [Got Issues](https://got-issues.herokuapp.com/) Thank you!''' % (clicks, top_source, top_source)
+    post = {
+      "body": text
+    }
+    return url, post
+  
+  elif url['clicks']:
+    clicks = str(url['clicks'])
+    text = ''' Hello! Do you still need help with this issue? It's been clicked on %s times through the [Civic Issue Finder](https://www.codeforamerica.org/geeks/civicissues)! \n\nCan this issue be closed or does it still need some assistance? You can always update the labels or add more info in the description to make it easier to contribute. \n\n Just doing a little open source gardening of Brigade projects! For more info/tools for creating civic issues, check out [Got Issues](https://got-issues.herokuapp.com/). Thank you!''' % (clicks)
+    post = {
+      "body": text
+    }
+    return url, post
+
+  elif not url['clicks']:
+    print "Error. No clicks for url: %s" % (url["html_url"])
+    return "error"
+
+def post_on_github(url, post, headers=None):
   if github_html_url_to_api(url["html_url"]):
     auth_url = github_html_url_to_api(url["html_url"]) + "/comments"
     r = requests.post(auth_url, json.dumps(post), auth=github_auth, headers=headers)
+    print "You just posted: \n" + str(post["body"])
     print "Successfully posted to %s" % (url["html_url"])
     return "success"
 
@@ -165,7 +169,7 @@ def run_civic_bot():
 
         ping = {
           "html_url":url["html_url"],
-          "status":post_on_github(url)
+          "status":post_on_github(get_github_post(url))
         }
         write_pinged_to_db(ping, db)
 
