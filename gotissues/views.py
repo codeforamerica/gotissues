@@ -38,7 +38,7 @@ def index():
     return render_template("index.html", data=data)
 
 @app.route("/analytics", methods=["GET", "POST"])
-def admin():
+def analytics():
     db_results = {}
 
     data = {}
@@ -47,6 +47,8 @@ def admin():
         with connect(os.environ['DATABASE_URL']) as conn:
             with dict_cursor(conn) as db:
                 data["pinged_issues"] = get_pinged_issues(db)
+                data["comment_delta"] = check_issues(db)["comment_delta"]
+                data["state_delta"] = check_issues(db)["state_delta"]
                 data["total_pinged"] = get_total_pinged(db)
                 data["closed_pinged"] = count_closed(db, data["pinged_issues"])
                 data["percentage_pinged"] = 100 * (float(data["closed_pinged"])/data["total_pinged"])
@@ -68,6 +70,10 @@ def admin():
             with dict_cursor(conn) as db:
                 data["pinged_issues"] = get_pinged_issues(db)
                 data["total_pinged"] = get_total_pinged(db)
+
+                for ping in data["pinged_issues"]:
+                    check_issues(db, ping)
+
                 data["closed_pinged"] = count_closed(db, data["pinged_issues"])
                 data["percentage_pinged"] = 100 * int(float(data["closed_pinged"])/data["total_pinged"])
                 db_results = get_all_activity(db)

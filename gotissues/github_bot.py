@@ -82,33 +82,46 @@ def get_github_post(url):
   print "Requesting %s" % (url["html_url"])
 
   if url["view_sources"] and url['clicks']:
+    issues_url = "/".join(url["html_url"].split("/")[:6])
     clicks = str(url["clicks"])
     top_source = str(url["view_sources"][0])
 
-    text = '''Hello! Do you still need help with this issue? It's been clicked on %s times through the [Civic Issue Finder](https://www.codeforamerica.org/geeks/civicissues) on [%s](%s). \n\nCan this issue be closed or does it still need some assistance? You can always update the labels or add more info in the description to make it easier to contribute. \n\n Just doing a little open source gardening of Brigade projects! For more info/tools for creating civic issues, check out [Got Issues](https://got-issues.herokuapp.com/) Thank you!''' % (clicks, top_source, top_source)
+    text = '''Hello! This issue looks like it still needs help! 
+    It's been clicked on %s times through the [Civic Issue Finder](https://www.codeforamerica.org/geeks/civicissues) on [%s](%s). 
+    Can this issue be closed or does it still need some assistance? 
+    \nIf you wrote this issue, you can always update the labels for specifying tasks, add more info in the description to make it easier to contribute, or re-write the title to make more contributors interested in helping out.
+    If you are an open source contributor, ask and see how you can help by commenting or check out more open issues in this repo at [%s](%s). \n\n Just doing a little :seedling: open source gardening :seedling: of Brigade projects! 
+    For more info/tools for creating civic issues, check out [Got Issues](https://got-issues.herokuapp.com/) Thank you!''' % (clicks, top_source, top_source)
     post = {
       "body": text
     }
-    return url, post
+    return post
   
   elif url['clicks']:
+    issues_url = "/".join(url["html_url"].split("/")[:6])
     clicks = str(url['clicks'])
-    text = ''' Hello! Do you still need help with this issue? It's been clicked on %s times through the [Civic Issue Finder](https://www.codeforamerica.org/geeks/civicissues)! \n\nCan this issue be closed or does it still need some assistance? You can always update the labels or add more info in the description to make it easier to contribute. \n\n Just doing a little open source gardening of Brigade projects! For more info/tools for creating civic issues, check out [Got Issues](https://got-issues.herokuapp.com/). Thank you!''' % (clicks)
+
+    text = ''' Hello! This issue looks like it still needs help! 
+    It's been clicked on %s times through the [Civic Issue Finder](https://www.codeforamerica.org/geeks/civicissues)! 
+    Can this issue be closed or does it still need some assistance? 
+    \nIf you wrote this issue, you can always update the labels for specifying tasks, add more info in the description to make it easier to contribute, or re-write the title to make more contributors interested in helping out.
+    If you are an open source contributor, ask and see how you can help by commenting or check out more open issues in this repo at [%s](%s). \n\n Just doing a little :seedling: open source gardening :seedling: of Brigade projects! 
+    For more info/tools for creating civic issues, check out [Got Issues](https://got-issues.herokuapp.com/). Thank you!''' % (clicks, issues_url, issues_url)
     post = {
       "body": text
     }
-    return url, post
+    return post
 
   elif not url['clicks']:
     print "Error. No clicks for url: %s" % (url["html_url"])
     return "error"
 
 def post_on_github(url, post, headers=None):
-  if github_html_url_to_api(url["html_url"]):
-    auth_url = github_html_url_to_api(url["html_url"]) + "/comments"
+  if github_html_url_to_api(url):
+    auth_url = github_html_url_to_api(url) + "/comments"
     r = requests.post(auth_url, json.dumps(post), auth=github_auth, headers=headers)
     print "You just posted: \n" + str(post["body"])
-    print "Successfully posted to %s" % (url["html_url"])
+    print "Successfully posted to %s" % (url)
     return "success"
 
   else:
@@ -141,10 +154,9 @@ def write_pinged_to_db(ping, db):
 
   if not exists:
     q = ''' INSERT INTO pinged_issues (html_url, status, comments)
-        VALUES ( %(html_url)s, %(status)s) '''
+        VALUES ( %(html_url)s, %(status)s, %(comments)s) '''
 
   db.execute(q, {"html_url":ping["html_url"], "status":ping["status"], "comments":ping["comments"]})
-
 
 #
 # Fetch urls from the db
@@ -153,7 +165,7 @@ def run_civic_bot():
   with connect(os.environ['DATABASE_URL']) as conn:
     with dict_cursor(conn) as db:
 
-      url_list = get_urls(db)
+      url_list = filter_issues(get_urls(db))
       # Test Issue Url must have clicks, html_url. created_at and view_sources optional
 
       # Since this will ping one random url in our url list, make sure the list
@@ -163,13 +175,15 @@ def run_civic_bot():
         if not check_pinged(url, db):
           new_url_list.append(url)
 
+      
+      print "The number of potential issues we can ping is " + str(len(new_url_list))
       if new_url_list:
         url = new_url_list[0]
         print "We are about to post on %s.\nLast Updated: %s" % (url["html_url"], url["created_at"])
 
         ping = {
           "html_url":url["html_url"],
-          "status":post_on_github(get_github_post(url)),
+          "status":post_on_github(url["html_url"], get_github_post(url)),
           "comments": url["comments"]
         }
         write_pinged_to_db(ping, db)

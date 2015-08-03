@@ -48,6 +48,8 @@
       <th>Issue Url</th>
       <th>Date Pinged</th>
       <th>Status</th>
+      <th>New Comments</th>
+      <th>New State</th>
     </tr>
 
      {% for issue in data["pinged_issues"] %}
@@ -55,6 +57,8 @@
       <td><a href="{{issue["html_url"]}}">{{issue["html_url"]}}</a></td>
       <td>{{issue["date_pinged"]}}</td>
       <td>{{issue["status"]}}</td>
+      <td>{{issue["comment_delta"]}}</td>
+      <td>{{issue["state_delta"]}}</td>
     </tr>
     {%endfor%}
   </table>
@@ -64,7 +68,7 @@
   <p> An easier way to look at our activity table, either sorted by type of event or url </p>
 </div>
 <div class="layout-minim">
-  <form action="/admin" method="post">
+  <form action="/analytics" method="post">
     <center>
     <select required="" name="category" style="margin-top:1.5em;margin-bottom:.5em;">
       <option disabled selected hidden value=''>Filter DB By</option>

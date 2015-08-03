@@ -185,3 +185,38 @@ def count_closed(db, issue_list):
       total_closed += 1
 
   return total_closed
+
+#
+# Figure out of there have been changes in activity in the issues we've pinged
+#
+
+def check_issues(db, ping):
+  final_data = []
+  comment_delta = 0
+  state_delta = False
+
+  check_ping = check_pinged_status(db, ping["html_url"])
+
+  if ping["comments"]:
+    if ping["comments"] - check_ping["comments"] > 1:
+      comment_delta = ping["comments"] - check_ping["comments"]
+    else:
+      comment_delta = 0
+  else:
+    comment_delta = 0
+
+  if check_ping["state"] == "closed":
+    state_delta = True
+  
+  ping["comment_delta"] = comment_delta
+  ping["state_delta"] = state_delta
+
+  return ping
+
+
+def check_pinged_status(db, html_url):
+  q = '''SELECT html_url,state,comments FROM issues WHERE html_url = '%s' ''' % html_url
+
+  db.execute(q)
+  new_status = db.fetchone()
+  return new_status
