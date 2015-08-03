@@ -37,7 +37,7 @@ def index():
 
     return render_template("index.html", data=data)
 
-@app.route("/admin", methods=["GET", "POST"])
+@app.route("/analytics", methods=["GET", "POST"])
 def admin():
     db_results = {}
 
@@ -47,6 +47,10 @@ def admin():
         with connect(os.environ['DATABASE_URL']) as conn:
             with dict_cursor(conn) as db:
                 data["pinged_issues"] = get_pinged_issues(db)
+                data["total_pinged"] = get_total_pinged(db)
+                data["closed_pinged"] = count_closed(db, data["pinged_issues"])
+                data["percentage_pinged"] = 100 * (float(data["closed_pinged"])/data["total_pinged"])
+                
                 category = request.form['category']
                 order = request.form['radio']
                 db_results = get_edited_activity(db, order, category)
@@ -57,11 +61,15 @@ def admin():
 
                 for date in data["pinged_issues"]:
                     date["date_pinged"] = date["date_pinged"].strftime('%B %d %Y')
+                    #date["state"] = get_issue_status(date["html_url"])
 
     else:
         with connect(os.environ['DATABASE_URL']) as conn:
             with dict_cursor(conn) as db:
                 data["pinged_issues"] = get_pinged_issues(db)
+                data["total_pinged"] = get_total_pinged(db)
+                data["closed_pinged"] = count_closed(db, data["pinged_issues"])
+                data["percentage_pinged"] = 100 * int(float(data["closed_pinged"])/data["total_pinged"])
                 db_results = get_all_activity(db)
         
         for result in db_results:
@@ -71,6 +79,7 @@ def admin():
 
         for date in data["pinged_issues"]:
             date["date_pinged"] = date["date_pinged"].strftime('%B %d %Y')
+            #date["state"] = get_issue_status(date["html_url"])
 
 
-    return render_template("admin.html", db_results=db_results, data=data)
+    return render_template("analytics.html", db_results=db_results, data=data)

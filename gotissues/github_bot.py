@@ -36,9 +36,9 @@ def get_urls(db, url=None):
   ''' Search the issues table for specific issues we want to ping, Testing w/ fake added issue'''
   #testing if url is not none
   if url:
-    q = ''' SELECT html_url,clicks,view_sources,created_at FROM issues WHERE html_url=\'%s\'''' % (url)
+    q = ''' SELECT html_url,clicks,view_sources,created_at,comments FROM issues WHERE html_url=\'%s\'''' % (url)
   else:
-    q = ''' SELECT html_url,clicks,view_sources,created_at,labels FROM issues WHERE state='open' ORDER BY created_at ASC'''
+    q = ''' SELECT html_url,clicks,view_sources,created_at,labels,comments FROM issues WHERE state='open' ORDER BY created_at ASC'''
 
   db.execute(q)
   results = db.fetchall()
@@ -140,10 +140,10 @@ def write_pinged_to_db(ping, db):
   exists = db.fetchone()
 
   if not exists:
-    q = ''' INSERT INTO pinged_issues (html_url, status)
+    q = ''' INSERT INTO pinged_issues (html_url, status, comments)
         VALUES ( %(html_url)s, %(status)s) '''
 
-  db.execute(q, {"html_url":ping["html_url"], "status":ping["status"]})
+  db.execute(q, {"html_url":ping["html_url"], "status":ping["status"], "comments":ping["comments"]})
 
 
 #
@@ -169,7 +169,8 @@ def run_civic_bot():
 
         ping = {
           "html_url":url["html_url"],
-          "status":post_on_github(get_github_post(url))
+          "status":post_on_github(get_github_post(url)),
+          "comments": url["comments"]
         }
         write_pinged_to_db(ping, db)
 

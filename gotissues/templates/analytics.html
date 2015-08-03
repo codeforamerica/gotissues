@@ -17,7 +17,32 @@
 
 <body>
 <div class="layout-breve">
-  <h1>Pinged Issues</h1>
+  <h1>Pinged Issues Analytics</h1>
+  <p> A way to see how issues are doing after we've pinged them </p>
+  <ul class="bricks bricks-cta bricks-3">
+    
+    <li class="brick badge-heading badge-blue">
+      <a class="brick-link">
+        <h4 class="brick-text">{{ data.total_pinged }}</h4>
+        <h2 class="brick-heading">Pinged Issues</h2>
+      </a>
+    </li>
+
+    <li class="brick badge-heading badge-red">
+      <a class="brick-link">
+        <h4 class="brick-text">{{ data.closed_pinged }}</h4>
+        <h2 class="brick-heading">Total Closed Issues</h2><h4> since we started pinging</h4>
+      </a>
+    </li>
+
+    <li class="brick badge-heading badge-dark-blue">
+      <a class="brick-link">
+        <h4 class="brick-text">{{ data.percentage_pinged }}%</h4>
+        <h2 class="brick-heading">Percentage Closed</h2>
+      </a>
+    </li>
+
+  </ul>
   <table>
     <tr>
       <th>Issue Url</th>
@@ -36,6 +61,7 @@
   
 <div class="layout-minim">
   <h1>Activity Verification</h1>
+  <p> An easier way to look at our activity table, either sorted by type of event or url </p>
 </div>
 <div class="layout-minim">
   <form action="/admin" method="post">

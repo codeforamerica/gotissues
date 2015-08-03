@@ -152,7 +152,7 @@ class GotIssuesTestCase(unittest.TestCase):
         issues_array.append(testdata.fake_issue_good)
         issues_array.append(testdata.fake_issue_bad)
         issues_array.append(testdata.fake_issue_bad_gov)
-        
+
         for issue in issues_array:
             print str(github_bot.get_github_post(issue)) + "\n"
 

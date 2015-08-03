@@ -116,7 +116,7 @@ def get_pinged_issues(db):
   return results
 
 #
-# db_results in admin
+# db_results in analytics
 #
 def get_all_activity(db):
   ''' Get all the activity '''
@@ -126,7 +126,7 @@ def get_all_activity(db):
   return results
 
 #
-# changing db_results in admin
+# changing db_results in analytiics
 #
 def get_edited_activity(db, order, category):
   ''' Get edited activity '''
@@ -153,3 +153,35 @@ def get_activity_summary(db):
   results = db.fetchall()
 
   return results
+
+#
+# data["total_pinged"] in analytics
+#
+def get_total_pinged(db):
+  ''' Pull out the number of closed issues from our database '''
+  q = ''' SELECT COUNT(*) FROM pinged_issues '''
+
+  db.execute(q)
+  total_count = db.fetchone()["count"]
+  return total_count
+
+#
+# data["closed_pinged"] in analytics
+#
+def get_issue_status(db, html_url):
+  ''' Pull out the number of closed issues from our database '''
+
+  q = ''' SELECT state FROM issues WHERE html_url=\'%s\'''' % (html_url)
+
+  db.execute(q)
+  issue_status = db.fetchone()["state"]
+  return issue_status
+
+def count_closed(db, issue_list):
+  total_closed = 0
+  for issue in issue_list:
+    status = get_issue_status(db, issue["html_url"])
+    if status =="closed":
+      total_closed += 1
+
+  return total_closed
