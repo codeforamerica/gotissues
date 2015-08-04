@@ -15,7 +15,7 @@ def index():
     for k in data.iterkeys():
         data[k] = get_analytics_query(k)
 
-    data["clicks_per_view"] = int(100 * int(data["total_clicks"])/float(int(data["total_page_views"])))
+    data["clicks_per_view"] = ("%.2f" % round(100 * int(data["total_clicks"])/float(int(data["total_page_views"])), 2))
     data["access_token"] = access_token
 
     no_results = 6
@@ -30,9 +30,10 @@ def index():
             data["open_count"] = get_open_count(db)
             data["closed_percent"] = int(100*float(data["closed_count"])/int(data["issue_count"]))
             data["top_clicks"] = get_most_clicked(db, 100)[:no_results]
-            data["least_clicks"] = get_least_clicked(db, 100)[:no_results]
-            data["closed_clicks"] = get_closed_clicked(db, 100)[:no_results]
+            data["least_clicks"] = get_least_clicked(db, 6)[:no_results]
+            data["closed_clicks"] = get_closed_clicked(db, 6)[:no_results]
             data["activity_summary"] = get_activity_summary(db)
+            print data["activity_summary"]
             data["pinged_issues"] = get_pinged_issues(db)
 
     return render_template("index.html", data=data)

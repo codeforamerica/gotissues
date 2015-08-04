@@ -68,10 +68,12 @@ def get_open_count(db):
 #
 def get_most_clicked(db, N):
   ''' Pull out the top N issues from our database '''
-  q = ''' SELECT html_url,clicks,views,title,labels,created_at,view_sources FROM issues WHERE views IS NOT NULL ORDER BY clicks DESC'''
+  q = ''' SELECT html_url,clicks,views,title,labels,created_at,view_sources,body,comments FROM issues WHERE views IS NOT NULL ORDER BY clicks DESC'''
   db.execute(q)
   most_count = db.fetchmany(size=N)
   for dic in most_count:
+    print dic["body"]
+    print "\n\n BREAK"
     dic["click-ratio"] = int(100*dic["clicks"]/float(dic["views"]))
     dic["created_at"] = dic["created_at"].strftime('%B %Y')
   return most_count
@@ -81,7 +83,7 @@ def get_most_clicked(db, N):
 #
 def get_least_clicked(db, N):
   ''' Pull out the bottom N issues from our database '''
-  q = ''' SELECT html_url,clicks,views,title,labels,created_at,view_sources FROM issues WHERE views IS NOT NULL ORDER BY clicks ASC'''
+  q = ''' SELECT html_url,clicks,views,title,labels,created_at,view_sources,body,comments FROM issues WHERE views IS NOT NULL ORDER BY clicks ASC'''
   db.execute(q)
   least_count = db.fetchmany(size=N)
   for dic in least_count:

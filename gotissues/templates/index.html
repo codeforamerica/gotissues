@@ -36,7 +36,8 @@
           <h2>Measuring Impact</h2>
         </div>
 
-        <ul class="bricks bricks-cta bricks-3">
+        <div class="layout-major-invert">
+          <ul class="bricks bricks-cta bricks-3">
           
           <li class="brick badge-heading badge-blue">
             <a class="brick-link">
@@ -59,6 +60,13 @@
               </a>
           </li>
         </ul>
+        </div>
+
+        <div class="layout-minor-invert block-teal">
+          <p class="icon-thumbs-up">Our Civic Issue Finder stats since August. We're getting a lot of traffic! <b>900 views</b> a month and <strong>30 people</strong> are looking at issues through this finder per day. Two people every day are trying to contribute to civic projects, and that's why it should be easy to.</p>
+        </div>
+
+        
       </div>
     </section>
 
@@ -110,6 +118,10 @@
                       {% endfor%}
                     </p></h4>
                 </a>
+                <div class="slab-dark-blue">
+                <p> people like to click on this, but it still hasn't been closed but also has {{stat["comments"]}} comments. Maybe that is what it is?</p>
+                <p> {{stat["body"]}}</p>
+              </div>
               </li>
             {% endfor %}
           </ul>
@@ -357,9 +369,9 @@ gapi.analytics.ready(function() {
    var clicks = new gapi.analytics.googleCharts.DataChart({
     query: {
       metrics: 'ga:totalEvents',
-      dimensions: 'ga:week',
+      dimensions: 'ga:date',
       filters : 'ga:eventCategory==Civic Issues',
-      sort : 'ga:week',
+      sort : 'ga:date',
       'start-date':'2014-08-24',
       'end-date': 'today'
     },
