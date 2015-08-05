@@ -53,7 +53,6 @@ choice_dict = {
     },
 
     "viewed_issues": {
-      'start_date' : 'today',
       'metrics':'ga:totalEvents',
       'dimensions':'ga:eventLabel',
       'sort':'-ga:totalEvents',
