@@ -146,37 +146,35 @@ def write_activity_summary_to_db(activity_info, db):
 
 if __name__ == '__main__':
 
-    # # Get todays clicked issues from Google Analytics
-    # clicked_issues = get_analytics_query("clicked_issues")
-    # # Get todays viewed issues from Google Analytics
-    # viewed_issues = get_analytics_query("viewed_issues")
+    # Get todays clicked issues from Google Analytics
+    clicked_issues = get_analytics_query("clicked_issues")
+    # Get todays viewed issues from Google Analytics
+    viewed_issues = get_analytics_query("viewed_issues")
 
-    # # Get the Github data for todays clicked issues, clicks, and views
-    # # Set the limit to 1 for testing
-    # github_issues = get_clicked_issue_github_data(clicked_issues, limit=None)
-    # trimmed_issues = trim_github_issues(github_issues)
-    # issues = add_views_to_issues(github_issues, viewed_issues)
+    # Get the Github data for todays clicked issues, clicks, and views
+    # Set the limit to 1 for testing
+    github_issues = get_clicked_issue_github_data(clicked_issues, limit=None)
+    trimmed_issues = trim_github_issues(github_issues)
+    issues = add_views_to_issues(github_issues, viewed_issues)
 
-    # # Get all of todays clicks
-    # clicks = get_analytics_query("all_clicks")
+    # Get all of todays clicks
+    clicks = get_analytics_query("all_clicks")
 
-    # # Get all of todays clicks activity
-    # activities = get_click_activity(clicks)
+    # Get all of todays clicks activity
+    activities = get_click_activity(clicks)
 
-    # # Write check each entry in the database and see if the status has changed
-    # run_civic_bot(True)
 
-    # Add each issue to the db
+    Add each issue to the db
     with connect(os.environ['DATABASE_URL']) as conn:
         with dict_cursor(conn) as db:
-            # for issue in issues:
-            #     write_issue_to_db(issue, db)
+            for issue in issues:
+                write_issue_to_db(issue, db)
 
-            # for click in clicks:
-            #     write_click_to_db(click,db)
+            for click in clicks:
+                write_click_to_db(click,db)
 
-            # for activity in activities:
-            #     write_activities_to_db(activity, db)
+            for activity in activities:
+                write_activities_to_db(activity, db)
 
             activity_summary = get_activity_summaries_array(db)
 
