@@ -63,7 +63,7 @@
         </div>
 
         <div class="layout-minor-invert block-teal">
-          <p class="icon-thumbs-up">Our Civic Issue Finder stats since August. We're getting a lot of traffic! <b>900 views</b> a month and <strong>30 people</strong> are looking at issues through this finder per day. Two people every day are trying to contribute to civic projects, and that's why it should be easy to.</p>
+          <p class="icon-search">We're getting a lot of traffic! Since Aug 2014, we've had <b>900 views</b> a month, meaning <strong>30 people</strong> per day. That means every day <b>2 people</b> find a real problem in civic projects that they can solve. The finder is one small portal in how we can facilitate these contributions.</p>
         </div>
 
         
@@ -75,14 +75,60 @@
         <div id="weeklyclicks" style="margin-top:11em">
           
           <div class="badge-heading badge-gray">
-            <h2>Breaking it Down</h2>
+            <h2>Civic Tech Contribution Can Be Trendy</h2>
           </div>
           
           <div id="embed-api-auth-container"></div>
           
-          <h3> Click Frequency By Month</h3>
+          <h3> Tracking Civic Issue Finder Views Over Time</h3>
           <div id="clickschart" ></div>
           <div id="view-selector-container" hidden></div>
+
+          <section class="slab-red">
+
+    <div class="layout-chimney">
+        
+          <div class="layout-minim-staccato slab-medium-red chimney">
+            
+              <div class="chimney-body">
+        
+                <blockquote class="twitter-tweet" lang="en"><p lang="en" dir="ltr">Use your coding skills to help solve civic problems at Code for America: <a href="http://t.co/ioGvoNbb2q">http://t.co/ioGvoNbb2q</a></p>&mdash; Lifehacker (@lifehacker) <a href="https://twitter.com/lifehacker/status/626815214885978112">July 30, 2015</a></blockquote>
+                <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+              
+              </div>
+              
+            </div>
+            
+            <div class="layout-minim-staccato">
+            
+              <h3 class="h4">How Do Trends Impact Issues</h3>
+              <p> A bunch of activity spikes can come from other organizations or people highlighting the fact that people can get into open civic tech projects easily. Empowerment of the ease and opprotunity is huge.</p>
+              
+              <ul class="list-no-bullets list-icons">
+
+                  <li class="icon-lamp"><a href="#">LifeHacker Article</a> 
+                    <a class="text-whisper" href="#">More national projects</a>
+                  </li>
+
+                  <li class="icon-lamp"><a href="#">Tim O'Reily Tweet</a> 
+                    <a class="text-whisper" href="#">More national projects</a>
+                  </li>
+
+                  <li class="icon-lamp"><a href="#">This week in Civic Tech</a> 
+                    <a class="text-whisper" href="#">More national projects</a>
+                  </li>
+
+                  <p> Generally, featuring what can be possible can help motivate </p>
+
+              </ul>
+           
+          </div>
+        
+    </div>
+    
+
+</section>
+
 
             <div class="badge-heading badge-glasses badge-gray">
               <h3> Top Embed Sources: Visualized</h3>
@@ -97,10 +143,46 @@
           </div>
 
           <div class="layout-breve">
-          <h2>What do Top Clicked Issues look like?</h2>
-          <p>If you want your issue to be clicked a lot when it's viewed, follow these guidlines for titles+labels</p>
-            <ul class="list-no-bullets layout-grid">
-            {%for stat in data["top_clicks"]%}
+            <h2>What Do Top Clicked Issues look like?</h2>
+            <p>We crunched the numbers around why people were more likely to click on civic tech issues after seeing them through the issue finder.</p>
+            <p class="icon-github2">labels to get people excited about contributing <span class="label">help wanted</span><span class="label">enhancement</span></p>
+            <p class="icon-github2">Utilize titles geared toward action, like the ones below. <strong>Active verbs</strong> plus <strong>relevant context</strong> about what your issue is specifically dealing with is key.</p>
+            <p> This allows people who are interested in completing specific actions to go to that issue and do that action.</p>
+
+            <div class="layout-minor block-dark-blue">
+              <p class="icon-thumbs-up">Top clicked issues have certain titles and labels were more conducive to being clicked on</p>
+              <p class="icon-thumbs-down">Top clicked issues have been open for a long time (many since Aug 2014) and there isn't a lot of comment activity. Since they're still open there may be something beyond the title/label preventing actual work being done that we could recommend. We <a href="/analytics">built a tool </a> to experiment with that.</p>
+            </div>
+
+            <div class="layout-major">
+              <ul class="list-no-bullets layout-grid">
+            {%for stat in data["top_clicks"][2:4]%}
+              <li class="layout-minim">
+                <a style="padding-bottom:.75em" class="billboard" href="{{stat["html_url"]}}">
+                  <strong style="padding-bottom:.75em" class="billboard-label">{{stat["title"]}}</strong>
+                  {% for label in stat["labels"] %}
+                      <div class="label">{{label.name}}</div>
+                    {% endfor %}
+                   <div id="stat-label" class="layout-grid">
+                  <div class="layout-crotchet"><h2> {{stat["clicks"]}} </h2> <p class="text-whisper"> Clicks since {{stat["created_at"]}}</p></div>
+                <div class="layout-crotchet"><h2>{{stat["views"]}}</h2><p class="text-whisper"> Views since June 2015</p></div>
+                <div class="layout-crotchet"><h2>{{stat["comments"]}}</h2><p class="text-whisper">Issue Comments</p></div></div>
+                <div>
+                <h6>
+                      {% for source in stat["view_sources"] %}
+                        {{source}}
+                      {% endfor%}
+                    </h6></div>
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+
+
+            </div>
+            <ul style="padding-top:0" class="list-no-bullets layout-grid">
+
+            {%for stat in data["top_clicks"][4:7]%}
               <li class="layout-crotchet">
                 <a style="padding-bottom:.75em" class="billboard" href="{{stat["html_url"]}}">
                   <strong style="padding-bottom:.75em" class="billboard-label">{{stat["title"]}}</strong>
@@ -108,20 +190,16 @@
                       <div class="label">{{label.name}}</div>
                     {% endfor %}
                    <div id="stat-label" class="layout-grid">
-                  <div class="layout-crotchet"><h2> {{stat["clicks"]}} </h2> <p class="text-whisper"> Clicks since Aug 2014</p></div>
+                  <div class="layout-crotchet"><h2> {{stat["clicks"]}} </h2> <p class="text-whisper"> Clicks since {{stat["created_at"]}}</p></div>
                 <div class="layout-crotchet"><h2>{{stat["views"]}}</h2><p class="text-whisper"> Views since June 2015</p></div>
-                <div class="layout-crotchet"><h2>{{stat["click-ratio"]}}%</h2><p class="text-whisper"> Clicks-to-Views Ratio</p></div></div>
-                <h4> Mostly viewed on
-                <p class="text-whisper">
+                <div class="layout-crotchet"><h2>{{stat["comments"]}}</h2><p class="text-whisper">Issue Comments</p></div></div>
+                <div>
+                <h6>
                       {% for source in stat["view_sources"] %}
                         {{source}}
                       {% endfor%}
-                    </p></h4>
+                    </h6></div>
                 </a>
-                <div class="slab-dark-blue">
-                <p> people like to click on this, but it still hasn't been closed but also has {{stat["comments"]}} comments. Maybe that is what it is?</p>
-                <p> {{stat["body"]}}</p>
-              </div>
               </li>
             {% endfor %}
           </ul>
@@ -129,38 +207,66 @@
           </div>
 
 
-          <div class="layout-breve layout-grid"> 
-          <h2>What do less popular Clicked Issues look like?</h3>
-          <p>If you don't want your issue to be clicked a lot, when it's viewed, avoid these things</p>
-          <ul class="list-no-bullets layout-grid">
-            {%for stat in data["least_clicks"]%}
-              <li class="layout-crotchet">
+          <div class="layout-breve">
+            <h2>What Do Less Popular Clicked Issues look like?</h2>
+            <p>We also crunched the numbers around why people were less likely to click on civic tech issues after seeing them through the issue finder.</p>
+            <p class="icon-github2"><b>caveat: </b> Just b/c they've been clicked less, doesn't mean they're not getting fixed. They just might be very new. Check out some examples below</p>
+
+            <div class="layout-minor block-dark-blue">
+              <p class="icon-thumbs-up">Maybe they're not getting viewed. Make sure to embed issues in an effective place. For example Code For San Francisco issues get the most attraction from the CFSF web site's widget embed!</p>
+              <p class="icon-thumbs-down">Issues that have been open a long time and aren't getting clicked are not good. That means their titles+labels aren't interesting enough AND/OR they aren't getting enough screen time</p>
+            </div>
+
+            <div class="layout-major">
+              <ul class="list-no-bullets layout-grid">
+            {%for stat in data["least_clicks"][4:6]%}
+              <li class="layout-minim">
                 <a style="padding-bottom:.75em" class="billboard" href="{{stat["html_url"]}}">
-                  <strong class="billboard-label">{{stat["title"]}}</strong>
-  
-                  
-                  {% if stat["labels"] %}
+                  <strong style="padding-bottom:.75em" class="billboard-label">{{stat["title"]}}</strong>
                   {% for label in stat["labels"] %}
                       <div class="label">{{label.name}}</div>
                     {% endfor %}
-                  {%else%}
-                  No labels!
-                  {%endif%}
-                    <div id="stat-label" class="layout-grid">
-                  <div class="layout-crotchet"><h2> {{stat["clicks"]}} </h2> <h2 class="text-whisper"> Clicks since {{stat.created_at}}</h2></div>
-                <div class="layout-crotchet"><h2>{{stat["views"]}}</h2><h2 class="text-whisper"> Views since June 2015</h2></div>
-                <div class="layout-crotchet"><h2>{{stat["click-ratio"]}}%</h2><h2 class="text-whisper"> Clicks-to-Views Ratio</h2></div>
-                </div>
-                <h2> Mostly viewed on
-                <p class="text-whisper">
+                   <div id="stat-label" class="layout-grid">
+                  <div class="layout-crotchet"><h2> {{stat["clicks"]}} </h2> <p class="text-whisper"> Clicks since {{stat["created_at"]}}</p></div>
+                <div class="layout-crotchet"><h2>{{stat["views"]}}</h2><p class="text-whisper"> Views since June 2015</p></div>
+                <div class="layout-crotchet"><h2>{{stat["comments"]}}</h2><p class="text-whisper">Issue Comments</p></div></div>
+                <div>
+                <h6>
                       {% for source in stat["view_sources"] %}
                         {{source}}
                       {% endfor%}
-                    </p></h2>
+                    </h6></div>
                 </a>
               </li>
             {% endfor %}
           </ul>
+
+
+            </div>
+            <ul style="padding-top:0" class="list-no-bullets layout-grid">
+
+            {%for stat in data["least_clicks"][6:9]%}
+              <li class="layout-crotchet">
+                <a style="padding-bottom:.75em" class="billboard" href="{{stat["html_url"]}}">
+                  <strong style="padding-bottom:.75em" class="billboard-label">{{stat["title"]}}</strong>
+                  {% for label in stat["labels"] %}
+                      <div class="label">{{label.name}}</div>
+                    {% endfor %}
+                   <div id="stat-label" class="layout-grid">
+                  <div class="layout-crotchet"><h2> {{stat["clicks"]}} </h2> <p class="text-whisper"> Clicks since {{stat["created_at"]}}</p></div>
+                <div class="layout-crotchet"><h2>{{stat["views"]}}</h2><p class="text-whisper"> Views since June 2015</p></div>
+                <div class="layout-crotchet"><h2>{{stat["comments"]}}</h2><p class="text-whisper">Issue Comments</p></div></div>
+                <div>
+                <h6>
+                      {% for source in stat["view_sources"] %}
+                        {{source}}
+                      {% endfor%}
+                    </h6></div>
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+          
           </div>
 
         <div class="layout-breve">
@@ -207,7 +313,7 @@
           <h2>What do closed clicked Issues look like?</h3>
           <p>If you don't want your issue to be closed eventually, check out these things</p>
           <ul class="list-no-bullets layout-grid">
-            {%for stat in data["closed_clicks"]|sort(attribute='days_open')%}
+            {%for stat in data["closed_clicks"][:6]|sort(attribute='days_open')%}
               <li class="layout-crotchet">
                 <a style="padding-bottom:.75em" class="billboard" href="{{stat["html_url"]}}">
                   <strong class="billboard-label">{{stat["title"]}}</strong>
@@ -395,7 +501,7 @@ gapi.analytics.ready(function() {
     renderTopSourcesChart(ids);
   });
 
-  function renderTopSourcesChart(ids) {
+function renderTopSourcesChart(ids) {
     query({
       'ids': ids,
       'dimensions': 'ga:eventLabel',

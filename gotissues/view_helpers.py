@@ -72,8 +72,8 @@ def get_most_clicked(db, N):
   db.execute(q)
   most_count = db.fetchmany(size=N)
   for dic in most_count:
-    print dic["body"]
-    print "\n\n BREAK"
+    #print dic["body"]
+    #print "\n\n BREAK"
     dic["click-ratio"] = int(100*dic["clicks"]/float(dic["views"]))
     dic["created_at"] = dic["created_at"].strftime('%B %Y')
   return most_count
@@ -199,7 +199,7 @@ def check_issues(db, ping):
 
   check_ping = check_pinged_status(db, ping["html_url"])
 
-  if ping["comments"]:
+  if ping.get("comments"):
     if ping["comments"] - check_ping["comments"] > 1:
       comment_delta = ping["comments"] - check_ping["comments"]
     else:
