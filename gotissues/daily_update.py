@@ -164,7 +164,7 @@ if __name__ == '__main__':
     activities = get_click_activity(clicks)
 
 
-    Add each issue to the db
+    #Add each issue to the db
     with connect(os.environ['DATABASE_URL']) as conn:
         with dict_cursor(conn) as db:
             for issue in issues:
