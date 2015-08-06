@@ -194,7 +194,7 @@
               <ul class="list-no-bullets layout-grid">
             {%for stat in data["least_clicks"][4:7]%}
               <li class="layout-crotchet">
-                <a style="padding-bottom:.75em" class="billboard" href="{{stat["html_url"]}}">
+                <a target="_blank" style="padding-bottom:.75em" class="billboard" href="{{stat["html_url"]}}">
                   <strong style="padding-bottom:.75em" class="billboard-label">{{stat["title"]}}</strong>
                   {% for label in stat["labels"] %}
                       <div class="label">{{label.name}}</div>
@@ -268,13 +268,15 @@
           <h2>What do closed clicked Issues look like?</h3>
           <p>Now, here's the goal of the finder, getting those issues fixed! Looking at properties of successfully closed issues </p>
            <div class="block-dark-blue">
-            <p class="icon-thumbs-up">Patience! On average, it takes {{data["average_to_close"]}} days for issues to get closed</p>
-
+            <h4> Lessons Learned About Closed Issues </h4>
+            <p class="icon-alarm">Patience: On average, it takes {{data["average_to_close"]}} days for issues to get closed</p>
+            <p class="icon-bubble">Clarity: They used good titles and labels <i>and their Github explanations described the issue well</i></p>
+            <p class="icon-users"> Responsiveness: When somone replies to an issue, being on top of answering questions helps contributors finish the task </p>
            </div>
           <ul class="list-no-bullets layout-grid">
-            {%for stat in data["closed_clicks"][:3]|sort(attribute='days_open')%}
+            {%for stat in data["closed_clicks"][0:3]|sort(attribute='days_open')%}
               <li class="layout-crotchet">
-                <a style="padding-bottom:.75em" class="billboard" href="{{stat["html_url"]}}">
+                <a target="_blank" style="padding-bottom:.75em" class="billboard" href="{{stat["html_url"]}}">
                   <strong class="billboard-label">{{stat["title"]}}</strong>
                   {% if stat["labels"] %}
                   {% for label in stat["labels"] %}
