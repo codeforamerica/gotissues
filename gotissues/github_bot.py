@@ -91,7 +91,7 @@ def get_github_post(url):
     Can this issue be closed or does it still need some assistance? 
     \nIf you wrote this issue, you can always update the labels for specifying tasks, add more info in the description to make it easier to contribute, or re-write the title to make more contributors interested in helping out.
     If you are an open source contributor, ask and see how you can help by commenting or check out more open issues in this repo at [%s](%s). \n\n Just doing a little :seedling: open source gardening :seedling: of Brigade projects! 
-    For more info/tools for creating civic issues, check out [Got Issues](https://got-issues.herokuapp.com/) Thank you!''' % (clicks, top_source, top_source)
+    For more info/tools for creating civic issues, check out [Got Issues](https://got-issues.herokuapp.com/) Thank you!''' % (clicks, top_source, top_source, issues_url, issues_url)
     post = {
       "body": text
     }

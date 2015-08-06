@@ -35,14 +35,15 @@ def trim_github_issues(github_issues):
 def add_views_to_issues(trimmed_issues, viewed_issues):
     ''' Add the number of views and sources to each issue '''
     issues = []
+
     for issue in trimmed_issues:
         issue["views"] = None
         issue["view_sources"] = None
 
-    found = find(viewed_issues,"url",issue["html_url"])
-    if found:
-        issue["views"] = viewed_issues[found]["views"]
-        issue["view_sources"] = viewed_issues[found]["view_sources"]
+        found = find(viewed_issues,"url",issue["html_url"])
+        if found:
+            issue["views"] = viewed_issues[found]["views"]
+            issue["view_sources"] = viewed_issues[found]["view_sources"]
 
     return trimmed_issues
 
@@ -164,7 +165,7 @@ if __name__ == '__main__':
     activities = get_click_activity(clicks)
 
 
-    Add each issue to the db
+    #Add each issue to the db
     with connect(os.environ['DATABASE_URL']) as conn:
         with dict_cursor(conn) as db:
             for issue in issues:

@@ -57,7 +57,7 @@ choice_dict = {
       'dimensions':'ga:eventLabel',
       'sort':'-ga:totalEvents',
       'filters':'ga:eventCategory==Civic Issue View',
-      'max_results':20,
+      'max_results':10000,
       'fields':None
     },
 
@@ -92,7 +92,7 @@ choice_dict = {
 }
 
 def edit_request_query(choice_dict_query):
-  print "Asking GA for: " + choice_dict_query
+  print "Asking GA for: " + str(choice_dict_query)
   results = service.data().ga().get(
           ids="ga:" + GOOGLE_ANALYTICS_PROFILE_ID,
           start_date=choice_dict[choice_dict_query].get("start_date",'2014-08-23'),
@@ -203,13 +203,14 @@ def return_timestamp_dict(row):
 
 def get_github_with_auth(url, headers=None):
   ''' Get authorized by github'''
-  print "Asking github for: " + url
-  got = requests.get(url, auth=github_auth, headers=headers)
-  if got.status_code == 404:
-    print "404 Error: " + url 
-    return None
-  else:
-    return got
+  if url:
+    print "Asking github for: " + str(url)
+    got = requests.get(url, auth=github_auth, headers=headers)
+    if got.status_code == 404:
+      print "404 Error: " + url 
+      return None
+    else:
+      return got
 
 def github_html_url_to_api(url):
     """ Convert https://github.com links to https://api.gitub.com """
@@ -291,10 +292,39 @@ def check_events(trimmed_activity, activity_git):
 #
 # data["activity_summary"]
 #
+
+def get_activity_summaries_array_2(db):
+  ''' Get label/title/count summary info from db '''
+  activity_summary_array = []
+  results = get_closed_clicked(db, 1000)
+  activity_summary = get_activity_summary(db, results) #Multiple functions defined below
+  counts = get_activity_types(db)
+  titles = activity_summary["titles"]
+  labels = activity_summary["labels"]
+
+  for key,value in titles.iteritems():
+      new_dict = {
+          "activity_type": key,
+          "common_titles": value
+          }
+      activity_summary_array.append(new_dict)
+
+  for key,value in labels.iteritems():
+      for entry in activity_summary_array:
+          if key == entry["activity_type"]:
+              entry["common_labels"] = value
+
+  for key,value in counts.iteritems():
+      for entry in activity_summary_array:
+          if key == entry["activity_type"]:
+              entry["count"] = value
+  return activity_summary_array
+
 def get_activity_summaries_array(db):
   ''' Get label/title/count summary info from db '''
   activity_summary_array = []
-  activity_summary = get_activity_summary(db) #Multiple functions defined below
+  results = get_info_activity(db)
+  activity_summary = get_activity_summary(db, results) #Multiple functions defined below
   counts = get_activity_types(db)
   titles = activity_summary["titles"]
   labels = activity_summary["labels"]
@@ -337,8 +367,8 @@ def get_info_activity(db):
 
   return results
 
-def get_activity_summary(db):
-  results = get_info_activity(db)
+def get_activity_summary(db, results):
+  
   activities = {}
 
   for row in results:
@@ -446,3 +476,14 @@ def freq_function(string):
   sortedbyfrequency =  sorted(wordcount,key=wordcount.get,reverse=True)
 
   return wordcount, sortedbyfrequency
+
+
+#
+# Easier way to get clicked issues list
+#
+def get_clicked_issues_from_db(db):
+  ''' Get all the issues '''
+  db.execute(''' SELECT * FROM issues ORDER BY clicks''')
+  results = db.fetchall()
+
+  return results
