@@ -23,6 +23,7 @@
   </head>
 
   <body>
+    <!-- Header -->
     <header class="slab-blue">
       <div class="layout-breve">
         <h1>Got Issues?</h1>
@@ -30,6 +31,7 @@
       </div>
     </header>
 
+    <!-- Measuring Impact (Raw Stats) -->
     <section>
       <div class="layout-breve">
         <div class="badge-heading badge-graph badge-gray">
@@ -69,7 +71,9 @@
       </div>
     </section>
 
-      <div style="padding-top:0"class="layout-breve">
+
+    <!-- Views over Time -->
+      <div style="padding-top:0" class="layout-breve">
         <div id="topembeds">
         <div id="weeklyclicks" style="margin-top:11em"></div></div>
 
@@ -96,32 +100,28 @@
             
             <div class="layout-minim-staccato">
             
-              <h3 class="h4">How Do Trends Impact Issues</h3>
-              <p> A bunch of activity spikes can come from other organizations or people highlighting the fact that people can get into open civic tech projects easily. Empowerment of the ease and opprotunity is huge.</p>
+              <h3 class="h4">How Do Trends Impact Issues Over Time</h3>
+              <p> A bunch of activity spikes can come from other organizations or people highlighting the fact that people can get into open civic tech projects easily. Empowerment of the <b>ease</b> and <b>opportunity</b> is huge.</p>
               
               <ul class="list-no-bullets list-icons">
 
-                  <li class="icon-lamp"><a href="#">LifeHacker Article</a> 
-                    <a class="text-whisper" href="#">More national projects</a>
+                  <li class="icon-lamp"><a href="http://lifehacker.com/use-your-coding-skills-to-help-solve-civic-problems-at-1721090273">LifeHacker Article</a> 
+                    
                   </li>
 
-                  <li class="icon-lamp"><a href="#">Tim O'Reily Tweet</a> 
-                    <a class="text-whisper" href="https://twitter.com/timoreilly/status/525722083045564418">More national projects</a>
+                  <li class="icon-lamp"><a href="https://twitter.com/timoreilly/status/525722083045564418">Tim O'Reily Tweet</a> 
                   </li>
 
-                  <li class="icon-lamp"><a href="#">This week in Civic Tech</a> 
-                    <a class="text-whisper" href="#">More national projects</a>
+                  <li class="icon-lamp"><a href="https://docs.google.com/presentation/d/1REVYDSRU0CBhtmgOTDRb2CJJHkyA-Lfo6mtZas6X8kc/">This week in Civic Tech</a> 
                   </li>
 
-                  <p> Generally, featuring what can be possible can help motivate </p>
+                  <p> Generally, featuring what can be possible can help motivate people to take a leap and contribute!</p>
 
               </ul>
            
           </div>
         
     </div>
-
-
     
 
 </section>
@@ -152,8 +152,8 @@
           <div class="layout-major" style="width:70%">
             <h2>What Do Top Clicked Issues look like?</h2>
             <p>We crunched the numbers around why people were more likely to click on civic tech issues after seeing them through the issue finder.</p>
-            <p class="icon-github2">labels to get people excited about contributing and clicking on issues <span class="label">help wanted</span><span class="label">enhancement</span></p>
-            <p class="icon-github2">Utilize titles geared toward action, like the ones below. <strong>Active verbs</strong> plus <strong>relevant context</strong> about what your issue is specifically dealing with is key. This allows people who are interested in completing specific actions to go to that issue and do that action.</p>
+            <p class="icon-github2">Labels that get people excited about contributing and clicking on issues <span class="label">help wanted</span><span class="label">enhancement</span></p>
+            <p class="icon-github2">Titles geared toward action, like the actual examples below. <strong>Active verbs</strong> plus <strong>relevant context</strong> about what your issue is specifically dealing with is key. This allows people who are interested in completing specific actions to go to that issue and do that action.</p>
 
               <ul class="list-no-bullets layout-grid">
             {%for stat in data["top_clicks"][2:5]%}
@@ -189,7 +189,7 @@
 
             <h2>What Do Less Popular Clicked Issues look like?</h2>
             <p>We also crunched the numbers around why people were less likely to click on civic tech issues after seeing them through the issue finder.</p>
-            <p class="icon-github2"><b>caveat: </b> Just b/c they've been clicked less, doesn't mean they're not getting fixed. They just might be very new. Check out some examples below</p>
+            <p class="icon-github2"><b>caveat: </b> Just because they've been clicked less, doesn't mean they're not getting fixed. They just might be very new. Check out some examples below</p>
 
               <ul class="list-no-bullets layout-grid">
             {%for stat in data["least_clicks"][4:7]%}
@@ -220,7 +220,7 @@
             <div class="layout-minor-invert block-dark-blue" style="width:20%">
               <h4> Lessons Learned about Least Clicked Issues </h4>
               <p class="icon-thumbs-up">Maybe they're not getting viewed. Make sure to embed issues in an effective place. For example Code For San Francisco issues get the most attraction from the CFSF web site's widget embed!</p>
-              <p class="icon-thumbs-down">Issues that have been open a long time and aren't getting clicked are not good. That means their titles+labels aren't interesting enough AND/OR they aren't getting enough screen time</p>
+              <p class="icon-thumbs-down">Issues that have been open a long time and aren't getting clicked are not good. That means their titles and labels aren't interesting enough and/or they aren't getting enough screen time</p>
             </div>
            
           </div>
@@ -266,12 +266,12 @@
 
           <div class="layout-breve layout-grid"> 
           <h2>What do closed clicked Issues look like?</h3>
-          <p>Now, here's the goal of the finder, getting those issues fixed! Looking at properties of successfully closed issues </p>
+          <p>Now, here's the goal of the finder, getting those issues fixed! Looking at properties of successfully closed issues yields specific</p>
            <div class="block-dark-blue">
             <h4> Lessons Learned About Closed Issues </h4>
-            <p class="icon-alarm">Patience: On average, it takes {{data["average_to_close"]}} days for issues to get closed</p>
-            <p class="icon-bubble">Clarity: They used good titles and labels <i>and their Github explanations described the issue well</i></p>
-            <p class="icon-users"> Responsiveness: When somone replies to an issue, being on top of answering questions helps contributors finish the task </p>
+            <p class="icon-alarm">Patience: On average, it takes <b>{{data["average_to_close"]}} days</b> for issues to get closed</p>
+            <p class="icon-bubble">Clarity: They used good titles and labels and their explanations on Github <i>described the issue well</i></p>
+            <p class="icon-users"> Responsiveness: When somone replies to an issue, the writer being on top of answering questions helps contributors finish the task.</p>
            </div>
           <ul class="list-no-bullets layout-grid">
             {%for stat in data["closed_clicks"][0:3]|sort(attribute='days_open')%}
@@ -311,9 +311,14 @@
         </div>
 
         <h2>Caused by a Click</h2>
-        <p>Measuring all activity on a repo within <b>24 hours of a click</b> 
+        <p>Measuring all activity on a repository within <b>24 hours of a click</b> 
           related to that particular issue that was clicked on.
         </p>
+
+        <div class="block-dark-blue">
+          <h4> Relating Specific Actions To Clicks </h4>
+          <p> Not precise: it's hard to determine what exactly happened after someone clicks because for the most part, people don't commit to action right away </p>
+        </div>
         
         <div class="layout-grid">
           {% for activity in data["activity_summary"]|sort(reverse=True, attribute='count') %}
@@ -448,7 +453,7 @@ gapi.analytics.ready(function() {
       options: {
         legend: null,
         width: '100%',
-        title:'Number Of Times All Issues Have Been Clicked by Month'
+        title:'Number Of Times All Issues Have Been Clicked over Time'
       }
     }
   });
