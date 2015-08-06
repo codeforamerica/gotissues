@@ -3,6 +3,7 @@ from data_helpers import *
 from view_helpers import *
 from gotissues import app
 from flask import render_template, request
+from datetime import timedelta
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -15,7 +16,7 @@ def index():
     for k in data.iterkeys():
         data[k] = get_analytics_query(k)
 
-    data["clicks_per_view"] = ("%.2f" % round(100 * int(data["total_clicks"])/float(int(data["total_page_views"])), 2))
+    data["clicks_per_view"] = ("%.0f" % round(100 * int(data["total_clicks"])/float(int(data["total_page_views"])), 2))
     data["access_token"] = access_token
 
     no_results = 9
@@ -31,10 +32,19 @@ def index():
             data["closed_percent"] = int(100*float(data["closed_count"])/int(data["issue_count"]))
             data["top_clicks"] = get_most_clicked(db, 100)[:no_results]
             data["least_clicks"] = get_least_clicked(db, 12)[:no_results]
-            data["closed_clicks"] = get_closed_clicked(db, 12)[:no_results]
+            data["closed_clicks"] = get_closed_clicked(db, 1000)
             data["activity_summary"] = get_activity_summary(db)
             #print data["activity_summary"]
             data["pinged_issues"] = get_pinged_issues(db)
+
+
+            total_time = timedelta(seconds=0)
+            for time in data["closed_clicks"]:
+                delta = time["closed"] - time["created"]
+                total_time += delta
+
+            data["average_to_close"] = (total_time/len(data["closed_clicks"])).days
+
 
     return render_template("index.html", data=data)
 

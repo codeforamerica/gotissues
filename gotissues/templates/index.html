@@ -38,7 +38,7 @@
 
         <div class="layout-major-invert">
           <ul class="bricks bricks-cta bricks-3">
-          
+
           <li class="brick badge-heading badge-blue">
             <a class="brick-link">
               <h4 class="brick-text">{{ data.total_clicks }}</h4>
@@ -52,44 +52,39 @@
               <h2 class="brick-heading">Total Page Views</h2>
             </a>
           </li>
-    
+
           <li class="brick badge-heading badge-dark-blue">
               <a class="brick-link">
                   <h4 class="brick-text">{{ data.clicks_per_view }}%</h4>
                   <h2 class="brick-heading">Clicks Per Page View</h2>
               </a>
           </li>
-        </ul>
-        </div>
+		</ul>
+    </div>
 
         <div class="layout-minor-invert block-teal">
           <p class="icon-search">We're getting a lot of traffic! Since Aug 2014, we've had <b>900 views</b> a month, meaning <strong>30 people</strong> per day. That means every day <b>2 people</b> find a real problem in civic projects that they can solve. The finder is one small portal in how we can facilitate these contributions.</p>
         </div>
 
-        
       </div>
     </section>
 
       <div style="padding-top:0"class="layout-breve">
         <div id="topembeds">
-        <div id="weeklyclicks" style="margin-top:11em">
-          
+        <div id="weeklyclicks" style="margin-top:11em"></div></div>
+
           <div class="badge-heading badge-gray">
             <h2>Civic Tech Contribution Can Be Trendy</h2>
           </div>
-          
           <div id="embed-api-auth-container"></div>
-          
           <h3> Tracking Civic Issue Finder Views Over Time</h3>
           <div id="clickschart" ></div>
-          <div id="view-selector-container" hidden></div>
+          <div id="view-selector-container" hidden></div></div>
 
           <section class="slab-red">
 
     <div class="layout-chimney">
-        
           <div class="layout-minim-staccato slab-medium-red chimney">
-            
               <div class="chimney-body">
         
                 <blockquote class="twitter-tweet" lang="en"><p lang="en" dir="ltr">Use your coding skills to help solve civic problems at Code for America: <a href="http://t.co/ioGvoNbb2q">http://t.co/ioGvoNbb2q</a></p>&mdash; Lifehacker (@lifehacker) <a href="https://twitter.com/lifehacker/status/626815214885978112">July 30, 2015</a></blockquote>
@@ -111,7 +106,7 @@
                   </li>
 
                   <li class="icon-lamp"><a href="#">Tim O'Reily Tweet</a> 
-                    <a class="text-whisper" href="#">More national projects</a>
+                    <a class="text-whisper" href="https://twitter.com/timoreilly/status/525722083045564418">More national projects</a>
                   </li>
 
                   <li class="icon-lamp"><a href="#">This week in Civic Tech</a> 
@@ -125,15 +120,19 @@
           </div>
         
     </div>
+
+
     
 
 </section>
+
+    <div class="layout-breve">
 
 
             <div class="badge-heading badge-glasses badge-gray">
               <h3> Top Embed Sources: Visualized</h3>
             </div>
-            <div class="layout-semibreve">
+
             <div class="layout-minim">
               <div id="chart-4-container"></div>
             </div>
@@ -143,48 +142,23 @@
           </div>
 
           <div class="layout-breve">
+          <div class="layout-minor block-dark-blue">
+              <h4> Lessons Learned about Top Clicked Issues </h4>
+              <p class="icon-thumbs-up">Top clicked issues have <i>certain titles and labels</i> that were <i>more conducive</i> to being clicked on</p>
+              <p class="icon-thumbs-down">Top clicked issues have been open for a long time (many since Aug 2014). Since these issues are still open, there may be something beyond the title/label preventing actual work being done. </p>
+              <p class="icon-thumbs-down"> Top clicked issues don't have a ton of recent comment activity (or any activity at all). There is something about the nature of the issue that prevents having a productive conversation about that issue. </p> 
+            </div>
+
+          <div class="layout-major" style="width:70%">
             <h2>What Do Top Clicked Issues look like?</h2>
             <p>We crunched the numbers around why people were more likely to click on civic tech issues after seeing them through the issue finder.</p>
-            <p class="icon-github2">labels to get people excited about contributing <span class="label">help wanted</span><span class="label">enhancement</span></p>
-            <p class="icon-github2">Utilize titles geared toward action, like the ones below. <strong>Active verbs</strong> plus <strong>relevant context</strong> about what your issue is specifically dealing with is key.</p>
-            <p> This allows people who are interested in completing specific actions to go to that issue and do that action.</p>
+            <p class="icon-github2">labels to get people excited about contributing and clicking on issues <span class="label">help wanted</span><span class="label">enhancement</span></p>
+            <p class="icon-github2">Utilize titles geared toward action, like the ones below. <strong>Active verbs</strong> plus <strong>relevant context</strong> about what your issue is specifically dealing with is key. This allows people who are interested in completing specific actions to go to that issue and do that action.</p>
 
-            <div class="layout-minor block-dark-blue">
-              <p class="icon-thumbs-up">Top clicked issues have certain titles and labels were more conducive to being clicked on</p>
-              <p class="icon-thumbs-down">Top clicked issues have been open for a long time (many since Aug 2014) and there isn't a lot of comment activity. Since they're still open there may be something beyond the title/label preventing actual work being done that we could recommend. We <a href="/analytics">built a tool </a> to experiment with that.</p>
-            </div>
-
-            <div class="layout-major">
               <ul class="list-no-bullets layout-grid">
-            {%for stat in data["top_clicks"][2:4]%}
-              <li class="layout-minim">
-                <a style="padding-bottom:.75em" class="billboard" href="{{stat["html_url"]}}">
-                  <strong style="padding-bottom:.75em" class="billboard-label">{{stat["title"]}}</strong>
-                  {% for label in stat["labels"] %}
-                      <div class="label">{{label.name}}</div>
-                    {% endfor %}
-                   <div id="stat-label" class="layout-grid">
-                  <div class="layout-crotchet"><h2> {{stat["clicks"]}} </h2> <p class="text-whisper"> Clicks since {{stat["created_at"]}}</p></div>
-                <div class="layout-crotchet"><h2>{{stat["views"]}}</h2><p class="text-whisper"> Views since June 2015</p></div>
-                <div class="layout-crotchet"><h2>{{stat["comments"]}}</h2><p class="text-whisper">Issue Comments</p></div></div>
-                <div>
-                <h6>
-                      {% for source in stat["view_sources"] %}
-                        {{source}}
-                      {% endfor%}
-                    </h6></div>
-                </a>
-              </li>
-            {% endfor %}
-          </ul>
-
-
-            </div>
-            <ul style="padding-top:0" class="list-no-bullets layout-grid">
-
-            {%for stat in data["top_clicks"][4:7]%}
+            {%for stat in data["top_clicks"][2:5]%}
               <li class="layout-crotchet">
-                <a style="padding-bottom:.75em" class="billboard" href="{{stat["html_url"]}}">
+                <a style="padding-bottom:.75em" class="billboard" target="_blank" href="{{stat["html_url"]}}">
                   <strong style="padding-bottom:.75em" class="billboard-label">{{stat["title"]}}</strong>
                   {% for label in stat["labels"] %}
                       <div class="label">{{label.name}}</div>
@@ -203,49 +177,22 @@
               </li>
             {% endfor %}
           </ul>
-          
+
+
           </div>
+  </div>
 
 
           <div class="layout-breve">
+
+            <div class="layout-major-invert" style="width:70%">
+
             <h2>What Do Less Popular Clicked Issues look like?</h2>
             <p>We also crunched the numbers around why people were less likely to click on civic tech issues after seeing them through the issue finder.</p>
             <p class="icon-github2"><b>caveat: </b> Just b/c they've been clicked less, doesn't mean they're not getting fixed. They just might be very new. Check out some examples below</p>
 
-            <div class="layout-minor block-dark-blue">
-              <p class="icon-thumbs-up">Maybe they're not getting viewed. Make sure to embed issues in an effective place. For example Code For San Francisco issues get the most attraction from the CFSF web site's widget embed!</p>
-              <p class="icon-thumbs-down">Issues that have been open a long time and aren't getting clicked are not good. That means their titles+labels aren't interesting enough AND/OR they aren't getting enough screen time</p>
-            </div>
-
-            <div class="layout-major">
               <ul class="list-no-bullets layout-grid">
-            {%for stat in data["least_clicks"][4:6]%}
-              <li class="layout-minim">
-                <a style="padding-bottom:.75em" class="billboard" href="{{stat["html_url"]}}">
-                  <strong style="padding-bottom:.75em" class="billboard-label">{{stat["title"]}}</strong>
-                  {% for label in stat["labels"] %}
-                      <div class="label">{{label.name}}</div>
-                    {% endfor %}
-                   <div id="stat-label" class="layout-grid">
-                  <div class="layout-crotchet"><h2> {{stat["clicks"]}} </h2> <p class="text-whisper"> Clicks since {{stat["created_at"]}}</p></div>
-                <div class="layout-crotchet"><h2>{{stat["views"]}}</h2><p class="text-whisper"> Views since June 2015</p></div>
-                <div class="layout-crotchet"><h2>{{stat["comments"]}}</h2><p class="text-whisper">Issue Comments</p></div></div>
-                <div>
-                <h6>
-                      {% for source in stat["view_sources"] %}
-                        {{source}}
-                      {% endfor%}
-                    </h6></div>
-                </a>
-              </li>
-            {% endfor %}
-          </ul>
-
-
-            </div>
-            <ul style="padding-top:0" class="list-no-bullets layout-grid">
-
-            {%for stat in data["least_clicks"][6:9]%}
+            {%for stat in data["least_clicks"][4:7]%}
               <li class="layout-crotchet">
                 <a style="padding-bottom:.75em" class="billboard" href="{{stat["html_url"]}}">
                   <strong style="padding-bottom:.75em" class="billboard-label">{{stat["title"]}}</strong>
@@ -256,7 +203,7 @@
                   <div class="layout-crotchet"><h2> {{stat["clicks"]}} </h2> <p class="text-whisper"> Clicks since {{stat["created_at"]}}</p></div>
                 <div class="layout-crotchet"><h2>{{stat["views"]}}</h2><p class="text-whisper"> Views since June 2015</p></div>
                 <div class="layout-crotchet"><h2>{{stat["comments"]}}</h2><p class="text-whisper">Issue Comments</p></div></div>
-                <div>
+                <br><div>
                 <h6>
                       {% for source in stat["view_sources"] %}
                         {{source}}
@@ -266,11 +213,21 @@
               </li>
             {% endfor %}
           </ul>
-          
+
+
+            </div>
+
+            <div class="layout-minor-invert block-dark-blue" style="width:20%">
+              <h4> Lessons Learned about Least Clicked Issues </h4>
+              <p class="icon-thumbs-up">Maybe they're not getting viewed. Make sure to embed issues in an effective place. For example Code For San Francisco issues get the most attraction from the CFSF web site's widget embed!</p>
+              <p class="icon-thumbs-down">Issues that have been open a long time and aren't getting clicked are not good. That means their titles+labels aren't interesting enough AND/OR they aren't getting enough screen time</p>
+            </div>
+           
           </div>
 
         <div class="layout-breve">
           <h2>Have issues been getting help?</h2>
+
         <div style="margin-bottom:0" class="layout-minim">
           <div class="layout-minim">
           <div id="stats">
@@ -284,11 +241,9 @@
             <h2 class="brick-heading">Open Civic Issues</h2>
           </div>
         </div>
-        
 
         </div>
 
-    
       <div style="margin-bottom:0" class="layout-minim">
       <div class="layout-minim">
       <div id="stats">
@@ -311,9 +266,13 @@
 
           <div class="layout-breve layout-grid"> 
           <h2>What do closed clicked Issues look like?</h3>
-          <p>If you don't want your issue to be closed eventually, check out these things</p>
+          <p>Now, here's the goal of the finder, getting those issues fixed! Looking at properties of successfully closed issues </p>
+           <div class="block-dark-blue">
+            <p class="icon-thumbs-up">Patience! On average, it takes {{data["average_to_close"]}} days for issues to get closed</p>
+
+           </div>
           <ul class="list-no-bullets layout-grid">
-            {%for stat in data["closed_clicks"][:6]|sort(attribute='days_open')%}
+            {%for stat in data["closed_clicks"][:3]|sort(attribute='days_open')%}
               <li class="layout-crotchet">
                 <a style="padding-bottom:.75em" class="billboard" href="{{stat["html_url"]}}">
                   <strong class="billboard-label">{{stat["title"]}}</strong>

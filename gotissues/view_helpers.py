@@ -101,6 +101,8 @@ def get_closed_clicked(db, N):
   closed = db.fetchmany(size=N)
   for dic in closed:
     dic["days_open"] = (dic["closed_at"] - dic["created_at"]).days
+    dic["created"] = dic["created_at"]
+    dic["closed"] = dic["closed_at"]
     dic["created_at"] = dic["created_at"].strftime('%B %Y')
     dic["closed_at"] = dic["closed_at"].strftime('%B %Y')
 
