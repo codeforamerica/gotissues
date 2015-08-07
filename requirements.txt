@@ -4,3 +4,4 @@ pyOpenSSL
 gunicorn
 requests
 psycopg2
+markdown

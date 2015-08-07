@@ -2,8 +2,10 @@
 from data_helpers import *
 from view_helpers import *
 from gotissues import app
-from flask import render_template, request
+from flask import render_template, request, Markup
 from datetime import timedelta
+
+import markdown
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -57,12 +59,30 @@ def analytics():
     if request.method == "POST":
         with connect(os.environ['DATABASE_URL']) as conn:
             with dict_cursor(conn) as db:
+                data["sources"] = get_top_sources(db)
+                data["activities"] = get_activity_types(db)
+                data["issue_count"] = get_total_count(db)
+                data["closed_count"] = get_closed_count(db)
+                data["open_count"] = get_open_count(db)
+                data["closed_percent"] = int(100*float(data["closed_count"])/int(data["issue_count"]))
+                data["top_clicks"] = get_most_clicked(db, 100)[:no_results]
+                data["least_clicks"] = get_least_clicked(db, 12)[:no_results]
+                data["closed_clicks"] = get_closed_clicked(db, 1000)
+                data["activity_summary"] = get_activity_summary(db)
+                #print data["activity_summary"]
                 data["pinged_issues"] = get_pinged_issues(db)
-                data["comment_delta"] = check_issues(db)["comment_delta"]
-                data["state_delta"] = check_issues(db)["state_delta"]
-                data["total_pinged"] = get_total_pinged(db)
-                data["closed_pinged"] = count_closed(db, data["pinged_issues"])
-                data["percentage_pinged"] = 100 * (float(data["closed_pinged"])/data["total_pinged"])
+
+
+                total_time = timedelta(seconds=0)
+                for time in data["closed_clicks"]:
+                    delta = time["closed"] - time["created"]
+                    total_time += delta
+
+                data["average_to_close"] = (total_time/len(data["closed_clicks"])).days
+
+                for date in data["pinged_issues"]:
+                    date["date_pinged"] = date["date_pinged"].strftime('%B %d %Y')
+                    #date["state"] = get_issue_status(date["html_url"])
                 
                 category = request.form['category']
                 order = request.form['radio']
@@ -71,10 +91,6 @@ def analytics():
                     result['time_after'] = int((result['activity_timestamp'] - result['click_timestamp']).total_seconds()/60)
                     result['activity_timestamp'] = str(result['activity_timestamp'])
                     result['click_timestamp'] = str(result['click_timestamp'])
-
-                for date in data["pinged_issues"]:
-                    date["date_pinged"] = date["date_pinged"].strftime('%B %d %Y')
-                    #date["state"] = get_issue_status(date["html_url"])
 
     else:
         with connect(os.environ['DATABASE_URL']) as conn:
@@ -100,3 +116,21 @@ def analytics():
 
 
     return render_template("analytics.html", db_results=db_results, data=data)
+
+@app.route("/cheatsheet", methods=["GET", "POST"])
+def cheatsheet():
+    data = {}
+    if request.method == "POST":
+        data['title'] = request.form.get("title", None)
+        data['description'] = request.form.get("description", "This is a Markdown rendering of what you're submitting")
+        data["content"] = Markup(markdown.markdown(data['description']))
+        print data
+    
+    else:
+        data['title'] = request.form.get("title", None)
+        data['description'] = request.form.get("description", "This is a Markdown rendering of what you're submitting")
+        data["content"] = Markup(markdown.markdown(data['description']))
+        print data
+    
+
+    return render_template("cheatsheet.html", **locals())
