@@ -46,6 +46,21 @@ class GotIssuesTestCase(unittest.TestCase):
         for k in testdata.bad_sample_dict.iterkeys():
             testdata.bad_sample_dict[k] = data_helpers.get_analytics_query(k)
             self.assertEqual(testdata.bad_sample_dict[k], error)
+
+    def test_writing_good_GA_request(self):
+        ''' Test for logic of writing to GA since we don't wanna request to GA'''
+        def check_query(choice):
+            if choice == "total_clicks":
+                return {"row": 9000}
+
+            elif choice == "viewed_issues_total":
+                return {"html_url":"https://github.com/codeforamerica/gotissues/issues/1", "views":9000}
+
+        for k in testdata.good_sample_dict.iterkeys():
+            testdata.good_sample_dict[k] = check_query(k)
+
+        self.assertEqual(testdata.good_sample_dict["total_clicks"]["row"], 9000)
+        self.assertEqual(testdata.good_sample_dict["viewed_issues_total"]["views"], 9000)
     
 
     def test_write_timestamp(self):
@@ -56,14 +71,6 @@ class GotIssuesTestCase(unittest.TestCase):
         results = json.dumps(timestamp_response, sort_keys=True, indent=4)
 
         self.assertEqual(control, results)
-
-
-    '''def test_writing_good_GA_request(self):
-        Test that fetching from GA is working
-
-        for k in good_sample_dict.iterkeys():
-            good_sample_dict[k] = get_analytics_query(k)
-            self.assertEqual(good_sample_dict[k], error)'''
 
 
     #
@@ -148,13 +155,12 @@ class GotIssuesTestCase(unittest.TestCase):
         self.assertEqual(expected_final, returned_array)
 
     def test_post_body_to_github(self):
-        issues_array = []
-        issues_array.append(testdata.fake_issue_good)
-        issues_array.append(testdata.fake_issue_bad)
-        issues_array.append(testdata.fake_issue_bad_gov)
+        results_array = []
+        results_array.append(github_bot.get_github_post(testdata.fake_issue_bad))
+        results_array.append(github_bot.get_github_post(testdata.fake_issue_good))
 
-        for issue in issues_array:
-            print str(github_bot.get_github_post(issue)) + "\n"
+        self.assertEqual(results_array[0], "error")
+        self.assertNotEqual(results_array[1]['body'], None)
 
 
 if __name__ == '__main__':

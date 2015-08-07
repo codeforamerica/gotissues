@@ -128,13 +128,15 @@ test_issue = {
 }
 
 bad_sample_dict = {
-  "test":"",
-  "holla":""
+  "nothing":"",
+  "here":""
 }
 
 good_sample_dict = {
-  "total_clicks":""
+  "total_clicks":"",
+  "viewed_issues_total":""
 }
+
 
 ga_timestamp_row = ['https://github.com/codeforamerica/gotissues/issues/8', '2015122707', '30']
 timestamp_entry = {
@@ -147,7 +149,7 @@ test_sources_result = [('www.codeforamerica.org', 2), ('http://testurl.com', 1)]
 
 fake_issue_bad = {
     "html_url":"lalala",
-    "clicks":9000,
+    "clicks":None,
     "view_sources":[],
     "created_at": "2015-06-06 23:16:56",
     "labels":[
