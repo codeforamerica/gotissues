@@ -164,92 +164,109 @@ if __name__ == '__main__':
         # Get all of todays clicks activity
         activities = get_click_activity(clicks)
 
+            #Add each to the db
+        with connect(os.environ['DATABASE_URL']) as conn:
+            with dict_cursor(conn) as db:
+                for issue in issues:
+                    write_issue_to_db(issue, db)
+
+                for click in clicks:
+                    write_click_to_db(click,db)
+
+                for activity in activities:
+                    write_activities_to_db(activity, db)
+
+                activity_summary = get_activity_summaries_array(db)
+
+                for summary in activity_summary:
+                    # Labels
+                    if summary["common_labels"][0]["frequencies"]:
+                        labels = summary["common_labels"][0]["frequencies"][1][:5]
+                    else:
+                        labels = None
+
+                    # Titles
+                    if summary["common_titles"][0]["frequencies"]:
+                        titles = summary["common_titles"][0]["frequencies"][1][:5]
+                    else:
+                        titles = None
+                    
+                    new_dict = {
+                        "activity_type": summary["activity_type"],
+                        "common_labels": labels,
+                        "common_titles": titles,
+                        "count": summary["count"]
+                    }
+
+                    write_activity_summary_to_db(new_dict, db)
+
     elif len(sys.argv) == 2:
         args = sys.argv
+        with connect(os.environ['DATABASE_URL']) as conn:
+            with dict_cursor(conn) as db:
+                if args[1] == "all":
+                    print "Updating All Databases From Default Start Date"
+                    # Get todays clicked issues from Google Analytics
+                    clicked_issues = get_analytics_query("clicked_issues_total")
+                    # Get todays viewed issues from Google Analytics
+                    viewed_issues = get_analytics_query("viewed_issues_total")
 
-        if args[1] == "all":
-            print "Updating All Databases From Default Start Date"
-            # Get todays clicked issues from Google Analytics
-            clicked_issues = get_analytics_query("clicked_issues_total")
-            # Get todays viewed issues from Google Analytics
-            viewed_issues = get_analytics_query("viewed_issues_total")
+                    # Get the Github data for todays clicked issues, clicks, and views
+                    # Set the limit to 1 for testing
+                    github_issues = get_clicked_issue_github_data(clicked_issues, limit=None)
+                    trimmed_issues = trim_github_issues(github_issues)
+                    issues = add_views_to_issues(github_issues, viewed_issues)
 
-            # Get the Github data for todays clicked issues, clicks, and views
-            # Set the limit to 1 for testing
-            github_issues = get_clicked_issue_github_data(clicked_issues, limit=5)
-            trimmed_issues = trim_github_issues(github_issues)
-            issues = add_views_to_issues(github_issues, viewed_issues)
+                    # Get all of todays clicks
+                    clicks = get_analytics_query("all_clicks_total")
 
-            # Get all of todays clicks
-            clicks = get_analytics_query("all_clicks_total")
+                    # Get all of todays clicks activity
+                    activities = get_click_activity(clicks)
 
-            # Get all of todays clicks activity
-            activities = get_click_activity(clicks)
+                    for issue in issues:
+                        write_issue_to_db(issue, db)
 
-        elif args[1] == "issues":
-            print "Updating issues Database From Default Start Date"
-            # Get todays clicked issues from Google Analytics
-            clicked_issues = get_analytics_query("clicked_issues_total")
-            # Get todays viewed issues from Google Analytics
-            viewed_issues = get_analytics_query("viewed_issues_total")
+                    for click in clicks:
+                        write_click_to_db(click,db)
 
-            # Get the Github data for todays clicked issues, clicks, and views
-            # Set the limit to 1 for testing
-            github_issues = get_clicked_issue_github_data(clicked_issues, limit=5)
-            trimmed_issues = trim_github_issues(github_issues)
-            issues = add_views_to_issues(github_issues, viewed_issues)
+                    for activity in activities:
+                        write_activities_to_db(activity, db)
 
-        elif args[1] == "clicks":
-            print "Updating clicks Database From Default Start Date"
-            # Get all of todays clicks
-            clicks = get_analytics_query("all_clicks_total")
+                elif args[1] == "issues":
+                    print "Updating issues Database From Default Start Date"
+                    # Get todays clicked issues from Google Analytics
+                    clicked_issues = get_analytics_query("clicked_issues_total")
+                    # Get todays viewed issues from Google Analytics
+                    viewed_issues = get_analytics_query("viewed_issues_total")
 
-        elif args[1] == "activities":
-            print "Updating activities Database From Default Start Date"
-            # Get all of todays clicks
-            clicks = get_analytics_query("all_clicks_total")
+                    # Get the Github data for todays clicked issues, clicks, and views
+                    # Set the limit to 1 for testing
+                    github_issues = get_clicked_issue_github_data(clicked_issues, limit=None)
+                    trimmed_issues = trim_github_issues(github_issues)
+                    issues = add_views_to_issues(github_issues, viewed_issues)
 
-            # Get all of todays clicks activity
-            activities = get_click_activity(clicks)
+                    for issue in issues:
+                        write_issue_to_db(issue, db)
 
-        else:
-            print "Not a valid argument"
-            sys.exit()
+                elif args[1] == "clicks":
+                    print "Updating clicks Database From Default Start Date"
+                    # Get all of todays clicks
+                    clicks = get_analytics_query("all_clicks_total")
 
+                    for click in clicks:
+                        write_click_to_db(click,db)
 
-    #Add each to the db
-    with connect(os.environ['DATABASE_URL']) as conn:
-        with dict_cursor(conn) as db:
-            for issue in issues:
-                write_issue_to_db(issue, db)
+                elif args[1] == "activities":
+                    print "Updating activities Database From Default Start Date"
+                    # Get all of todays clicks
+                    clicks = get_analytics_query("all_clicks_total")
 
-            for click in clicks:
-                write_click_to_db(click,db)
+                    # Get all of todays clicks activity
+                    activities = get_click_activity(clicks)
+                    for activity in activities:
+                        write_activities_to_db(activity, db)
 
-            for activity in activities:
-                write_activities_to_db(activity, db)
-
-            activity_summary = get_activity_summaries_array(db)
-
-            for summary in activity_summary:
-                # Labels
-                if summary["common_labels"][0]["frequencies"]:
-                    labels = summary["common_labels"][0]["frequencies"][1][:5]
                 else:
-                    labels = None
-
-                # Titles
-                if summary["common_titles"][0]["frequencies"]:
-                    titles = summary["common_titles"][0]["frequencies"][1][:5]
-                else:
-                    titles = None
-                
-                new_dict = {
-                    "activity_type": summary["activity_type"],
-                    "common_labels": labels,
-                    "common_titles": titles,
-                    "count": summary["count"]
-                }
-
-                write_activity_summary_to_db(new_dict, db)
+                    print "Not a valid argument"
+                    sys.exit()
 

@@ -117,6 +117,16 @@ choice_dict = {
       'filters':'ga:eventCategory==Civic Issues',
       'max_results':10000,
       'fields':'rows'
+    },
+    "all_clicks_total_10k":{
+      'start-index':10001,
+      'end_date':'today',
+      'metrics':'ga:totalEvents',
+      'dimensions':'ga:eventLabel, ga:dateHour, ga:minute',
+      'sort':'-ga:dateHour',
+      'filters':'ga:eventCategory==Civic Issues',
+      'max_results':10000,
+      'fields':'rows'
     }
 }
 
@@ -131,6 +141,7 @@ def edit_request_query(choice_dict_query):
           sort=choice_dict[choice_dict_query]['sort'],
           max_results=choice_dict[choice_dict_query]['max_results'],
           filters=choice_dict[choice_dict_query]['filters'],
+          start_index=choice_dict[choice_dict_query].get("start-index", 1),
           fields=choice_dict[choice_dict_query]['fields']).execute()
 
   return results
@@ -216,8 +227,16 @@ def get_analytics_query(choice):
             viewed_issues.append(viewed_issue)
     return viewed_issues
 
+  # Google Analytics restricts after 10000 results, so we need to add a separate
+  # request that asks for 10001 plus
   elif choice == "all_clicks_total":
     results = edit_request_query(choice)
+    if len(results["rows"]) == 10000:
+      results_10k = edit_request_query("all_clicks_total_10k")
+      if results_10k:
+        for row in results_10k["rows"]:
+          results["rows"].append(row)
+
     clicks = []
     for row in results["rows"]:
       click = {
