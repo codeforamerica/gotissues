@@ -53,6 +53,7 @@ choice_dict = {
     },
 
     "viewed_issues": {
+      'start_date':'today',
       'metrics':'ga:totalEvents',
       'dimensions':'ga:eventLabel',
       'sort':'-ga:totalEvents',
@@ -88,6 +89,34 @@ choice_dict = {
       'filters':'ga:eventCategory==Civic Issues',
       'max_results':None,
       'fields':None
+    },
+
+    "clicked_issues_total": {
+      'metrics':'ga:totalEvents',
+      'dimensions':'ga:eventLabel',
+      'sort':'-ga:totalEvents',
+      'filters':'ga:eventCategory==Civic Issues;ga:eventLabel=@github.com',
+      'max_results':10000,
+      'fields':None
+    },
+
+    "viewed_issues_total": {
+      'metrics':'ga:totalEvents',
+      'dimensions':'ga:eventLabel',
+      'sort':'-ga:totalEvents',
+      'filters':'ga:eventCategory==Civic Issue View',
+      'max_results':10000,
+      'fields':None
+    },
+
+    "all_clicks_total": {
+      'end_date':'today',
+      'metrics':'ga:totalEvents',
+      'dimensions':'ga:eventLabel, ga:dateHour, ga:minute',
+      'sort':'-ga:dateHour',
+      'filters':'ga:eventCategory==Civic Issues',
+      'max_results':10000,
+      'fields':'rows'
     }
 }
 
@@ -157,6 +186,47 @@ def get_analytics_query(choice):
     results = edit_request_query(choice)
     total_clicks = results["rows"][0][0]
     return total_clicks
+
+  elif choice == "clicked_issues_total":
+    results = edit_request_query(choice)
+    clicked_issues = []
+    for row in results["rows"]:
+        issue = {
+            "url" : row[0],
+            "clicks" : row[1]
+        }
+        clicked_issues.append(issue)
+    return clicked_issues
+
+  elif choice == "viewed_issues_total":
+    results = edit_request_query(choice)
+    viewed_issues = []
+    for row in results["rows"]:
+        viewed_issue = {
+            "url" : row[0].split(',')[0],
+            "views" : row[1],
+            "view_sources" : [row[0].split(',')[1]]
+        }
+
+        # If the github url already exists in our list, add the new source to it
+        found = find(viewed_issues, "url", viewed_issue["view_sources"][0])
+        if found:
+            viewed_issues[found]["view_sources"].append(viewed_issue["view_sources"][0])
+        else:
+            viewed_issues.append(viewed_issue)
+    return viewed_issues
+
+  elif choice == "all_clicks_total":
+    results = edit_request_query(choice)
+    clicks = []
+    for row in results["rows"]:
+      click = {
+        "issue_url" : row[0],
+        "timestamp" : ga_time_to_timestamp(row[1], row[2])[0],
+        "readable_date" : ga_time_to_timestamp(row[1], row[2])[1]
+      }
+      clicks.append(click)
+    return clicks
 
   else:
     response = {

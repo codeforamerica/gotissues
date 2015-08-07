@@ -1,6 +1,5 @@
 import json
 from data_helpers import *
-from github_bot import *
 
 def get_clicked_issue_github_data(clicked_issues, limit=None):
     """ Get all the github data about all the clicked issues """
@@ -146,26 +145,79 @@ def write_activity_summary_to_db(activity_info, db):
 
 
 if __name__ == '__main__':
+    import sys
+    if len(sys.argv) == 1:
+        # Get todays clicked issues from Google Analytics
+        clicked_issues = get_analytics_query("clicked_issues")
+        # Get todays viewed issues from Google Analytics
+        viewed_issues = get_analytics_query("viewed_issues")
 
-    # Get todays clicked issues from Google Analytics
-    clicked_issues = get_analytics_query("clicked_issues")
-    # Get todays viewed issues from Google Analytics
-    viewed_issues = get_analytics_query("viewed_issues")
+        # Get the Github data for todays clicked issues, clicks, and views
+        # Set the limit to 1 for testing
+        github_issues = get_clicked_issue_github_data(clicked_issues, limit=None)
+        trimmed_issues = trim_github_issues(github_issues)
+        issues = add_views_to_issues(github_issues, viewed_issues)
 
-    # Get the Github data for todays clicked issues, clicks, and views
-    # Set the limit to 1 for testing
-    github_issues = get_clicked_issue_github_data(clicked_issues, limit=None)
-    trimmed_issues = trim_github_issues(github_issues)
-    issues = add_views_to_issues(github_issues, viewed_issues)
+        # Get all of todays clicks
+        clicks = get_analytics_query("all_clicks")
 
-    # Get all of todays clicks
-    clicks = get_analytics_query("all_clicks")
+        # Get all of todays clicks activity
+        activities = get_click_activity(clicks)
 
-    # Get all of todays clicks activity
-    activities = get_click_activity(clicks)
+    elif len(sys.argv) == 2:
+        args = sys.argv
+
+        if args[1] == "all":
+            print "Updating All Databases From Default Start Date"
+            # Get todays clicked issues from Google Analytics
+            clicked_issues = get_analytics_query("clicked_issues_total")
+            # Get todays viewed issues from Google Analytics
+            viewed_issues = get_analytics_query("viewed_issues_total")
+
+            # Get the Github data for todays clicked issues, clicks, and views
+            # Set the limit to 1 for testing
+            github_issues = get_clicked_issue_github_data(clicked_issues, limit=5)
+            trimmed_issues = trim_github_issues(github_issues)
+            issues = add_views_to_issues(github_issues, viewed_issues)
+
+            # Get all of todays clicks
+            clicks = get_analytics_query("all_clicks_total")
+
+            # Get all of todays clicks activity
+            activities = get_click_activity(clicks)
+
+        elif args[1] == "issues":
+            print "Updating issues Database From Default Start Date"
+            # Get todays clicked issues from Google Analytics
+            clicked_issues = get_analytics_query("clicked_issues_total")
+            # Get todays viewed issues from Google Analytics
+            viewed_issues = get_analytics_query("viewed_issues_total")
+
+            # Get the Github data for todays clicked issues, clicks, and views
+            # Set the limit to 1 for testing
+            github_issues = get_clicked_issue_github_data(clicked_issues, limit=5)
+            trimmed_issues = trim_github_issues(github_issues)
+            issues = add_views_to_issues(github_issues, viewed_issues)
+
+        elif args[1] == "clicks":
+            print "Updating clicks Database From Default Start Date"
+            # Get all of todays clicks
+            clicks = get_analytics_query("all_clicks_total")
+
+        elif args[1] == "activities":
+            print "Updating activities Database From Default Start Date"
+            # Get all of todays clicks
+            clicks = get_analytics_query("all_clicks_total")
+
+            # Get all of todays clicks activity
+            activities = get_click_activity(clicks)
+
+        else:
+            print "Not a valid argument"
+            sys.exit()
 
 
-    #Add each issue to the db
+    #Add each to the db
     with connect(os.environ['DATABASE_URL']) as conn:
         with dict_cursor(conn) as db:
             for issue in issues:
