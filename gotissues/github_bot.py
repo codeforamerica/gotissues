@@ -2,6 +2,7 @@ from psycopg2 import connect, extras
 
 import requests
 import json
+import datetime
 
 from config import *
 
@@ -55,9 +56,17 @@ def filter_issues(results):
         if label["name"] == "help wanted":
           hw_issues.append(issue)
 
+  # Only return issues older than a year
+  old_issues = []
+  for issue in hw_issues:
+    today = datetime.datetime.today()
+    year_ago = today.replace(year=today.year-1)
+    if issue["created_at"] < year_ago:
+      old_issues.append(issue)
+
   # Filter out government issues
   filtered_issues = []
-  for issue in hw_issues:
+  for issue in old_issues:
     dont_add_flag = False
     for gov_github in ["https://github.com/presidential-innovation-fellows", "https://github.com/uscensusbureau", "https://github.com/chicago", "https://github.com/GSA", "https://github.com/project-open-data", "https://github.com/datasf","https://github.com/18f"]:
       if issue["html_url"].lower().startswith(gov_github.lower()):
